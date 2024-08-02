@@ -64,3 +64,7 @@ exports.slabs = [
     { max: 40000, ratePerThousand: 4.4 },
     { max: Infinity, ratePerThousand: 5.5 }
 ];
+
+exports.rebates = [
+    {category:"d", connection_size:"15mm", consumption:"15000", charges:"free", } ,
+]
