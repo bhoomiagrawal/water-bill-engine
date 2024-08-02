@@ -1,12 +1,10 @@
 'use client';
 import { calculateWaterBill } from "@/components/calc";
-import { slabs } from "@/components/slabs";
 import * as XLSX from "xlsx";
 import { useState } from "react";
 import Table from 'react-bootstrap/Table';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import { Col, Form, Row } from 'react-bootstrap';
-import { calculateWaterBill } from "@/components/calc";
 // Example usage:
 let readings = [
     {
@@ -114,7 +112,8 @@ export default function Bill() {
             <div className="">
                 {getUI()}
             </div>
-            <input
+          <div className="p-5 m-5">
+          <input
                 type="file"
                 name="file"
                 onChange={(e) => {
@@ -122,8 +121,7 @@ export default function Bill() {
                     readExcel(file);
                 }}
             />
-            {/* <input type="submit" value="Upload" /> */}
-            {/* </form> */}
+           
             <br></br>
             <br></br>
             <br></br>
@@ -172,6 +170,7 @@ export default function Bill() {
                     </Table>
                 </Col>
             </Row>
+          </div>
 
         </main>
     );
