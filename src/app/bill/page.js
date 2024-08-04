@@ -107,24 +107,24 @@ export default function Bill() {
 
 
 // for ui coustom styles
-const styles = {
-    header: {
-        backgroundColor: '#00bfff',
-        padding: '20px',
-        textAlign: 'center',
-        color: '#fff',
-    },
-    main: {
-        padding: '20px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '70vh',
-    },
-    footer: {
-        textAlign: 'center',
-        padding: '10px',
-        backgroundColor: '#f0f8ff',
-        color: '#007acc',
-    },
-};
+// const styles = {
+//     header: {
+//         backgroundColor: '#00bfff',
+//         padding: '20px',
+//         textAlign: 'center',
+//         color: '#fff',
+//     },
+//     main: {
+//         padding: '20px',
+//         display: 'flex',
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         minHeight: '70vh',
+//     },
+//     footer: {
+//         textAlign: 'center',
+//         padding: '10px',
+//         backgroundColor: '#f0f8ff',
+//         color: '#007acc',
+//     },
+// };
