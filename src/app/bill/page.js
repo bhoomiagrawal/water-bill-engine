@@ -9,36 +9,42 @@ let readings = [
     connection_size: "15mm",
     consumption: "45000",
     meter_status: "mf",
+    severage: "yes",
   },
   {
     category: "d",
     connection_size: "15mm",
     consumption: "20000",
     meter_status: "mf",
+    severage: "yes",
   },
   {
     category: "d",
     connection_size: "15mm",
     consumption: "15000",
     meter_status: "mf",
+    severage: "yes",
   },
   {
     category: "d",
     connection_size: "15mm",
     consumption: "10000",
     meter_status: "mf",
+    severage: "no",
   },
   {
     category: "d",
     connection_size: "15mm",
     consumption: "15001",
     meter_status: "mf",
+    severage: "yes",
   },
   {
     category: "d",
     connection_size: "15mm",
     consumption: "16000",
     meter_status: "mf",
+    severage: "no",
   },
 ];
 let waterBill = calculateWaterBill(readings);
@@ -56,6 +62,9 @@ export default function Bill() {
           <li> meter status: {r.meter_status}</li>
           <li> water charge: {r.waterCharge?.toFixed(2)}</li>
           <li> minimum charge: {r.minimum?.toFixed(2)}</li>
+          <li> basic charge: {r.basicCharge?.toFixed(2)}</li>
+          <li> severage charge: {r.severageCharge?.toFixed(2)}</li>
+
           <li> Fixed charge: {r.fixedCharge?.fixed_charge}</li>
           <li> Meter Service charge: {r.fixedCharge?.service_charge}</li>
           <li> total Fixed charge: {r.fixedCharge?.total_fixed_charge}</li>
