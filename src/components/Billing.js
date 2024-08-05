@@ -69,6 +69,7 @@ export default function Billing() {
         <tr key={i} >
           <td>  {r.category}</td>
           <td>  {r.connection_size}</td>
+          <td>  {r.connection_type}</td>
           <td>  {r.current_consumption}</td>
           <td>  {r.meter_status}</td>
           <td>  {r.waterCharge?.toFixed(2)}</td>
@@ -112,15 +113,16 @@ export default function Billing() {
 
                         <th >Category</th>
                         <th >Connection Size</th>
+                        <th >Connection Type</th>
                         <th >Current Consumption</th>
                         <th >Meter status</th>
                         <th >Water charge</th>
                         <th >Minimum charge</th>
                         <th >Basic charge</th>
                         <th >Severage charge</th>
-                        <th >Fixed charge</th>
-                        <th >Meter Service charge</th>
-                        <th >Total Fixed charge</th>
+                        <th >( Fixed charge+</th>
+                        <th >Meter Service charge=</th>
+                        <th >Total Fixed charge)</th>
                         <th >Bill</th>
                       </tr>
                     </thead>

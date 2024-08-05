@@ -29,7 +29,8 @@ export function calculateWaterBill(readings) {
         }
       }
     }
-    reading.waterCharge = waterCharge;
+    reading.waterCharge = reading.connection_type == "T" ?  waterCharge*1.5 : waterCharge
+    // reading.waterCharge = waterCharge;
     reading.minimum = getMinimumCharge(reading);
     // compare water charge with minimum charge
 
@@ -57,7 +58,7 @@ function getMinimumCharge(reading) {
   if (reading.meter_status == "mf" && reading.current_consumption <= 15000) {
     return 0;
   } else {
-    return 55;
+    return reading.connection_type == "T" ?  82.5 : 55
   }
 }
 
@@ -109,4 +110,16 @@ function getSeverageCharge(reading) {
   const { basicCharge, severage } = reading;
   let severageCharge = severage == "Y" ? (basicCharge * 20) / 100 : 0;
   return severageCharge;
+}
+
+
+function getAverageConsumption() {
+  let readings = [500, 1000, 1500, 2100, 2800, 3500, 4200];
+
+  readings.sort()
+
+}
+
+function getTemporaryCharge() {
+
 }
