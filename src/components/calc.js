@@ -8,6 +8,7 @@ export function calculateWaterBill(readings) {
     let waterCharge = 0;
 
     // check for rebate in domestic connection
+    console.log('getZeroOnConsumption function for current_consumption ',current_consumption, 'is', getZeroOnConsumption(connection_size, category, current_consumption))
     if (getZeroOnConsumption(connection_size, category, current_consumption)) {
       waterCharge = 0;
       previousMax = 0;
@@ -49,11 +50,11 @@ export function calculateWaterBill(readings) {
 }
 
 function getZeroOnConsumption(connection_size, category, current_consumption) {
-  connection_size == "15mm" && category == "D" && current_consumption <= "15000";
+  return connection_size == 15 && category == "D" && current_consumption <= 15000;
 }
 
 function getMinimumCharge(reading) {
-  if (reading.meter_status == "mf" && reading.current_consumption <= "15000") {
+  if (reading.meter_status == "mf" && reading.current_consumption <= 15000) {
     return 0;
   } else {
     return 55;
@@ -61,6 +62,7 @@ function getMinimumCharge(reading) {
 }
 
 function addFixedCharge(reading) {
+  console.log('reading', reading)
   let fixedCharge = 0;
   let meterServiceCharge = 0;
 
@@ -81,14 +83,14 @@ function addFixedCharge(reading) {
   }
 
   switch (reading.connection_size) {
-    case "15mm":
+    case 15:
       meterServiceCharge = 22.0;
 
       break;
-    case "20mm":
+    case 20:
       meterServiceCharge = 55.0;
       break;
-    case "25mm":
+    case 25:
       meterServiceCharge = 110.0;
       break;
     default:
@@ -105,6 +107,6 @@ function addFixedCharge(reading) {
 
 function getSeverageCharge(reading) {
   const { basicCharge, severage } = reading;
-  let severageCharge = severage == "yes" ? (basicCharge * 20) / 100 : 0;
+  let severageCharge = severage == "Y" ? (basicCharge * 20) / 100 : 0;
   return severageCharge;
 }

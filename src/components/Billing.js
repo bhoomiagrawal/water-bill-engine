@@ -62,7 +62,6 @@ export default function Billing() {
       // console.log('test', test)
     }
   }, [readings.length])
-  console.log('readings', readings)
   const getUI = () =>
     waterBill?.map((r, i) => {
       return (
