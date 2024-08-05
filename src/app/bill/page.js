@@ -15,13 +15,11 @@ export default function Bill() {
         <main className=" min-h-screen">
             {/* MY UI CODE START FROM HEAR */}
             
-            <div>
     
         <FirstUI />
       {/* <ReadExcel /> */}
 
      
-    </div>
             {/* MY UI CODE END HEAR */}
            
 

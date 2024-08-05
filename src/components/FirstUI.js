@@ -92,7 +92,7 @@ export default function FirstUI() {
     });
   return (
     <>
-      <div className="bg-blue-200 relative isolate overflow-hidden py-24 sm:py-32">
+      <div className="bg-blue-100 relative isolate overflow-hidden py-24 sm:py-32 min-h-screen">
         <img
           alt=""
           src="/water-1560478_1280.png"
@@ -102,7 +102,7 @@ export default function FirstUI() {
         />
         <div className="m-4">
           <div className=" max-w-full lg:mx-0">
-            <h2 className="m-2 text-4xl font-bold tracking-tight text-gray -mt-20">Water billing system</h2>
+            <h2 className="m-2 text-4xl font-bold tracking-tight text-gray -mt-20">Water Billing System</h2>
             <ReadExcel setReadings={setReadings} />
 
             {displayItem ?
@@ -148,7 +148,7 @@ export default function FirstUI() {
           backgroundColor: '#f0f8ff',
           color: '#007acc'
         }}>
-          <p>&copy; {new Date().getFullYear()} Water Billing Co.</p>
+          <p className='text-center '>&copy; {new Date().getFullYear()} Water Billing System.</p>
         </footer>
       </div>
 

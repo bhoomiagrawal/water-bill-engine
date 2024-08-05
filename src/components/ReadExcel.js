@@ -28,7 +28,7 @@ export default function ReadExcel({  setReadings }) {
   };
   return (
     <div className="p-2 m-2 mt-8">
-      <label className="mt-6 text-lg leading-8 text-gray-300">Upload your file </label>
+      <label className="mt-6 text-lg leading-8 font-bold text-gray">Upload your file </label>
       <input
         type="file"
         name="file"
