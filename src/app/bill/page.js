@@ -1,7 +1,7 @@
 "use client";
 import Head from 'next/head';
 import ReadExcel from "@/components/ReadExcel";
-import FirstUI from "@/components/FirstUI";
+import Billing from "@/components/Billing";
 import { useState } from 'react';
 
 // Example usage:
@@ -16,7 +16,7 @@ export default function Bill() {
             {/* MY UI CODE START FROM HEAR */}
             
     
-        <FirstUI />
+        <Billing />
       {/* <ReadExcel /> */}
 
      

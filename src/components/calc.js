@@ -3,21 +3,21 @@ import { slabs, rebates } from "@/components/data";
 export function calculateWaterBill(readings) {
   // console.log("slabs", slabs);
   for (const reading of readings) {
-    let { consumption, category, connection_size, meter_status } = reading;
+    let { current_consumption, category, connection_size, meter_status } = reading;
     let previousMax = 0;
     let waterCharge = 0;
 
     // check for rebate in domestic connection
-    if (getZeroOnConsumption(connection_size, category, consumption)) {
+    if (getZeroOnConsumption(connection_size, category, current_consumption)) {
       waterCharge = 0;
       previousMax = 0;
     } else {
       for (let i = 0; i < slabs?.length; i++) {
         const slab = slabs[i];
 
-        if (consumption <= slab.max) {
+        if (current_consumption <= slab.max) {
           waterCharge +=
-            ((consumption - previousMax) / 1000) * slab.ratePerThousand;
+            ((current_consumption - previousMax) / 1000) * slab.ratePerThousand;
 
           break;
         } else {
@@ -48,12 +48,12 @@ export function calculateWaterBill(readings) {
   return readings;
 }
 
-function getZeroOnConsumption(connection_size, category, consumption) {
-  connection_size == "15mm" && category == "d" && consumption <= "15000";
+function getZeroOnConsumption(connection_size, category, current_consumption) {
+  connection_size == "15mm" && category == "D" && current_consumption <= "15000";
 }
 
 function getMinimumCharge(reading) {
-  if (reading.meter_status == "mf" && reading.consumption <= "15000") {
+  if (reading.meter_status == "mf" && reading.current_consumption <= "15000") {
     return 0;
   } else {
     return 55;
@@ -65,14 +65,14 @@ function addFixedCharge(reading) {
   let meterServiceCharge = 0;
 
   switch (reading.category) {
-    case "d":
+    case "D":
       fixedCharge = 27.5;
 
       break;
-    case "nd":
+    case "ND":
       fixedCharge = 55.0;
       break;
-    case "id":
+    case "ID":
       fixedCharge = 110.0;
       break;
     default:

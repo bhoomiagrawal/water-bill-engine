@@ -4,63 +4,62 @@ import { useEffect, useState } from 'react';
 import ReadExcel from './ReadExcel';
 import { calculateWaterBill } from "@/components/calc";
 
-let staticReadings = [
-  {
-    category: "d",
-    connection_size: "15mm",
-    consumption: "45000",
-    meter_status: "mf",
-    severage: "yes",
-  },
-  {
-    category: "d",
-    connection_size: "15mm",
-    consumption: "20000",
-    meter_status: "mf",
-    severage: "yes",
-  },
-  {
-    category: "d",
-    connection_size: "15mm",
-    consumption: "15000",
-    meter_status: "mf",
-    severage: "yes",
-  },
-  {
-    category: "d",
-    connection_size: "15mm",
-    consumption: "10000",
-    meter_status: "mf",
-    severage: "no",
-  },
-  {
-    category: "d",
-    connection_size: "15mm",
-    consumption: "15001",
-    meter_status: "mf",
-    severage: "yes",
-  },
-  {
-    category: "d",
-    connection_size: "15mm",
-    consumption: "16000",
-    meter_status: "mf",
-    severage: "no",
-  },
-];
-let waterBill = calculateWaterBill(staticReadings);
+// let staticReadings = [
+//   {
+//     category: "d",
+//     connection_size: "15mm",
+//     current_consumption: "45000",
+//     meter_status: "mf",
+//     severage: "yes",
+//   },
+//   {
+//     category: "d",
+//     connection_size: "15mm",
+//     current_consumption: "20000",
+//     meter_status: "mf",
+//     severage: "yes",
+//   },
+//   {
+//     category: "d",
+//     connection_size: "15mm",
+//     current_consumption: "15000",
+//     meter_status: "mf",
+//     severage: "yes",
+//   },
+//   {
+//     category: "d",
+//     connection_size: "15mm",
+//     current_consumption: "10000",
+//     meter_status: "mf",
+//     severage: "no",
+//   },
+//   {
+//     category: "d",
+//     connection_size: "15mm",
+//     current_consumption: "15001",
+//     meter_status: "mf",
+//     severage: "yes",
+//   },
+//   {
+//     category: "d",
+//     connection_size: "15mm",
+//     current_consumption: "16000",
+//     meter_status: "mf",
+//     severage: "no",
+//   },
+// ];
+// let waterBill = calculateWaterBill(staticReadings);
 
-export default function FirstUI() {
+export default function Billing() {
   const [usage, setUsage] = useState('');
-  const [bill, setBill] = useState(null);
   const [readings, setReadings] = useState([]);
   const [displayItem, setDisplayItem] = useState(false)
-
+  const [waterBill, setWaterBill] = useState([])
   useEffect(() => {
     if (readings.length) {
-      let test = calculateWaterBill(readings);
+      setWaterBill(calculateWaterBill(readings));
       setDisplayItem(true)
-      console.log('test', test)
+      // console.log('test', test)
     }
   }, [readings.length])
   console.log('readings', readings)
@@ -68,18 +67,15 @@ export default function FirstUI() {
     waterBill?.map((r, i) => {
       return (
 
-
-
         <tr key={i} >
           <td>  {r.category}</td>
           <td>  {r.connection_size}</td>
-          <td>  {r.consumption}</td>
+          <td>  {r.current_consumption}</td>
           <td>  {r.meter_status}</td>
           <td>  {r.waterCharge?.toFixed(2)}</td>
           <td>  {r.minimum?.toFixed(2)}</td>
           <td>  {r.basicCharge?.toFixed(2)}</td>
           <td>  {r.severageCharge?.toFixed(2)}</td>
-
           <td>  {r.fixedCharge?.fixed_charge}</td>
           <td>  {r.fixedCharge?.service_charge}</td>
           <td>  {r.fixedCharge?.total_fixed_charge}</td>
@@ -108,7 +104,7 @@ export default function FirstUI() {
             {displayItem ?
               <>
                 <div className="p-2 m-2">
-                  <h2 className="p-2 m-2 mt-8 font-bold">Water Bill Calculation</h2>
+                  <h2 className="p-2 m-2 mt-8 font-bold text-center">Water Bill Calculation</h2>
 
                   <table className="table table-striped mt-6 text-lg leading-8 " style={{ width: '100%' }}>
 
@@ -117,7 +113,7 @@ export default function FirstUI() {
 
                         <th >Category</th>
                         <th >Connection Size</th>
-                        <th >Consumption</th>
+                        <th >Current Consumption</th>
                         <th >Meter status</th>
                         <th >Water charge</th>
                         <th >Minimum charge</th>
