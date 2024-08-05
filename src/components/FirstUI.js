@@ -1,10 +1,10 @@
 // components/FirstUI.js
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReadExcel from './ReadExcel';
 import { calculateWaterBill } from "@/components/calc";
 
-let readings = [
+let staticReadings = [
   {
     category: "d",
     connection_size: "15mm",
@@ -48,16 +48,22 @@ let readings = [
     severage: "no",
   },
 ];
-let waterBill = calculateWaterBill(readings);
-console.log("waterBill", waterBill);
+let waterBill = calculateWaterBill(staticReadings);
 
 export default function FirstUI() {
   const [usage, setUsage] = useState('');
   const [bill, setBill] = useState(null);
-
+  const [readings, setReadings] = useState([]);
   const [displayItem, setDisplayItem] = useState(false)
 
-
+  useEffect(() => {
+    if (readings.length) {
+      let test = calculateWaterBill(readings);
+      setDisplayItem(true)
+      console.log('test', test)
+    }
+  }, [readings.length])
+  console.log('readings', readings)
   const getUI = () =>
     readings?.map((r, i) => {
       return (
@@ -97,39 +103,39 @@ export default function FirstUI() {
         <div className="m-4">
           <div className=" max-w-full lg:mx-0">
             <h2 className="m-2 text-4xl font-bold tracking-tight text-gray -mt-20">Water billing system</h2>
-            <ReadExcel displayItem={displayItem} setDisplayItem={setDisplayItem} />
+            <ReadExcel setReadings={setReadings} />
 
-              {displayItem ? 
+            {displayItem ?
               <>
-               <div className="p-2 m-2">
-              <h2 className="p-2 m-2 mt-8 font-bold">Water Bill Calculation</h2>
-              
-              <table className="table table-striped mt-6 text-lg leading-8 "style={{width:'100%'}}>
-             
-                <thead>
-                  <tr className='row-auto '>
-                    
-                    <th >Category</th>
-                    <th >Connection Size</th>
-                    <th >Consumption</th>
-                    <th >Meter status</th>
-                    <th >Water charge</th>
-                    <th >Minimum charge</th>
-                    <th >Basic charge</th>
-                    <th >Severage charge</th>
-                    <th >Fixed charge</th>
-                    <th >Meter Service charge</th>
-                    <th >Total Fixed charge</th>
-                    <th >Bill</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {  getUI()}
-                </tbody>
-              </table> 
-              </div>
+                <div className="p-2 m-2">
+                  <h2 className="p-2 m-2 mt-8 font-bold">Water Bill Calculation</h2>
+
+                  <table className="table table-striped mt-6 text-lg leading-8 " style={{ width: '100%' }}>
+
+                    <thead>
+                      <tr className='row-auto '>
+
+                        <th >Category</th>
+                        <th >Connection Size</th>
+                        <th >Consumption</th>
+                        <th >Meter status</th>
+                        <th >Water charge</th>
+                        <th >Minimum charge</th>
+                        <th >Basic charge</th>
+                        <th >Severage charge</th>
+                        <th >Fixed charge</th>
+                        <th >Meter Service charge</th>
+                        <th >Total Fixed charge</th>
+                        <th >Bill</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {getUI()}
+                    </tbody>
+                  </table>
+                </div>
               </>
-           
+
               : ""}
           </div>
 
