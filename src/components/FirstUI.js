@@ -65,7 +65,7 @@ export default function FirstUI() {
   }, [readings.length])
   console.log('readings', readings)
   const getUI = () =>
-    readings?.map((r, i) => {
+    waterBill?.map((r, i) => {
       return (
 
 
