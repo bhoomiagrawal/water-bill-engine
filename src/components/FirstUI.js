@@ -2,17 +2,82 @@
 
 import { useState } from 'react';
 import ReadExcel from './ReadExcel';
+import { calculateWaterBill } from "@/components/calc";
+
+let readings = [
+  {
+      category: "d",
+      connection_size: "15mm",
+      consumption: "45000",
+      meter_status: "mf",
+      severage: "yes",
+  },
+  {
+      category: "d",
+      connection_size: "15mm",
+      consumption: "20000",
+      meter_status: "mf",
+      severage: "yes",
+  },
+  {
+      category: "d",
+      connection_size: "15mm",
+      consumption: "15000",
+      meter_status: "mf",
+      severage: "yes",
+  },
+  {
+      category: "d",
+      connection_size: "15mm",
+      consumption: "10000",
+      meter_status: "mf",
+      severage: "no",
+  },
+  {
+      category: "d",
+      connection_size: "15mm",
+      consumption: "15001",
+      meter_status: "mf",
+      severage: "yes",
+  },
+  {
+      category: "d",
+      connection_size: "15mm",
+      consumption: "16000",
+      meter_status: "mf",
+      severage: "no",
+  },
+];
+let waterBill = calculateWaterBill(readings);
+console.log("waterBill", waterBill);
 
 export default function FirstUI() {
   const [usage, setUsage] = useState('');
   const [bill, setBill] = useState(null);
 
-  const handleCalculate = () => {
-    const ratePerUnit = 1.5; // Define the rate per unit of water
-    const calculatedBill = usage * ratePerUnit;
-    setBill(calculatedBill);
-  };
+  const [displayItem, setDisplayItem] = useState(false)
+ 
 
+  const getUI = () =>
+    readings?.map((r, i) => {
+        return (
+            <ul key={i} className="flex justify-between">
+                <li> category: {r.category}</li>
+                <li> Connection Size: {r.connection_size}</li>
+                <li> consumption: {r.consumption}</li>
+                <li> meter status: {r.meter_status}</li>
+                <li> water charge: {r.waterCharge?.toFixed(2)}</li>
+                <li> minimum charge: {r.minimum?.toFixed(2)}</li>
+                <li> basic charge: {r.basicCharge?.toFixed(2)}</li>
+                <li> severage charge: {r.severageCharge?.toFixed(2)}</li>
+
+                <li> Fixed charge: {r.fixedCharge?.fixed_charge}</li>
+                <li> Meter Service charge: {r.fixedCharge?.service_charge}</li>
+                <li> total Fixed charge: {r.fixedCharge?.total_fixed_charge}</li>
+                <li> bill: {r.bill?.toFixed(2)}</li>
+            </ul>
+        );
+    });
   return (
     <>
       <div className="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
@@ -27,30 +92,12 @@ export default function FirstUI() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-7xl lg:mx-0">
           <h2 className="text-4xl font-bold tracking-tight text-white -mt-20">Water billing system</h2>
-      <ReadExcel />
+      <ReadExcel displayItem={displayItem} setDisplayItem={setDisplayItem}/>
 
-          {/* <p className="mt-6 text-lg leading-8 text-gray-300">
-            Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet
-            fugiat veniam occaecat fugiat aliqua.
-          </p> */}
+      <h2>Water Bill Connection</h2>
+      <div className="">{displayItem ? getUI() : ""}</div>
         </div>
-        {/* <div className="mx-auto mt-10 max-w-2xl lg:mx-0 lg:max-w-none">
-          <div className="grid grid-cols-1 gap-x-8 gap-y-6 text-base font-semibold leading-7 text-white sm:grid-cols-2 md:flex lg:gap-x-10">
-            {links.map((link) => (
-              <a key={link.name} href={link.href}>
-                {link.name} <span aria-hidden="true">&rarr;</span>
-              </a>
-            ))}
-          </div>
-          <dl className="mt-16 grid grid-cols-1 gap-8 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat) => (
-              <div key={stat.name} className="flex flex-col-reverse">
-                <dt className="text-base leading-7 text-gray-300">{stat.name}</dt>
-                <dd className="text-2xl font-bold leading-9 tracking-tight text-white">{stat.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div> */}
+       
       </div>
 
       </div>
@@ -62,27 +109,7 @@ export default function FirstUI() {
       </footer>
       </div>
 
-    {/* <div style={styles.formContainer}>
-      <h2>Calculate Your Water Bill</h2>
-      <div style={styles.inputContainer}>
-        <label htmlFor="usage">Enter Water Usage (in cubic meters): </label>
-        <input
-          type="number"
-          id="usage"
-          value={usage}
-          onChange={(e) => setUsage(e.target.value)}
-          style={styles.input}
-        />
-      </div>
-      <button onClick={handleCalculate} style={styles.button}>Calculate Bill</button>
 
-      {bill !== null && (
-        <div style={styles.result}>
-          <h3>Your Estimated Bill:</h3>
-          <p>${bill.toFixed(2)}</p>
-        </div>
-      )}
-    </div> */}
     </>
   );
 }
