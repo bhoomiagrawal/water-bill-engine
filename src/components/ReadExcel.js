@@ -6,7 +6,6 @@ import readXlsxFile from 'read-excel-file'
 export default function ReadExcel({ setReadings }) {
 
 
-
   const handleReadExcel = (file) => {
     console.log(file, "fileeeeeeeeeeeeeeeeeeeee");
     readXlsxFile(file).then((rows) => {
@@ -30,7 +29,7 @@ export default function ReadExcel({ setReadings }) {
         'meter status': 'meter_status',
         'current': 'current_reading'
       };
-
+      
       const mappedArray = valueSheet.map(values => {
         return keys.reduce((obj, key, index) => {
           let k = typeof (key) == String ? key.toLowerCase() : key;
@@ -38,7 +37,7 @@ export default function ReadExcel({ setReadings }) {
           obj[k] = values[index];
           if (k == "meter reading") {
 
-            obj[6] = values[index]
+            obj[7] = values[index]
           }
 
           let newObj = Object.fromEntries(Object.entries(obj).map(([k, v]) => [keyReplacements[k] || k, v]))
@@ -46,12 +45,8 @@ export default function ReadExcel({ setReadings }) {
         }, {})
 
 
-
-
-
       }
       );
-      console.log('mappedArray', mappedArray)
       setReadings(mappedArray)
     })
   };

@@ -6,9 +6,11 @@ export function calculateWaterBill(readings) {
     let { current_consumption, category, connection_size, meter_status } = reading;
     let previousMax = 0;
     let waterCharge = 0;
-
+    let averageConsumption = getAverageConsumption(reading)
+    console.log('averageConsumption', averageConsumption)
+    let consumption = current_consumption ? current_consumption : averageConsumption
     // check for rebate in domestic connection
-    console.log('getZeroOnConsumption function for current_consumption ',current_consumption, 'is', getZeroOnConsumption(connection_size, category, current_consumption))
+    console.log('getZeroOnConsumption function for current_consumption ', current_consumption, 'is', getZeroOnConsumption(connection_size, category, current_consumption))
     if (getZeroOnConsumption(connection_size, category, current_consumption)) {
       waterCharge = 0;
       previousMax = 0;
@@ -29,7 +31,7 @@ export function calculateWaterBill(readings) {
         }
       }
     }
-    reading.waterCharge = reading.connection_type == "T" ?  waterCharge*1.5 : waterCharge
+    reading.waterCharge = reading.connection_type == "T" ? waterCharge * 1.5 : waterCharge
     // reading.waterCharge = waterCharge;
     reading.minimum = getMinimumCharge(reading);
     // compare water charge with minimum charge
@@ -58,7 +60,7 @@ function getMinimumCharge(reading) {
   if (reading.meter_status == "mf" && reading.current_consumption <= 15000) {
     return 0;
   } else {
-    return reading.connection_type == "T" ?  82.5 : 55
+    return reading.connection_type == "T" ? 82.5 : 55
   }
 }
 
@@ -113,13 +115,25 @@ function getSeverageCharge(reading) {
 }
 
 
-function getAverageConsumption() {
-  let readings = [500, 1000, 1500, 2100, 2800, 3500, 4200];
+function getAverageConsumption(reading) {
+  console.log('reading', reading)
+  let monthlyReadings = [reading[1], reading[2], reading[3], reading[4], reading[5], reading[6], reading[7]]
+  // let current_reading = reading['current_reading'];
+  // let current_consumption = typeof reading['current_consumption'] == Number ? reading['current_consumption'] : '';
 
-  readings.sort()
+  monthlyReadings.sort((a, b) => b - a)
+  let monthlyConsumption = []
+  // if(current_consumption) {
+  //   monthlyConsumption.push(current_consumption)
+  // }
+
+  // Loop through the array, subtracting each element from the next
+  for (let i = 0; i < monthlyReadings.length - 1; i++) {
+    monthlyConsumption.push(monthlyReadings[i] - monthlyReadings[i + 1]);
+  }
+
+  const sixReadingConsumptionAv = (monthlyConsumption.reduce((prev, curr, i) => prev + curr, 0)) / monthlyConsumption.length
+  return sixReadingConsumptionAv
 
 }
 
-function getTemporaryCharge() {
-
-}
