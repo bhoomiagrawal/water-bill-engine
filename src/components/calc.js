@@ -6,31 +6,28 @@ export function calculateWaterBill(readings) {
     let { current_consumption, category, connection_size, meter_status } = reading;
     let previousMax = 0;
     let basicCharge = 0;
-    let averageConsumption = meter_status != "mf" ? getAverageConsumption(reading) : '-'
-    console.log('averageConsumption', averageConsumption)
-    let consumption = current_consumption ? current_consumption : averageConsumption
-    reading.averageConsumption = averageConsumption
+
     // check for rebate in domestic connection
-    console.log('getZeroOnConsumption function for current_consumption ', current_consumption, 'is', getZeroOnConsumption(connection_size, category, current_consumption))
     if (meter_status == "mf" && getZeroOnConsumption(connection_size, category, current_consumption)) {
       basicCharge = 0;
       previousMax = 0;
     } else {
-      for (let i = 0; i < slabs?.length; i++) {
-        const slab = slabs[i];
+      basicCharge = getBasicCharge(reading)
+      // for (let i = 0; i < slabs?.length; i++) {
+      //   const slab = slabs[i];
 
-        if (consumption <= slab.max) {
-          basicCharge +=
-            ((consumption - previousMax) / 1000) * slab.ratePerThousand;
+      //   if (consumption <= slab.max) {
+      //     basicCharge +=
+      //       ((consumption - previousMax) / 1000) * slab.ratePerThousand;
 
-          break;
-        } else {
-          basicCharge +=
-            ((slab.max - previousMax) / 1000) * slab.ratePerThousand;
+      //     break;
+      //   } else {
+      //     basicCharge +=
+      //       ((slab.max - previousMax) / 1000) * slab.ratePerThousand;
 
-          previousMax = slab.max;
-        }
-      }
+      //     previousMax = slab.max;
+      //   }
+      // }
     }
     reading.basicCharge = reading.connection_type == "t" ? basicCharge * 1.5 : basicCharge
     reading.minimum = getMinimumCharge(reading);
@@ -55,6 +52,45 @@ export function calculateWaterBill(readings) {
   }
   console.log("readings", readings);
   return readings;
+}
+
+function getBasicCharge(reading) {
+  let { current_consumption, category, connection_size, meter_status } = reading;
+
+  let bCharge = 0;
+  let previousMax = 0;
+
+  let averageConsumption = meter_status != "mf" ? getAverageConsumption(reading) : '-'
+  let consumption = current_consumption ? current_consumption : averageConsumption;
+
+  reading.averageConsumption = averageConsumption
+  let catSlabs = slabs.filter(s => {
+    if (s.category == reading.category) {
+        return connection_size > 25 ? s.isBulk == true : s.isBulk == false
+    }
+  })
+
+
+
+
+  console.log('catSlabs', catSlabs)
+  for (let i = 0; i < catSlabs?.length; i++) {
+    const slab = catSlabs[i];
+
+    if (consumption <= slab.max) {
+      bCharge +=
+        ((consumption - previousMax) / 1000) * slab.ratePerThousand;
+
+      break;
+    } else {
+      bCharge +=
+        ((slab.max - previousMax) / 1000) * slab.ratePerThousand;
+
+      previousMax = slab.max;
+    }
+  }
+  return bCharge
+
 }
 
 function getZeroOnConsumption(connection_size, category, current_consumption) {
