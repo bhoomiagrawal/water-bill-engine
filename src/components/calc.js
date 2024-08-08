@@ -5,63 +5,85 @@ export function calculateWaterBill(readings) {
   for (const reading of readings) {
     let { current_consumption, category, connection_size, meter_status } = reading;
     let previousMax = 0;
-    let waterCharge = 0;
-    let averageConsumption = getAverageConsumption(reading)
+    let basicCharge = 0;
+    let averageConsumption = meter_status != "mf" ? getAverageConsumption(reading) : '-'
     console.log('averageConsumption', averageConsumption)
     let consumption = current_consumption ? current_consumption : averageConsumption
+    reading.averageConsumption = averageConsumption
     // check for rebate in domestic connection
     console.log('getZeroOnConsumption function for current_consumption ', current_consumption, 'is', getZeroOnConsumption(connection_size, category, current_consumption))
-    if (getZeroOnConsumption(connection_size, category, current_consumption)) {
-      waterCharge = 0;
+    if (meter_status == "mf" && getZeroOnConsumption(connection_size, category, current_consumption)) {
+      basicCharge = 0;
       previousMax = 0;
     } else {
       for (let i = 0; i < slabs?.length; i++) {
         const slab = slabs[i];
 
-        if (current_consumption <= slab.max) {
-          waterCharge +=
-            ((current_consumption - previousMax) / 1000) * slab.ratePerThousand;
+        if (consumption <= slab.max) {
+          basicCharge +=
+            ((consumption - previousMax) / 1000) * slab.ratePerThousand;
 
           break;
         } else {
-          waterCharge +=
+          basicCharge +=
             ((slab.max - previousMax) / 1000) * slab.ratePerThousand;
 
           previousMax = slab.max;
         }
       }
     }
-    reading.waterCharge = reading.connection_type == "T" ? waterCharge * 1.5 : waterCharge
-    // reading.waterCharge = waterCharge;
+    reading.basicCharge = reading.connection_type == "t" ? basicCharge * 1.5 : basicCharge
     reading.minimum = getMinimumCharge(reading);
     // compare water charge with minimum charge
 
-    reading.basicCharge =
-      reading.waterCharge > reading.minimum
-        ? reading.waterCharge
+    reading.waterCharge =
+      reading.basicCharge > reading.minimum
+        ? reading.basicCharge
         : reading.minimum;
     reading.fixedCharge = addFixedCharge(reading);
     reading.severageCharge = getSeverageCharge(reading, reading.basicCharge);
-
+    if (reading.stp == "y") {
+      reading.stp = getStpCharge(reading)
+    } else {
+      reading.stp = 0
+    }
+    console.log('reading.stp', reading.stp)
     reading.bill =
-      reading.basicCharge +
+      reading.waterCharge +
       addFixedCharge(reading).total_fixed_charge +
-      reading.severageCharge;
+      reading.severageCharge + reading.stp;
   }
   console.log("readings", readings);
   return readings;
 }
 
 function getZeroOnConsumption(connection_size, category, current_consumption) {
-  return connection_size == 15 && category == "D" && current_consumption <= 15000;
+  return connection_size == 15 && category == "d" && current_consumption <= 15000;
 }
 
 function getMinimumCharge(reading) {
-  if (reading.meter_status == "mf" && reading.current_consumption <= 15000) {
-    return 0;
-  } else {
-    return reading.connection_type == "T" ? 82.5 : 55
+  let minimumCharge = 0
+  console.log('reading >>>>>>>>>>>>>>>>>>>>', reading)
+  switch (reading.connection_size) {
+    case 15:
+      if ((reading.meter_status).toLowerCase() == "mf" && reading.current_consumption <= 15000) {
+        minimumCharge = 0;
+      } else {
+        minimumCharge = reading.connection_type == "t" ? 82.5 : 55
+      }
+
+      break;
+    case 20:
+      minimumCharge = 220.0;
+      break;
+    case 25:
+      minimumCharge = 550.0;
+      break;
+    default:
+      minimumCharge = 0;
+      break;
   }
+  return minimumCharge
 }
 
 function addFixedCharge(reading) {
@@ -70,14 +92,14 @@ function addFixedCharge(reading) {
   let meterServiceCharge = 0;
 
   switch (reading.category) {
-    case "D":
+    case "d":
       fixedCharge = 27.5;
 
       break;
-    case "ND":
+    case "nd":
       fixedCharge = 55.0;
       break;
-    case "ID":
+    case "id":
       fixedCharge = 110.0;
       break;
     default:
@@ -109,14 +131,13 @@ function addFixedCharge(reading) {
 }
 
 function getSeverageCharge(reading) {
-  const { basicCharge, severage } = reading;
-  let severageCharge = severage == "Y" ? (basicCharge * 20) / 100 : 0;
+  const { waterCharge, severage } = reading;
+  let severageCharge = severage == "y" ? (waterCharge * 20) / 100 : 0;
   return severageCharge;
 }
 
 
 function getAverageConsumption(reading) {
-  console.log('reading', reading)
   let monthlyReadings = [reading[1], reading[2], reading[3], reading[4], reading[5], reading[6], reading[7]]
   // let current_reading = reading['current_reading'];
   // let current_consumption = typeof reading['current_consumption'] == Number ? reading['current_consumption'] : '';
@@ -133,7 +154,14 @@ function getAverageConsumption(reading) {
   }
 
   const sixReadingConsumptionAv = (monthlyConsumption.reduce((prev, curr, i) => prev + curr, 0)) / monthlyConsumption.length
-  return sixReadingConsumptionAv
+  return Math.round(sixReadingConsumptionAv)
 
 }
 
+function getStpCharge(reading) {
+  // 13% of water charge whatever the connection category is
+
+  let stp = (reading.waterCharge * 13) / 100
+
+  return stp
+}

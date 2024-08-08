@@ -7,13 +7,11 @@ export default function ReadExcel({ setReadings }) {
 
 
   const handleReadExcel = (file) => {
-    console.log(file, "fileeeeeeeeeeeeeeeeeeeee");
     readXlsxFile(file).then((rows) => {
       let arr1 = rows[0];
       let arr2 = rows[1];
 
       let keys = arr1.map((value, index) => {
-        console.log('arr2[index]', arr2[index])
         return value === null ? (arr2[index]) : value.toLowerCase()
       });
 
@@ -40,7 +38,8 @@ export default function ReadExcel({ setReadings }) {
             obj[7] = values[index]
           }
 
-          let newObj = Object.fromEntries(Object.entries(obj).map(([k, v]) => [keyReplacements[k] || k, v]))
+          let newObj = Object.fromEntries(Object.entries(obj).map(([k, v]) => [keyReplacements[k] || k, typeof v == 'string' ? v.toLowerCase() : v]))
+          console.log('newObj', newObj)
           return newObj;
         }, {})
 
