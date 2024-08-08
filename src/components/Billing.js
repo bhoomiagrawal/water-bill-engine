@@ -55,39 +55,75 @@ export default function Billing() {
   const [readings, setReadings] = useState([]);
   const [displayItem, setDisplayItem] = useState(false)
   const [waterBill, setWaterBill] = useState([])
+
   useEffect(() => {
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
       setDisplayItem(true)
-      // console.log('test', test)
+      console.log('waterBillwaterBillwaterBillwaterBill!!!!!!!!!!!!!!!!!!!!!!', waterBill)
     }
   }, [readings.length])
   const getUI = () =>
     waterBill?.map((r, i) => {
       return (
-
         <tr key={i} >
           <td>  {r.category}</td>
           <td>  {r.connection_size}</td>
           <td>  {r.connection_type}</td>
           <td>  {r.current_consumption}</td>
-          <td>  {r.averageConsumption}</td>
           <td>  {r.meter_status}</td>
-          <td>  {r.basicCharge?.toFixed(2)}</td>
-          <td>  {r.minimum?.toFixed(2)}</td>
           <td>  {r.waterCharge?.toFixed(2)}</td>
+          <td>  {r.minimum?.toFixed(2)}</td>
+          <td>  {r.basicCharge?.toFixed(2)}</td>
           <td>  {r.severageCharge?.toFixed(2)}</td>
-          <td>  {r.stp?.toFixed(2)}</td>
           <td>  {r.fixedCharge?.fixed_charge}</td>
           <td>  {r.fixedCharge?.service_charge}</td>
           <td>  {r.fixedCharge?.total_fixed_charge}</td>
           <td>  {r.bill?.toFixed(2)}</td>
         </tr>
-
-
-
       );
     });
+    const downloadCSV = (waterBill) => {
+      const csvRows = [];
+      
+      // Get headers
+      const headers = Object.keys(waterBill[0]);
+      csvRows.push(headers.join(','));
+      
+      console.log("my data is here ",headers)
+      // Format rows
+      for (const row of waterBill) {
+        const values = headers.map(header => JSON.stringify(row[header] || ''));
+        console.log("my values is JSON.stringify ",JSON.stringify(row))
+        const tempdata=  JSON.parse(values.indexOf('{'), values.lastIndexOf('}') + 1)
+        console.log("tempdatatempdata ",tempdata)
+        console.log("JSON.stringify(row).fixedChargeJSON.stringify(row).fixedCharge",(values.indexOf('{'), values.lastIndexOf('}') + 1 ));
+        console.log(" fixedCharge my values is here ",values)
+        //https://stackoverflow.com/questions/44113379/extract-object-from-string-in-javascript
+        // console.log(JSON.parse(values.substring(values.indexOf('{'), values.lastIndexOf('}') + 1))); 
+        var dataArray = [];
+        for(var o in row) {
+            dataArray.push(row[o]);
+            //find the if any array of obj 
+            // dataArray
+            console.log(dataArray[20],"dataArraydataArraydataArraydataArraydataArray");
+        }
+        csvRows.push(values.join(','));
+      }
+    
+      // // Create CSV blob
+      // const csvData = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+      // const csvUrl = URL.createObjectURL(csvData);
+    
+      // // Create a link and click it to download
+      // const link = document.createElement('a');
+      // link.href = csvUrl;
+      // link.download = 'data.csv';
+      // link.click();
+    
+      // // Clean up
+      // URL.revokeObjectURL(csvUrl);
+    };
   return (
     <>
       <div className="bg-blue-100 relative isolate overflow-hidden py-24 sm:py-32 min-h-screen">
@@ -106,8 +142,8 @@ export default function Billing() {
             {displayItem ?
               <>
                 <div className="p-2 m-2">
+                  <button className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 hover:border-blue-500 rounded float-right"  onClick={() => downloadCSV(waterBill)}>Download</button>
                   <h2 className="p-2 m-2 mt-8 font-bold text-center">Water Bill Calculation</h2>
-
                   <table className="table table-striped mt-6 text-lg leading-8 " style={{ width: '100%' }}>
 
                     <thead>
@@ -117,13 +153,11 @@ export default function Billing() {
                         <th >Connection Size</th>
                         <th >Connection Type</th>
                         <th >Current Consumption</th>
-                        <th >Average Consumption</th>
                         <th >Meter status</th>
-                        <th >Basic charge</th>
-                        <th >Minimum charge</th>
                         <th >Water charge</th>
+                        <th >Minimum charge</th>
+                        <th >Basic charge</th>
                         <th >Severage charge</th>
-                        <th >STP charge</th>
                         <th >( Fixed charge+</th>
                         <th >Meter Service charge=</th>
                         <th >Total Fixed charge)</th>
