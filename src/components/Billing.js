@@ -59,11 +59,10 @@ export default function Billing() {
             ? row[header].fixed_charge
             : header == "severageCharge"
             ? row["fixedCharge"].service_charge
-            : header == "bill"
-            ? row["fixedCharge"].total_fixed_charge
             : row[header] || ""
         )
       );
+      
       csvRows.push(values.join(","));
     }
 
