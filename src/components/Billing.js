@@ -90,39 +90,35 @@ export default function Billing() {
       const headers = Object.keys(waterBill[0]);
       csvRows.push(headers.join(','));
       
-      console.log("my data is here ",headers)
+      // console.log("my data is here ",headers)
       // Format rows
       for (const row of waterBill) {
-        const values = headers.map(header => JSON.stringify(row[header] || ''));
-        console.log("my values is JSON.stringify ",JSON.stringify(row))
-        const tempdata=  JSON.parse(values.indexOf('{'), values.lastIndexOf('}') + 1)
-        console.log("tempdatatempdata ",tempdata)
-        console.log("JSON.stringify(row).fixedChargeJSON.stringify(row).fixedCharge",(values.indexOf('{'), values.lastIndexOf('}') + 1 ));
-        console.log(" fixedCharge my values is here ",values)
-        //https://stackoverflow.com/questions/44113379/extract-object-from-string-in-javascript
-        // console.log(JSON.parse(values.substring(values.indexOf('{'), values.lastIndexOf('}') + 1))); 
-        var dataArray = [];
-        for(var o in row) {
-            dataArray.push(row[o]);
-            //find the if any array of obj 
-            // dataArray
-            console.log(dataArray[20],"dataArraydataArraydataArraydataArraydataArray");
-        }
+        // const values = headers.map(header => JSON.stringify(row[header] || ''));
+        const values = headers.map(header => 
+          JSON.stringify(
+            header=="fixedCharge"
+            ?row[header].fixed_charge
+            :header=="severageCharge"
+            ?row["fixedCharge"].service_charge
+            :header=="bill"
+            ?row["fixedCharge"].total_fixed_charge
+            :row[header] || ''));
         csvRows.push(values.join(','));
       }
+      
+      // Create CSV blob
+      const csvData = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+      const csvUrl = URL.createObjectURL(csvData);
+      console.log(csvData);
     
-      // // Create CSV blob
-      // const csvData = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-      // const csvUrl = URL.createObjectURL(csvData);
+      // Create a link and click it to download
+      const link = document.createElement('a');
+      link.href = csvUrl;
+      link.download = 'data.csv';
+      link.click();
     
-      // // Create a link and click it to download
-      // const link = document.createElement('a');
-      // link.href = csvUrl;
-      // link.download = 'data.csv';
-      // link.click();
-    
-      // // Clean up
-      // URL.revokeObjectURL(csvUrl);
+      // Clean up
+      URL.revokeObjectURL(csvUrl);
     };
   return (
     <>
