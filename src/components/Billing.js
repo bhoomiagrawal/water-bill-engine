@@ -10,12 +10,14 @@ export default function Billing() {
   const [waterBill, setWaterBill] = useState([]);
 
   useEffect(() => {
+    console.log(readings.length);
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
       setDisplayItem(true);
       
     }
   }, [readings.length]);
+  console.log(readings, "readungd dddddf")
   const getUI = () =>
     waterBill?.map((r, i) => {
       return (
@@ -40,14 +42,39 @@ export default function Billing() {
         </tr>
       );
     });
+  const resetData = (e) => {
+    console.log("value of e", e)
+    // readings.length = 0;
+    setReadings([])
+  }
   const downloadCSV = (waterBill) => {
     const csvRows = [];
-
+    const keyChange = {
+      0: "0",
+      1: "1",
+      2: "2",
+      3: "3",
+      4: "4",
+      5: "5",
+      6: "6",
+      7: "current_month",
+    };
     // Get headers
+    Object.keys(waterBill[0]) !== 1 ? console.log("key replace ") : console.log("not to key replace");
     const headers = Object.keys(waterBill[0]);
+    console.log("my data is here ", waterBill[0])
+    console.log("header00000000000000000000", headers["0"])
+    console.log("header11111111111111111111", headers["1"])
+    console.log("header22222222222222222222", headers["2"])
+    console.log("header33333333333333333333", headers["3"])
+    console.log("header44444444444444444444", headers["4"])
+    console.log("header55555555555555555555", headers["5"])
+    console.log("header66666666666666666666", headers["6"])
+    console.log("header67777777777777777777", headers["7"])
+
+    console.log("Object.keys(waterBill[0])", Object.keys(waterBill[0]))
     csvRows.push(headers.join(","));
 
-    // console.log("my data is here ",headers)
     // Format rows
     for (const row of waterBill) {
       // const values = headers.map(header => JSON.stringify(row[header] || ''));
@@ -56,27 +83,27 @@ export default function Billing() {
           header == "fixedCharge"
             ? row[header].fixed_charge
             : header == "severageCharge"
-            ? row["fixedCharge"].service_charge
-            : row[header] || ""
+              ? row["fixedCharge"].service_charge
+              : row[header] || ""
         )
       );
-      
+
       csvRows.push(values.join(","));
     }
 
-    // Create CSV blob
-    const csvData = new Blob([csvRows.join("\n")], { type: "text/csv" });
-    const csvUrl = URL.createObjectURL(csvData);
-    console.log(csvData);
+    // // Create CSV blob
+    // const csvData = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    // const csvUrl = URL.createObjectURL(csvData);
+    // console.log(csvData);
 
-    // Create a link and click it to download
-    const link = document.createElement("a");
-    link.href = csvUrl;
-    link.download = "data.csv";
-    link.click();
+    // // Create a link and click it to download
+    // const link = document.createElement("a");
+    // link.href = csvUrl;
+    // link.download = "data.csv";
+    // link.click();
 
-    // Clean up
-    URL.revokeObjectURL(csvUrl);
+    // // Clean up
+    // URL.revokeObjectURL(csvUrl);
   };
   return (
     <>
@@ -97,6 +124,16 @@ export default function Billing() {
 
             {displayItem ? (
               <>
+
+                <div className="p-2 m-2 mt-8">
+
+                  <button
+                    className="bg-gray-500 hover:bg-gray-500 text-white font-bold py-2 px-4 hover:border-gray-400 rounded"
+                    onClick={() => resetData(true)}
+                  >
+                    Reset
+                  </button>
+                </div>
                 <div className="p-2 m-2">
                   <button
                     className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 hover:border-blue-500 rounded float-right"

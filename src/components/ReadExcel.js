@@ -5,13 +5,12 @@ import readXlsxFile from "read-excel-file";
 
 export default function ReadExcel({ setReadings }) {
   const handleReadExcel = (file) => {
-    console.log(file, "fileeeeeeeeeeeeeeeeeeeee");
     readXlsxFile(file).then((rows) => {
       let arr1 = rows[0];
       let arr2 = rows[1];
 
       let keys = arr1.map((value, index) => {
-        console.log("arr2[index]", arr2[index]);
+        // console.log("arr2[index]", arr2[index]);
         return value === null ? arr2[index] : value.toLowerCase();
       });
 
@@ -46,7 +45,7 @@ export default function ReadExcel({ setReadings }) {
           return newObj;
         }, {});
       });
-      console.log("mappedArray", mappedArray);
+      // console.log("mappedArray", mappedArray);
       setReadings(mappedArray);
     });
   };
