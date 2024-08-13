@@ -33,6 +33,7 @@ export default function Billing() {
           <td> {r.minimum?.toFixed(1)}</td>
           <td> {r.waterCharge?.toFixed(1)}</td>
           <td> {r.severageCharge?.toFixed(1)}</td>
+          <td> {r.stp?.toFixed(1)}</td>
           <td> {r.fixedCharge?.fixed_charge}</td>
           <td> {r.fixedCharge?.service_charge}</td>
           <td> {r.fixedCharge?.total_fixed_charge}</td>
@@ -126,6 +127,7 @@ export default function Billing() {
                         <th>Min. ch.</th>
                         <th>Water ch.</th>
                         <th>Svrge ch.</th>
+                        <th>STP</th>
                         <th>( Fixed ch.+</th>
                         <th>Mtr Srvc ch.=</th>
                         <th>Ttl Fxd ch.)</th>
