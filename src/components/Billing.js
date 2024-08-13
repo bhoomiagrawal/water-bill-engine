@@ -13,10 +13,7 @@ export default function Billing() {
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
       setDisplayItem(true);
-      console.log(
-        "waterBillwaterBillwaterBillwaterBill!!!!!!!!!!!!!!!!!!!!!!",
-        waterBill
-      );
+      
     }
   }, [readings.length]);
   const getUI = () =>

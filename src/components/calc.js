@@ -5,41 +5,51 @@ import {
   fixedCharges,
   meterServiceCharges,
   idc,
+  consumptionRules,
 } from "@/components/data";
 
 export function calculateWaterBill(readings) {
-  // console.log("slabs", slabs);
   for (const reading of readings) {
     let { current_consumption, category, connection_size, meter_status } =
       reading;
-
-    reading.averageConsumption =
-      meter_status != "mf" ? getAverageConsumption(reading) : "-";
-
     let basicCharge = 0;
-
-    reading.consumption = current_consumption
-      ? current_consumption
-      : reading.averageConsumption;
-
-    // check for rebate in domestic connection
-    if (
-      meter_status == "mf" &&
-      getZeroOnConsumption(connection_size, category, current_consumption)
-    ) {
-      basicCharge = 0;
+    if (meter_status == "ok") {
+      reading.consumption = current_consumption
+      if (getZeroOnConsumption(connection_size, category, current_consumption)) {
+        basicCharge = 0;
+      } else {
+        basicCharge = getBasicCharge(reading);
+      }
     } else {
-      basicCharge = getBasicCharge(reading);
+
+      let getRuleConsumption = consumptionRules.find(c => c.meter_status == meter_status)
+
+      if (getRuleConsumption.rule == "average") {
+        reading.averageConsumption =
+          getAverageConsumption(reading)
+        reading.consumption = reading.averageConsumption
+      } else if (getRuleConsumption.rule == "minimum") {
+        reading.basicCharge = 0
+        reading.consumption = reading.meter_status
+      }
+
+
     }
+    
+
     reading.basicCharge =
       reading.connection_type == "t" ? basicCharge * 1.5 : basicCharge;
     reading.minimum = getMinimumCharge(reading);
+    // check for rebate in domestic connection
+
     // compare water charge with minimum charge
 
     reading.waterCharge =
-      reading.basicCharge > reading.minimum
+      reading.basicCharge >= reading.minimum
         ? reading.basicCharge
         : reading.minimum;
+
+
     reading.fixedCharge = addFixedCharge(reading);
     reading.severageCharge = getSeverageCharge(reading, reading.basicCharge);
 
@@ -57,14 +67,7 @@ export function calculateWaterBill(readings) {
       reading.severageCharge +
       reading.stp +
       reading.idc;
-    console.log(
-      "khklhklhkljh",
-      reading.waterCharge,
-      reading.fixedCharge.total_fixed_charge,
-      reading.severageCharge,
-      reading.stp,
-      reading.idc
-    );
+    
   }
   return readings;
 }
@@ -110,10 +113,10 @@ function getMinimumCharge(reading) {
       m.category == reading.category
     );
   });
-  let minimumCharge = 0;
+  let minimumCharge = minimumChargeData.min_charges;
   if (
     reading.connection_size == 15 &&
-    reading.meter_status.toLowerCase() == "mf" &&
+    reading.meter_status.toLowerCase() == "ok" &&
     reading.current_consumption <= 15000
   ) {
     minimumCharge = 0;
@@ -129,7 +132,6 @@ function getMinimumCharge(reading) {
 }
 
 function addFixedCharge(reading) {
-  console.log("reading", reading);
 
   let fixedChargeData = fixedCharges.find((f) => {
     return (
