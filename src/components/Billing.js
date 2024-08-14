@@ -10,14 +10,11 @@ export default function Billing() {
   const [waterBill, setWaterBill] = useState([]);
 
   useEffect(() => {
-    console.log(readings.length);
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
-      setDisplayItem(true);
-      
+      setDisplayItem(true);      
     }
-  }, [readings.length]);
-  console.log(readings, "readungd dddddf")
+  }, [readings]);
   const getUI = () =>
     waterBill?.map((r, i) => {
       return (
@@ -42,10 +39,12 @@ export default function Billing() {
         </tr>
       );
     });
-  const resetData = (e) => {
-    console.log("value of e", e)
+  const resetData = () => {
+    // console.log("value of e", e)
     // readings.length = 0;
+    setDisplayItem(false);
     setReadings([])
+    setWaterBill([])
   }
   const downloadCSV = (waterBill) => {
     const csvRows = [];
@@ -60,40 +59,54 @@ export default function Billing() {
       7: "current_month",
     };
     // Get headers
-    Object.keys(waterBill[0]) !== 1 ? console.log("key replace ") : console.log("not to key replace");
+    // Object.keys(waterBill[0]) !== 1 ? console.log("key replace ") : console.log("not to key replace");
     const headers = Object.keys(waterBill[0]);
-    console.log("my data is here ", waterBill[0])
-    console.log("header00000000000000000000", headers["0"])
-    console.log("header11111111111111111111", headers["1"])
-    console.log("header22222222222222222222", headers["2"])
-    console.log("header33333333333333333333", headers["3"])
-    console.log("header44444444444444444444", headers["4"])
-    console.log("header55555555555555555555", headers["5"])
-    console.log("header66666666666666666666", headers["6"])
-    console.log("header67777777777777777777", headers["7"])
 
-    console.log("Object.keys(waterBill[0])", Object.keys(waterBill[0]))
+    // console.log("my data is here ", waterBill[0])
+    // console.log("header00000000000000000000", headers["0"])
+    // console.log("header11111111111111111111", headers["1"])
+    // console.log("header22222222222222222222", headers["2"])
+    // console.log("header33333333333333333333", headers["3"])
+    // console.log("header44444444444444444444", headers["4"])
+    // console.log("header55555555555555555555", headers["5"])
+    // console.log("header66666666666666666666", headers["6"])
+    // console.log("header67777777777777777777", headers["7"])
+
+    // console.log("Object.keys(waterBill[0])", Object.keys(waterBill[0]))
+    // headers["0"] = headers["0"] == "1" ? "First Month":"Current Month";
+    // headers["1"] = headers["1"] == "2" ? "Second Month":"Current Month";
+    // headers["2"] = headers["2"] == "3" ? "Third Month":"Current Month";
+    // headers["3"] = headers["3"] == "4" ? "Fourth Month":"Current Month";
+    // headers["4"] = headers["4"] == "5" ? "Fifth Month":"Current Month";
+    // headers["5"] = headers["5"] == "6" ? "Sixth Month":"Current Month";
+    // headers["6"] = headers["6"] == "7" ? "Seventh Month":"Current Month";
+    // console.log("headers after key change ",headers)
     csvRows.push(headers.join(","));
 
     // Format rows
     for (const row of waterBill) {
       // const values = headers.map(header => JSON.stringify(row[header] || ''));
       const values = headers.map((header) =>
-        JSON.stringify(
-          header == "fixedCharge"
-            ? row[header].fixed_charge
-            : header == "severageCharge"
-              ? row["fixedCharge"].service_charge
-              : row[header] || ""
-        )
+        // header == 1 ? console.log("mil gya"): console.log("nhi mila")
+        // console.log("headerssssssssssssssssssssssssss",header)
+      // header["0"] = header["0"] == "1" ? "First Month":"Current Month";
+      JSON.stringify(
+        header == "fixedCharge"
+          ? row[header].fixed_charge
+          : header == "severageCharge"
+            ? row["fixedCharge"].service_charge
+            : row[header] || ""
+      )
       );
-
+// console.log("valuess@@@@@@@@@@@@@@@@@@@@@@@@@@",values)
       csvRows.push(values.join(","));
+      // console.log("my csv rows is ",csvRows)
     }
 
-    // // Create CSV blob
+    // Create CSV blob
     // const csvData = new Blob([csvRows.join("\n")], { type: "text/csv" });
     // const csvUrl = URL.createObjectURL(csvData);
+    // console.log("csvUrl Data @@@@@@@@@@@@@@@@@@",csvUrl)
     // console.log(csvData);
 
     // // Create a link and click it to download
@@ -124,12 +137,11 @@ export default function Billing() {
 
             {displayItem ? (
               <>
-
                 <div className="p-2 m-2 mt-8">
 
                   <button
                     className="bg-gray-500 hover:bg-gray-500 text-white font-bold py-2 px-4 hover:border-gray-400 rounded"
-                    onClick={() => resetData(true)}
+                    onClick={resetData}
                   >
                     Reset
                   </button>
