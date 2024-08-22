@@ -12,11 +12,12 @@ export default function Billing() {
   useEffect(() => {
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
-      setDisplayItem(true);      
+      setDisplayItem(true);
     }
   }, [readings]);
   const getUI = () =>
     waterBill?.map((r, i) => {
+      // console.log("value of waterbill array ",r?.stp?.toFixed(1))
       return (
         <tr key={i}>
           <td> {r.category}</td>
@@ -36,6 +37,7 @@ export default function Billing() {
           <td> {r.idc?.toFixed(1)}</td>
           {/* <td> {Math.round(r.bill)}</td> */}
           <td> {r.bill?.toFixed(1)}</td>
+          {/* <td> {r.rebate}</td> */}
         </tr>
       );
     });
@@ -47,76 +49,71 @@ export default function Billing() {
     setWaterBill([])
   }
   const downloadCSV = (waterBill) => {
-    const csvRows = [];
-    const keyChange = {
-      0: "0",
-      1: "1",
-      2: "2",
-      3: "3",
-      4: "4",
-      5: "5",
-      6: "6",
-      7: "current_month",
+    // Mapping for header names
+    const headerMap = {
+      "1": "First Month",
+      "2": "Second Month",
+      "3": "Third Month",
+      "4": "Fourth Month",
+      "5": "Fifth Month",
+      "6": "Sixth Month",
+      "7": "Seventh Month",
+      "fixedCharge": "Fixed Charge",
+      "severageCharge": "Service Charge"
     };
-    // Get headers
-    // Object.keys(waterBill[0]) !== 1 ? console.log("key replace ") : console.log("not to key replace");
+
+    const csvRows = [];
+
+    // Get headers from the data
     const headers = Object.keys(waterBill[0]);
 
-    // console.log("my data is here ", waterBill[0])
-    // console.log("header00000000000000000000", headers["0"])
-    // console.log("header11111111111111111111", headers["1"])
-    // console.log("header22222222222222222222", headers["2"])
-    // console.log("header33333333333333333333", headers["3"])
-    // console.log("header44444444444444444444", headers["4"])
-    // console.log("header55555555555555555555", headers["5"])
-    // console.log("header66666666666666666666", headers["6"])
-    // console.log("header67777777777777777777", headers["7"])
-
-    // console.log("Object.keys(waterBill[0])", Object.keys(waterBill[0]))
-    // headers["0"] = headers["0"] == "1" ? "First Month":"Current Month";
-    // headers["1"] = headers["1"] == "2" ? "Second Month":"Current Month";
-    // headers["2"] = headers["2"] == "3" ? "Third Month":"Current Month";
-    // headers["3"] = headers["3"] == "4" ? "Fourth Month":"Current Month";
-    // headers["4"] = headers["4"] == "5" ? "Fifth Month":"Current Month";
-    // headers["5"] = headers["5"] == "6" ? "Sixth Month":"Current Month";
-    // headers["6"] = headers["6"] == "7" ? "Seventh Month":"Current Month";
-    // console.log("headers after key change ",headers)
-    csvRows.push(headers.join(","));
+    // Map headers according to headerMap
+    const mappedHeaders = headers.map(header => headerMap[header] || header);
+    csvRows.push(mappedHeaders.map(header => `"${header}"`).join(","));
 
     // Format rows
     for (const row of waterBill) {
-      // const values = headers.map(header => JSON.stringify(row[header] || ''));
-      const values = headers.map((header) =>
-        // header == 1 ? console.log("mil gya"): console.log("nhi mila")
-        // console.log("headerssssssssssssssssssssssssss",header)
-      // header["0"] = header["0"] == "1" ? "First Month":"Current Month";
-      JSON.stringify(
-        header == "fixedCharge"
-          ? row[header].fixed_charge
-          : header == "severageCharge"
-            ? row["fixedCharge"].service_charge
-            : row[header] || ""
-      )
-      );
-// console.log("valuess@@@@@@@@@@@@@@@@@@@@@@@@@@",values)
+      const values = headers.map(header => {
+        let value = row[header] || "";
+
+        if (header === "fixedCharge") {
+          value = row[header]?.fixed_charge || "";
+        } else if (header === "severageCharge") {
+          value = row[header]?.service_charge || "";
+        }
+
+        // Handle cases with commas or quotes in the values
+        return `"${value.toString().replace(/"/g, '""')}"`;
+      });
       csvRows.push(values.join(","));
-      // console.log("my csv rows is ",csvRows)
+
+      // console.log("csv data print here ",csvRows);
     }
 
     // Create CSV blob
-    // const csvData = new Blob([csvRows.join("\n")], { type: "text/csv" });
-    // const csvUrl = URL.createObjectURL(csvData);
-    // console.log("csvUrl Data @@@@@@@@@@@@@@@@@@",csvUrl)
-    // console.log(csvData);
+    const csvData = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const csvUrl = URL.createObjectURL(csvData);
+    // Custom Formatting of Local Date and Time
+    const now = new Date();
 
-    // // Create a link and click it to download
-    // const link = document.createElement("a");
-    // link.href = csvUrl;
-    // link.download = "data.csv";
-    // link.click();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
 
-    // // Clean up
-    // URL.revokeObjectURL(csvUrl);
+    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    // Create a link and click it to download
+    const link = document.createElement("a");
+    link.href = csvUrl;
+    link.download = `calculatedBilling${formattedDateTime}.csv`;
+    document.body.appendChild(link); // Append to body to ensure it's in the DOM
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link); // Remove link from the DOM
+    URL.revokeObjectURL(csvUrl);
   };
   return (
     <>
@@ -178,6 +175,8 @@ export default function Billing() {
                         <th>Ttl Fxd ch.)</th>
                         <th>IDC</th>
                         <th>Bill</th>
+                        {/* <th>Rebate</th>
+                        <th>RebateCharge</th> */}
                       </tr>
                     </thead>
                     <tbody>{getUI()}</tbody>

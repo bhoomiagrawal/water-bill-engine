@@ -52,6 +52,8 @@ export function calculateWaterBill(readings) {
 
     reading.fixedCharge = addFixedCharge(reading);
     reading.severageCharge = getSeverageCharge(reading, reading.basicCharge);
+    // reading.rebates = getRebateCharge(reading);
+    getRebateCharge(reading);
 
     if (reading.stp == "y") {
       reading.stp = getStpCharge(reading);
@@ -134,6 +136,7 @@ function getMinimumCharge(reading) {
 function addFixedCharge(reading) {
 
   let fixedChargeData = fixedCharges.find((f) => {
+    // console.log("value of f ",f)
     return (
       f.connection_size == reading.connection_size &&
       f.category == reading.category
@@ -186,9 +189,8 @@ function getAverageConsumption(reading) {
 
 function getStpCharge(reading) {
   // 13% of water charge whatever the connection category is
-
   let stp = (reading.waterCharge * 13) / 100;
-
+  // console.log(stp,"stp charge ")
   return stp;
 }
 
@@ -199,4 +201,16 @@ function getIDC(reading) {
   });
   let idcharge = idcData ? (waterCharge * idcData.chargePercent) / 100 : 0;
   return idcharge;
+}
+function getRebateCharge(reading) {
+  // console.log(" Getting the rebates from data.js",rebates);
+  // console.log(" Getting the rebates from data.js",rebates[0]?.discount);
+  const { waterCharge, rebate, category } = reading;
+  // console.log(" Getting the category of connection ",category);
+  // console.log(" Getting the rebate", rebate);
+  // console.log(`rebate is ${rebate ==='y'?`exixt plz apply rebate charge and water charge is ${waterCharge}`:'not exixt'}`);
+  // console.log(" Getting the waterCharge",waterCharge);
+  let rebateCharge = rebate === "y" &&  rebates[0]?.category === "d" ? (waterCharge * rebates[0]?.discount) / 100 : 0;
+  // console.log("rebate charges on water charge will be apply water charge of 75%", rebateCharge);
+  return rebateCharge;
 }

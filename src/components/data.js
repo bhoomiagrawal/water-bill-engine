@@ -139,8 +139,7 @@ exports.consumptionRules = [
 exports.rebates = [
     {
         category: "d",
-        connection_size: "15mm",
-        consumption: "15000",
-        charges: "free",
+        discount: 75,
+        discount_type:'percent'
     },
 ];
