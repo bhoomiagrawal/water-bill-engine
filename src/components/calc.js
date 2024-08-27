@@ -14,28 +14,27 @@ export function calculateWaterBill(readings) {
       reading;
     let basicCharge = 0;
     if (meter_status == "ok") {
-      reading.consumption = current_consumption
-      if (getZeroOnConsumption(connection_size, category, current_consumption)) {
+      reading.consumption = current_consumption;
+      if (
+        getZeroOnConsumption(connection_size, category, current_consumption)
+      ) {
         basicCharge = 0;
       } else {
         basicCharge = getBasicCharge(reading);
       }
     } else {
-
-      let getRuleConsumption = consumptionRules.find(c => c.meter_status == meter_status)
+      let getRuleConsumption = consumptionRules.find(
+        (c) => c.meter_status == meter_status
+      );
 
       if (getRuleConsumption.rule == "average") {
-        reading.averageConsumption =
-          getAverageConsumption(reading)
-        reading.consumption = reading.averageConsumption
+        reading.averageConsumption = getAverageConsumption(reading);
+        reading.consumption = reading.averageConsumption;
       } else if (getRuleConsumption.rule == "minimum") {
-        reading.basicCharge = 0
-        reading.consumption = reading.meter_status
+        reading.basicCharge = 0;
+        reading.consumption = reading.meter_status;
       }
-
-
     }
-    
 
     reading.basicCharge =
       reading.connection_type == "t" ? basicCharge * 1.5 : basicCharge;
@@ -49,11 +48,8 @@ export function calculateWaterBill(readings) {
         ? reading.basicCharge
         : reading.minimum;
 
-
     reading.fixedCharge = addFixedCharge(reading);
     reading.severageCharge = getSeverageCharge(reading, reading.basicCharge);
-    // reading.rebates = getRebateCharge(reading);
-    getRebateCharge(reading);
 
     if (reading.stp == "y") {
       reading.stp = getStpCharge(reading);
@@ -69,8 +65,15 @@ export function calculateWaterBill(readings) {
       reading.severageCharge +
       reading.stp +
       reading.idc;
-    
+
+    let rebate = 0;
+    if (reading.rebate) {
+      rebate = getRebate(reading);
+    }
+    reading.bill = reading.bill - rebate;
+    reading.rebate = rebate;
   }
+
   return readings;
 }
 
@@ -134,7 +137,6 @@ function getMinimumCharge(reading) {
 }
 
 function addFixedCharge(reading) {
-
   let fixedChargeData = fixedCharges.find((f) => {
     // console.log("value of f ",f)
     return (
@@ -202,15 +204,12 @@ function getIDC(reading) {
   let idcharge = idcData ? (waterCharge * idcData.chargePercent) / 100 : 0;
   return idcharge;
 }
-function getRebateCharge(reading) {
-  // console.log(" Getting the rebates from data.js",rebates);
-  // console.log(" Getting the rebates from data.js",rebates[0]?.discount);
+function getRebate(reading) {
   const { waterCharge, rebate, category } = reading;
-  // console.log(" Getting the category of connection ",category);
-  // console.log(" Getting the rebate", rebate);
-  // console.log(`rebate is ${rebate ==='y'?`exixt plz apply rebate charge and water charge is ${waterCharge}`:'not exixt'}`);
-  // console.log(" Getting the waterCharge",waterCharge);
-  let rebateCharge = rebate === "y" &&  rebates[0]?.category === "d" ? (waterCharge * rebates[0]?.discount) / 100 : 0;
+
+  let rebateCharge =
+    rebate === "y" ? (waterCharge * rebates[0]?.discount) / 100 : 0;
   // console.log("rebate charges on water charge will be apply water charge of 75%", rebateCharge);
-  return rebateCharge;
+
+  return rebateCharge.toFixed(2);
 }

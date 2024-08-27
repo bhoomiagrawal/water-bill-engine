@@ -37,7 +37,7 @@ export default function Billing() {
           <td> {r.idc?.toFixed(1)}</td>
           {/* <td> {Math.round(r.bill)}</td> */}
           <td> {r.bill?.toFixed(1)}</td>
-          {/* <td> {r.rebate}</td> */}
+          <td> {r.rebate}</td>
         </tr>
       );
     });
@@ -174,6 +174,7 @@ export default function Billing() {
                         <th>Ttl Fxd ch.)</th>
                         <th>IDC</th>
                         <th>Bill</th>
+                        <th>Rebate</th>
                         {/* <th>Rebate</th>
                         <th>RebateCharge</th> */}
                       </tr>
