@@ -3,17 +3,15 @@
 import { useRef, useState } from "react";
 import readXlsxFile from "read-excel-file";
 
-
 export default function ReadExcel({ setReadings }) {
   const imagRef = useRef();
-
   const handleReadExcel = (file) => {
     readXlsxFile(file).then((rows) => {
       let arr1 = rows[0];
       let arr2 = rows[1];
 
       let keys = arr1.map((value, index) => {
-        imagRef.current.value = "";
+        // imagRef.current.value = "";
         // console.log("arr2[index]", arr2[index]);
         return value === null ? arr2[index] : value.toLowerCase();
       });
@@ -71,9 +69,13 @@ export default function ReadExcel({ setReadings }) {
       </div>
       <div className="p-2 m-2">
         <a
-          href="/test cases.xlsx"  // This link points directly to the file in the public directory
-          download="test cases.xlsx"  // Optional: suggests a default filename
-          style={{ textDecoration: 'underline', color: 'blue', cursor: 'pointer' }}
+          href="/test cases.xlsx" // This link points directly to the file in the public directory
+          download="test cases.xlsx" // Optional: suggests a default filename
+          style={{
+            textDecoration: "underline",
+            color: "blue",
+            cursor: "pointer",
+          }}
         >
           Download Your Sample File
         </a>

@@ -45,21 +45,21 @@ export default function Billing() {
     // console.log("value of e", e)
     // readings.length = 0;
     setDisplayItem(false);
-    setReadings([])
-    setWaterBill([])
-  }
+    setReadings([]);
+    setWaterBill([]);
+  };
   const downloadCSV = (waterBill) => {
     // Mapping for header names
     const headerMap = {
-      "1": "First Month",
-      "2": "Second Month",
-      "3": "Third Month",
-      "4": "Fourth Month",
-      "5": "Fifth Month",
-      "6": "Sixth Month",
-      "7": "Seventh Month",
-      "fixedCharge": "Fixed Charge",
-      "severageCharge": "Service Charge"
+      1: "First Month",
+      2: "Second Month",
+      3: "Third Month",
+      4: "Fourth Month",
+      5: "Fifth Month",
+      6: "Sixth Month",
+      7: "Seventh Month",
+      fixedCharge: "Fixed Charge",
+      severageCharge: "Service Charge",
     };
 
     const csvRows = [];
@@ -68,12 +68,12 @@ export default function Billing() {
     const headers = Object.keys(waterBill[0]);
 
     // Map headers according to headerMap
-    const mappedHeaders = headers.map(header => headerMap[header] || header);
-    csvRows.push(mappedHeaders.map(header => `"${header}"`).join(","));
+    const mappedHeaders = headers.map((header) => headerMap[header] || header);
+    csvRows.push(mappedHeaders.map((header) => `"${header}"`).join(","));
 
     // Format rows
     for (const row of waterBill) {
-      const values = headers.map(header => {
+      const values = headers.map((header) => {
         let value = row[header] || "";
 
         if (header === "fixedCharge") {
@@ -97,11 +97,11 @@ export default function Billing() {
     const now = new Date();
 
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
 
     const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     // Create a link and click it to download
@@ -135,7 +135,6 @@ export default function Billing() {
             {displayItem ? (
               <>
                 <div className="p-2 m-2 mt-8">
-
                   <button
                     className="bg-gray-500 hover:bg-gray-500 text-white font-bold py-2 px-4 hover:border-gray-400 rounded"
                     onClick={resetData}
