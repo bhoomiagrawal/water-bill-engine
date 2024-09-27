@@ -114,6 +114,17 @@ exports.consumptionRules = [
   { meter_status: "bp", rule: "pending", description: "meter stopped" },
   { meter_status: "sr", rule: "average", description: "meter stopped" },
 ];
+exports.rebates = [
+  {
+    category: "nd",
+    discount: 75,
+    discount_type: "percent",
+  },
+];
+
+
+
+
 // exports.slabs =
 // {
 //     d: [
@@ -136,10 +147,4 @@ exports.consumptionRules = [
 //     ],
 // }
 
-exports.rebates = [
-  {
-    category: "nd",
-    discount: 75,
-    discount_type: "percent",
-  },
-];
+
