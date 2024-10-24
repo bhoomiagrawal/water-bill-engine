@@ -33,10 +33,15 @@ export default function ReadExcel({ setReadings, displayItem }) {
         return keys.reduce((obj, key, index) => {
           let k = typeof key == String ? key.toLowerCase() : key;
           obj[k] = values[index];
+
+
+          // k=="category" && (values[index])
+          // obj[k] == "category" &&  (values[index] == "n" ? "nd" : values[index])
           let newObj = Object.fromEntries(
             Object.entries(obj).map(([k, v]) => [
               keyReplacements[k] || k,
               typeof v == "string" ? v.toLowerCase() : v,
+
             ])
           );
           return newObj;
@@ -48,51 +53,51 @@ export default function ReadExcel({ setReadings, displayItem }) {
   //new code end 
 
   //OLD CODE START FROM HERE
-    // const handleReadExcel = (file) => {
-    //     readXlsxFile(file).then((rows) => {
-    //       let arr1 = rows[0];
-    //       let arr2 = rows[1];
+  // const handleReadExcel = (file) => {
+  //     readXlsxFile(file).then((rows) => {
+  //       let arr1 = rows[0];
+  //       let arr2 = rows[1];
 
-    //       let keys = arr1.map((value, index) => {
+  //       let keys = arr1.map((value, index) => {
 
-    //         return value === null ? arr2[index] : value.toLowerCase();
-    //       });
+  //         return value === null ? arr2[index] : value.toLowerCase();
+  //       });
 
-    //       const valueSheet = rows.slice(2);
+  //       const valueSheet = rows.slice(2);
 
-    //       const keyReplacements = {
-    //         category: "category",
-    //         size: "connection_size",
-    //         "current consumption": "current_consumption",
-    //         "connection type": "connection_type",
-    //         rebate: "rebate",
-    //         severage: "severage",
-    //         "meter status": "meter_status",
-    //         current: "current_reading",
-    //       };
+  //       const keyReplacements = {
+  //         category: "category",
+  //         size: "connection_size",
+  //         "current consumption": "current_consumption",
+  //         "connection type": "connection_type",
+  //         rebate: "rebate",
+  //         severage: "severage",
+  //         "meter status": "meter_status",
+  //         current: "current_reading",
+  //       };
 
-    //       const mappedArray = valueSheet.map((values) => {
-    //         return keys.reduce((obj, key, index) => {
-    //           let k = typeof key == String ? key.toLowerCase() : key;
+  //       const mappedArray = valueSheet.map((values) => {
+  //         return keys.reduce((obj, key, index) => {
+  //           let k = typeof key == String ? key.toLowerCase() : key;
 
-    //           obj[k] = values[index];
-    //           if (k == "meter reading") {
-    //             obj[7] = values[index];
-    //           }
+  //           obj[k] = values[index];
+  //           if (k == "meter reading") {
+  //             obj[7] = values[index];
+  //           }
 
-    //           let newObj = Object.fromEntries(
-    //             Object.entries(obj).map(([k, v]) => [
-    //               keyReplacements[k] || k,
-    //               typeof v == "string" ? v.toLowerCase() : v,
-    //             ])
-    //           );
-    //           return newObj;
-    //         }, {});
-    //       });
-    //       // console.log("mappedArray", mappedArray);
-    //       setReadings(mappedArray);
-    //     });
-    //   };
+  //           let newObj = Object.fromEntries(
+  //             Object.entries(obj).map(([k, v]) => [
+  //               keyReplacements[k] || k,
+  //               typeof v == "string" ? v.toLowerCase() : v,
+  //             ])
+  //           );
+  //           return newObj;
+  //         }, {});
+  //       });
+  //       // console.log("mappedArray", mappedArray);
+  //       setReadings(mappedArray);
+  //     });
+  //   };
   //OLD CODE END FROM HERE
 
 

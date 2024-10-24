@@ -20,17 +20,18 @@ export default function Billing() {
       // console.log("value of waterbill array ",r?.stp?.toFixed(1))
       return (
         <tr key={i}>
+          <td> {r.cid}</td>
           <td> {r.category}</td>
-          <td> {r.connection_size}</td>
+          <td> {r.meter_size}</td>
           <td> {r.connection_type}</td>
           <td> {r.consumption}</td>
           {/* <td> {r.averageConsumption}</td> */}
-          <td> {r.meter_status}</td>
+          <td> {r.meter_stts}</td>
           <td> {r.basicCharge?.toFixed(2)}</td>
           <td> {r.minimum?.toFixed(1)}</td>
           <td> {r.waterCharge?.toFixed(1)}</td>
-          <td> {r.severageCharge?.toFixed(1)}</td>
-          <td> {r.stp?.toFixed(1)}</td>
+          <td> {r.sewerageCharge?.toFixed(1)}</td>
+          <td> {r.stpCharge?.toFixed(1)}</td>
           <td> {r.fixedCharge?.fixed_charge}</td>
           <td> {r.fixedCharge?.service_charge}</td>
           <td> {r.fixedCharge?.total_fixed_charge}</td>
@@ -79,7 +80,7 @@ export default function Billing() {
         
         if (header === "fixedCharge") {
           value = row[header]?.fixed_charge || "";
-        } else if (header === "severageCharge") {
+        } else if (header === "sewerageCharge") {
           value = row[header]?.service_charge || "";
         }
 
@@ -159,6 +160,7 @@ export default function Billing() {
                   >
                     <thead>
                       <tr className="row-auto ">
+                        <th>CID</th>
                         <th>Ctgry</th>
                         <th>Conn.Size</th>
                         <th>Conn.Type</th>
@@ -168,7 +170,7 @@ export default function Billing() {
                         <th>Basic ch.</th>
                         <th>Min. ch.</th>
                         <th>Water ch.</th>
-                        <th>Svrge ch.</th>
+                        <th>Swrge ch.</th>
                         <th>STP</th>
                         <th>( Fixed ch.+</th>
                         <th>Mtr Srvc ch.=</th>

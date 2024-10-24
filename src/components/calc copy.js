@@ -12,15 +12,13 @@ export function calculateWaterBill(readings) {
 
   for (const reading of readings) {
     console.log('reading', reading)
-    let { curr_cons, curr_cons1, curr_rdg, last_rdg,  category, meter_size, meter_stts } =
+    let { current_consumption, category, connection_size, meter_status } =
       reading;
     let basicCharge = 0;
-    if (meter_stts == "ok") {
-      reading.consumption = curr_cons;
-      let rdg = curr_rdg - last_rdg
-      reading.rdg = rdg
+    if (meter_status == "ok") {
+      reading.consumption = current_consumption;
       if (
-        getZeroOnConsumption(meter_size, category, curr_cons)
+        getZeroOnConsumption(connection_size, category, current_consumption)
       ) {
         basicCharge = 0;
       } else {
@@ -28,24 +26,18 @@ export function calculateWaterBill(readings) {
       }
     } else {
       let getRuleConsumption = consumptionRules.find(
-        (c) => c.meter_status == meter_stts
+        (c) => c.meter_status == meter_status
       );
 
-      if (getRuleConsumption?.rule == "average") {
-        // reading.averageConsumption = getAverageConsumption(reading);
-        // reading.consumption = reading.averageConsumption;
-        reading.averageConsumption = reading.pre_cons
-        reading.consumption = reading.averageConsumption
-      basicCharge = getBasicCharge(reading);
-
-      } else if (getRuleConsumption?.rule == "minimum") {
+      if (getRuleConsumption.rule == "average") {
+        reading.averageConsumption = getAverageConsumption(reading);
+        reading.consumption = reading.averageConsumption;
+      } else if (getRuleConsumption.rule == "minimum") {
         reading.basicCharge = 0;
-
-
-        reading.consumption = reading.meter_stts;
-        
+        reading.consumption = reading.meter_status;
       }
 
+      basicCharge = getBasicCharge(reading);
 
     }
 
@@ -62,12 +54,12 @@ export function calculateWaterBill(readings) {
         : reading.minimum;
 
     reading.fixedCharge = addFixedCharge(reading);
-    reading.sewerageCharge = getSewerageCharge(reading, reading.basicCharge);
+    reading.severageCharge = getSeverageCharge(reading, reading.basicCharge);
 
     if (reading.stp == "y") {
-      reading.stpCharge = getStpCharge(reading);
+      reading.stp = getStpCharge(reading);
     } else {
-      reading.stpCharge = 0;
+      reading.stp = 0;
     }
 
     reading.idc = getIDC(reading);
@@ -75,8 +67,8 @@ export function calculateWaterBill(readings) {
     reading.bill =
       reading.waterCharge +
       reading.fixedCharge.total_fixed_charge +
-      reading.sewerageCharge +
-      reading.stpCharge +
+      reading.severageCharge +
+      reading.stp +
       reading.idc;
 
     let rebate = 0;
@@ -91,13 +83,14 @@ export function calculateWaterBill(readings) {
 }
 
 function getBasicCharge(reading) {
-  let { meter_size, consumption } = reading;
+  let { connection_size, consumption } = reading;
 
   let bCharge = 0;
   let previousMax = 0;
+
   let catSlabs = slabs.filter((s) => {
     if (s.category == reading.category) {
-      return meter_size > 25 ? s.isBulk == true : s.isBulk == false;
+      return connection_size > 25 ? s.isBulk == true : s.isBulk == false;
     }
   });
 
@@ -117,31 +110,28 @@ function getBasicCharge(reading) {
   return bCharge;
 }
 
-function getZeroOnConsumption(meter_size, category, curr_cons) {
+function getZeroOnConsumption(connection_size, category, current_consumption) {
   return (
-    meter_size == 15 && category == "d" && curr_cons <= 15000
+    connection_size == 15 && category == "d" && current_consumption <= 15000
   );
 }
 
 function getMinimumCharge(reading) {
-  reading.cid == "140110108119" && console.log("minimum readings", reading);
   let minimumChargeData = minimumCharges.find((m) => {
     return (
-      m.meter_size == reading.meter_size &&
+      m.connection_size == reading.connection_size &&
       m.category == reading.category
     );
   });
-
-  reading.cid == "140110108119" && console.log('minimumChargeData', minimumChargeData)
-  let minimumCharge = minimumChargeData?.min_charges;
+  let minimumCharge = minimumChargeData.min_charges;
   if (
-    reading.meter_size == 15 &&
-    reading.meter_stts.toLowerCase() == "ok" &&
-    reading.curr_cons <= 15000
+    reading.connection_size == 15 &&
+    reading.meter_status.toLowerCase() == "ok" &&
+    reading.current_consumption <= 15000
   ) {
     minimumCharge = 0;
   } else {
-    minimumCharge = minimumChargeData?.min_charges;
+    minimumCharge = minimumChargeData.min_charges;
   }
 
   if (reading.connection_type == "t") {
@@ -155,15 +145,15 @@ function addFixedCharge(reading) {
   let fixedChargeData = fixedCharges.find((f) => {
     // console.log("value of f ",f)
     return (
-      f.meter_size == reading.meter_size &&
+      f.connection_size == reading.connection_size &&
       f.category == reading.category
     );
   });
 
   let meterServiceData = meterServiceCharges.find((m) => {
-    return m.meter_size == reading.meter_size;
+    return m.connection_size == reading.connection_size;
   });
-  let fixedCharge = fixedChargeData?.fixed_charges;
+  let fixedCharge = fixedChargeData.fixed_charges;
   let meterServiceCharge = meterServiceData.meter_service;
 
   return {
@@ -173,10 +163,10 @@ function addFixedCharge(reading) {
   };
 }
 
-function getSewerageCharge(reading) {
-  const { waterCharge, sewerage_tax } = reading;
-  let sewerageCharge = sewerage_tax == "y" ? (waterCharge * 20) / 100 : 0;
-  return sewerageCharge;
+function getSeverageCharge(reading) {
+  const { waterCharge, severage } = reading;
+  let severageCharge = severage == "y" ? (waterCharge * 20) / 100 : 0;
+  return severageCharge;
 }
 
 function getAverageConsumption(reading) {
@@ -206,9 +196,9 @@ function getAverageConsumption(reading) {
 
 function getStpCharge(reading) {
   // 13% of water charge whatever the connection category is
-  let stpCharge = (reading.waterCharge * 13) / 100;
+  let stp = (reading.waterCharge * 13) / 100;
   // console.log(stp,"stp charge ")
-  return stpCharge;
+  return stp;
 }
 
 function getIDC(reading) {
