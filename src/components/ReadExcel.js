@@ -1,43 +1,38 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import readXlsxFile from "read-excel-file";
 
-export default function ReadExcel({ setReadings }) {
+export default function ReadExcel({ setReadings, displayItem }) {
   const imagRef = useRef();
+  useEffect(() => {
+    if (!displayItem) {
+      imagRef.current.value = "";
+    }
+  }, [displayItem])
+
+  //new code start from here
   const handleReadExcel = (file) => {
     readXlsxFile(file).then((rows) => {
-      let arr1 = rows[0];
-      let arr2 = rows[1];
+      let header = rows[0];
+      let data = rows[1];
 
-      let keys = arr1.map((value, index) => {
-        // imagRef.current.value = "";
-        // console.log("arr2[index]", arr2[index]);
-        return value === null ? arr2[index] : value.toLowerCase();
+      let keys = header.map((value, index) => {
+        return value === null ? data[index] : value.toLowerCase();
       });
 
       const valueSheet = rows.slice(2);
 
       const keyReplacements = {
-        category: "category",
-        size: "connection_size",
-        "current consumption": "current_consumption",
+        Category: "category",
         "connection type": "connection_type",
-        rebate: "rebate",
-        severage: "severage",
-        "meter status": "meter_status",
-        current: "current_reading",
+        "sewerage tax": "sewerage_tax",
       };
 
       const mappedArray = valueSheet.map((values) => {
         return keys.reduce((obj, key, index) => {
           let k = typeof key == String ? key.toLowerCase() : key;
-
           obj[k] = values[index];
-          if (k == "meter reading") {
-            obj[7] = values[index];
-          }
-
           let newObj = Object.fromEntries(
             Object.entries(obj).map(([k, v]) => [
               keyReplacements[k] || k,
@@ -47,10 +42,60 @@ export default function ReadExcel({ setReadings }) {
           return newObj;
         }, {});
       });
-      // console.log("mappedArray", mappedArray);
       setReadings(mappedArray);
-    });
-  };
+    })
+  }
+  //new code end 
+
+  //OLD CODE START FROM HERE
+    // const handleReadExcel = (file) => {
+    //     readXlsxFile(file).then((rows) => {
+    //       let arr1 = rows[0];
+    //       let arr2 = rows[1];
+
+    //       let keys = arr1.map((value, index) => {
+
+    //         return value === null ? arr2[index] : value.toLowerCase();
+    //       });
+
+    //       const valueSheet = rows.slice(2);
+
+    //       const keyReplacements = {
+    //         category: "category",
+    //         size: "connection_size",
+    //         "current consumption": "current_consumption",
+    //         "connection type": "connection_type",
+    //         rebate: "rebate",
+    //         severage: "severage",
+    //         "meter status": "meter_status",
+    //         current: "current_reading",
+    //       };
+
+    //       const mappedArray = valueSheet.map((values) => {
+    //         return keys.reduce((obj, key, index) => {
+    //           let k = typeof key == String ? key.toLowerCase() : key;
+
+    //           obj[k] = values[index];
+    //           if (k == "meter reading") {
+    //             obj[7] = values[index];
+    //           }
+
+    //           let newObj = Object.fromEntries(
+    //             Object.entries(obj).map(([k, v]) => [
+    //               keyReplacements[k] || k,
+    //               typeof v == "string" ? v.toLowerCase() : v,
+    //             ])
+    //           );
+    //           return newObj;
+    //         }, {});
+    //       });
+    //       // console.log("mappedArray", mappedArray);
+    //       setReadings(mappedArray);
+    //     });
+    //   };
+  //OLD CODE END FROM HERE
+
+
   return (
     <>
       <div className="p-2 m-2 mt-8">
@@ -60,12 +105,14 @@ export default function ReadExcel({ setReadings }) {
         <input
           ref={imagRef}
           type="file"
-          name="file"
+          // name="file"
           onChange={(e) => {
             const file = e.target.files[0];
+            // console.log(file, "file name is")
             handleReadExcel(file);
           }}
         />
+
       </div>
       <div className="p-2 m-2">
         <a
@@ -80,7 +127,7 @@ export default function ReadExcel({ setReadings }) {
           Download Your Sample File
         </a>
       </div>
-      
+
     </>
   );
 }

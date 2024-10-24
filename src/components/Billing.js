@@ -42,13 +42,14 @@ export default function Billing() {
       );
     });
   const resetData = () => {
-    // console.log("value of e", e)
+    // console.log("value of displayItem", displayItem)
     // readings.length = 0;
     setDisplayItem(false);
     setReadings([]);
     setWaterBill([]);
   };
   const downloadCSV = (waterBill) => {
+    console.log("waterBill",waterBill)
     // Mapping for header names
     const headerMap = {
       1: "First Month",
@@ -75,7 +76,7 @@ export default function Billing() {
     for (const row of waterBill) {
       const values = headers.map((header) => {
         let value = row[header] || "";
-
+        
         if (header === "fixedCharge") {
           value = row[header]?.fixed_charge || "";
         } else if (header === "severageCharge") {
@@ -130,7 +131,7 @@ export default function Billing() {
             <h2 className="m-2 text-4xl font-bold tracking-tight text-gray -mt-20">
               Water Billing System
             </h2>
-            <ReadExcel setReadings={setReadings} />
+            <ReadExcel setReadings={setReadings} displayItem={displayItem}/>
 
             {displayItem ? (
               <>
