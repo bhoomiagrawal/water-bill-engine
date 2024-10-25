@@ -3,45 +3,93 @@
 import { useEffect, useState } from "react";
 import ReadExcel from "./ReadExcel";
 import { calculateWaterBill } from "@/components/calc";
+import DataTable from "./DataTable";
 
 export default function Billing() {
   const [readings, setReadings] = useState([]);
   const [displayItem, setDisplayItem] = useState(false);
   const [waterBill, setWaterBill] = useState([]);
+  const [waterBillPrev, setWaterBillPrev] = useState([]);
+  const [data, setData] = useState([])
 
   useEffect(() => {
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
+      if (readings.curr_cons1) {
+        let previous_readings = {
+          ...readings,
+          curr_cons: readings.curr_cons1,
+          curr_rdg: readings.curr_rdg1,
+          pre_cons: readings.pre_cons1,
+          last_rdg: readings.curr_rdg,
+          meter_stts: readings.meter_stts1,
+        }
+        console.log('calculateWaterBill(previous_readings)', calculateWaterBill(previous_readings))
+        setWaterBillPrev(calculateWaterBill(previous_readings));
+
+
+
+      }
+    
+
       setDisplayItem(true);
     }
-  }, [readings]);
-  const getUI = () =>
-    waterBill?.map((r, i) => {
-      // console.log("value of waterbill array ",r?.stp?.toFixed(1))
-      return (
-        <tr key={i}>
-          <td> {r.cid}</td>
-          <td> {r.category}</td>
-          <td> {r.meter_size}</td>
-          <td> {r.connection_type}</td>
-          <td> {r.consumption}</td>
-          {/* <td> {r.averageConsumption}</td> */}
-          <td> {r.meter_stts}</td>
-          <td> {r.basicCharge?.toFixed(2)}</td>
-          <td> {r.minimum?.toFixed(1)}</td>
-          <td> {r.waterCharge?.toFixed(1)}</td>
-          <td> {r.sewerageCharge?.toFixed(1)}</td>
-          <td> {r.stpCharge?.toFixed(1)}</td>
-          <td> {r.fixedCharge?.fixed_charge}</td>
-          <td> {r.fixedCharge?.service_charge}</td>
-          <td> {r.fixedCharge?.total_fixed_charge}</td>
-          <td> {r.idc?.toFixed(1)}</td>
-          {/* <td> {Math.round(r.bill)}</td> */}
-          <td> {r.bill?.toFixed(1)}</td>
-          <td> {r.rebate}</td>
-        </tr>
-      );
+  }, [readings, waterBillPrev]);
+
+  useEffect(() => {
+    if(waterBill.length && waterBillPrev.length) {
+
+      let merged = mergedArray(waterBill, waterBillPrev)
+      console.log('merged', merged)
+      setData(merged);
+    }
+  },[waterBill.length, waterBillPrev.length])
+
+  const mergedArray = (array1, array2) => {
+    return array1.map(obj1 => {
+      console.log('obj1', obj1)
+      console.log('array2', array2)
+      const obj2 = array2.find(obj => obj.cid === obj1.cid);
+      return {
+        ...obj1,
+        ...(obj2 ? { prev: obj2 } : {})
+      };
     });
+  }
+
+  // const getUI = () =>
+  //   waterBill?.map((r, i) => {
+  //     // console.log("value of waterbill array ",r?.stp?.toFixed(1))
+  //     return (
+  //       <tr key={i}  className="odd:bg-white even:bg-gray-100">
+  //         <td className="px-4 py-2 border"> {r.cid}</td>
+  //         <td className="px-4 py-2 border"> {r.category}</td>
+  //         <td className="px-4 py-2 border"> {r.meter_size}</td>
+  //         <td className="px-4 py-2 border"> {r.connection_type}</td>
+  //         <td className="px-4 py-2 border"> {r.consumption}</td>
+  //         {/* <td className="px-4 py-2 border"> {r.averageConsumption}</td> */}
+  //         <td className="px-4 py-2 border"> {r.meter_stts}</td>
+  //         <td className="px-4 py-2 border"> {r.basicCharge?.toFixed(2)}</td>
+  //         <td className="px-4 py-2 border"> {r.minimum?.toFixed(1)}</td>
+  //         <td className="px-4 py-2 border"> {r.waterCharge?.toFixed(1)}</td>
+  //         <td className="px-4 py-2 border"> {r.curr_watr}</td>
+  //         <td className="px-4 py-2 border"> {r.sewerageCharge?.toFixed(1)}</td>
+
+  //         <td className="px-4 py-2 border"> {r.stpCharge?.toFixed(1)}</td>
+  //         <td className="px-4 py-2 border">
+  //           {r.curr_swtx}
+  //         </td>
+  //         <td className="px-4 py-2 border"> {r.fixedCharge?.fixed_charge}</td>
+  //         <td className="px-4 py-2 border"> {r.fixedCharge?.service_charge}</td>
+  //         <td className="px-4 py-2 border"> {r.fixedCharge?.total_fixed_charge}</td>
+  //         <td className="px-4 py-2 border"> {r.idc?.toFixed(1)}</td>
+  //         <td className="px-4 py-2 border">{r.curr_devp}</td>
+  //         {/* <td className="px-4 py-2 border"> {Math.round(r.bill)}</td> */}
+  //         <td className="px-4 py-2 border"> {r.bill?.toFixed(1)}</td>
+  //         <td className="px-4 py-2 border"> {r.rebate}</td>
+  //       </tr>
+  //     );
+  //   });
   const resetData = () => {
     // console.log("value of displayItem", displayItem)
     // readings.length = 0;
@@ -50,7 +98,7 @@ export default function Billing() {
     setWaterBill([]);
   };
   const downloadCSV = (waterBill) => {
-    console.log("waterBill",waterBill)
+    console.log("waterBill", waterBill)
     // Mapping for header names
     const headerMap = {
       1: "First Month",
@@ -77,7 +125,7 @@ export default function Billing() {
     for (const row of waterBill) {
       const values = headers.map((header) => {
         let value = row[header] || "";
-        
+
         if (header === "fixedCharge") {
           value = row[header]?.fixed_charge || "";
         } else if (header === "sewerageCharge") {
@@ -117,6 +165,32 @@ export default function Billing() {
     document.body.removeChild(link); // Remove link from the DOM
     URL.revokeObjectURL(csvUrl);
   };
+
+  const columns = [
+    { header: "CID", accessor: "cid" },
+    { header: "Ctgry", accessor: "category" },
+    { header: "Conn.Size", accessor: "meter_size" },
+    { header: "conn. type", accessor: "connection_type" },
+    { header: "Cnsmp", accessor: "consumption" },
+    { header: "Mtr status", accessor: "meter_stts" },
+    { header: "Basic ch.", accessor: "basicCharge" },
+    { header: "Min. ch.", accessor: "minimum" },
+    { header: "Water ch.", accessor: "waterCharge" },
+    { header: "xls Water ch.", accessor: "curr_watr" },
+    { header: "Swrge ch.", accessor: "sewerageCharge" },
+    { header: "STP", accessor: "stpCharge" },
+    { header: "xls Swrge ch.", accessor: "curr_swtx" },
+    { header: "Fixed ch.", accessor: "fixedCharge.fixed_charge" },
+    { header: "Mtr Srvc ch.", accessor: "fixedCharge.service_charge" },
+    { header: "IDC", accessor: "idc" },
+    { header: "xls IDC", accessor: "curr_devp" },
+    { header: "Bill", accessor: "bill" },
+    { header: "Rebate", accessor: "rebate" },
+
+
+  ];
+
+
   return (
     <>
       <div className="bg-blue-100 relative isolate overflow-hidden py-24 sm:py-32 min-h-screen">
@@ -132,7 +206,7 @@ export default function Billing() {
             <h2 className="m-2 text-4xl font-bold tracking-tight text-gray -mt-20">
               Water Billing System
             </h2>
-            <ReadExcel setReadings={setReadings} displayItem={displayItem}/>
+            <ReadExcel setReadings={setReadings} displayItem={displayItem} />
 
             {displayItem ? (
               <>
@@ -154,7 +228,8 @@ export default function Billing() {
                   <h2 className="p-2 m-2 mt-8 font-bold text-center">
                     Water Bill Calculation
                   </h2>
-                  <table
+
+                  {/* <table
                     className="table table-striped mt-6 text-lg leading-8 "
                     style={{ width: "100%" }}
                   >
@@ -165,25 +240,30 @@ export default function Billing() {
                         <th>Conn.Size</th>
                         <th>Conn.Type</th>
                         <th>Cnsmp.</th>
-                        {/* <th>Average Consumption</th> */}
+                     
                         <th>Mtr status</th>
                         <th>Basic ch.</th>
                         <th>Min. ch.</th>
                         <th>Water ch.</th>
+                        <th>xls Water ch.</th>
                         <th>Swrge ch.</th>
                         <th>STP</th>
+                        <th>xls Swrge ch.</th>
                         <th>( Fixed ch.+</th>
                         <th>Mtr Srvc ch.=</th>
                         <th>Ttl Fxd ch.)</th>
                         <th>IDC</th>
+                        <th>xls IDC</th>
                         <th>Bill</th>
                         <th>Rebate</th>
-                        {/* <th>Rebate</th>
-                        <th>RebateCharge</th> */}
+                     
                       </tr>
                     </thead>
                     <tbody>{getUI()}</tbody>
-                  </table>
+                  </table> */}
+
+
+                  <DataTable data={data} columns={columns} />
                 </div>
               </>
             ) : (

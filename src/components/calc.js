@@ -11,9 +11,7 @@ import {
 export function calculateWaterBill(readings) {
 
   for (const reading of readings) {
-    console.log('reading', reading)
-    let { curr_cons, curr_cons1, curr_rdg, last_rdg,  category, meter_size, meter_stts } =
-      reading;
+    let { curr_cons, curr_rdg, last_rdg,  category, meter_size, meter_stts } = reading;
     let basicCharge = 0;
     if (meter_stts == "ok") {
       reading.consumption = curr_cons;

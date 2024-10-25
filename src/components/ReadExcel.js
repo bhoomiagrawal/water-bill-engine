@@ -21,7 +21,7 @@ export default function ReadExcel({ setReadings, displayItem }) {
         return value === null ? data[index] : value.toLowerCase();
       });
 
-      const valueSheet = rows.slice(2);
+      const valueSheet = rows.slice(1);
 
       const keyReplacements = {
         Category: "category",
