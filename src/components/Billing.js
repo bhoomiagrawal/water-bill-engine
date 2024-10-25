@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ReadExcel from "./ReadExcel";
 import { calculateWaterBill } from "@/components/calc";
 import DataTable from "./DataTable";
+import ComputationSheet from "./ComputationSheet";
 
 export default function Billing() {
   const [readings, setReadings] = useState([]);
@@ -11,6 +12,14 @@ export default function Billing() {
   const [waterBill, setWaterBill] = useState([]);
   const [waterBillPrev, setWaterBillPrev] = useState([]);
   const [data, setData] = useState([])
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null); // To store the selected record for printing
+
+  const handleDownloadClick = (record) => {
+    console.log("data pass ",record)
+    setSelectedRecord(record); // Set the selected record
+    setShowPrintModal(true);
+  };
 
   useEffect(() => {
     if (readings.length) {
@@ -87,6 +96,14 @@ export default function Billing() {
   //         {/* <td className="px-4 py-2 border"> {Math.round(r.bill)}</td> */}
   //         <td className="px-4 py-2 border"> {r.bill?.toFixed(1)}</td>
   //         <td className="px-4 py-2 border"> {r.rebate}</td>
+//   <td>
+//   <button
+//     onClick={() => handleDownloadClick(r)} // Pass the entire record
+//     className="text-blue-600 underline hover:text-blue-800"
+//   >
+//     Download
+//   </button>
+// </td>
   //       </tr>
   //     );
   //   });
@@ -99,6 +116,7 @@ export default function Billing() {
   };
   const downloadCSV = (waterBill) => {
     console.log("waterBill", waterBill)
+    // console.log("waterBill",waterBill)
     // Mapping for header names
     const headerMap = {
       1: "First Month",
@@ -265,6 +283,13 @@ export default function Billing() {
 
                   <DataTable data={data} columns={columns} />
                 </div>
+                 {/* Print Modal */}
+                 {showPrintModal && selectedRecord && (
+                  <ComputationSheet
+                    selectedRecord={selectedRecord}
+                    setShowPrintModal={setShowPrintModal}
+                  />
+                )}
               </>
             ) : (
               ""
