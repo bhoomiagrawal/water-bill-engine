@@ -127,7 +127,7 @@ const getNestedValue = (obj, path) => {
                 {columns.map((column) => (
                   <td key={column.accessor} className="px-4 py-2 border">
                     {/* {row[column.accessor]} */}
-                    {getNestedValue(row, column.accessor)}
+                    {column.Cell ? column.Cell(row) : getNestedValue(row, column.accessor)}
                   </td>
                 ))}
               </tr>

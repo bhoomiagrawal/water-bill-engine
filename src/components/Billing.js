@@ -10,8 +10,6 @@ export default function Billing() {
   const [readings, setReadings] = useState([]);
   const [displayItem, setDisplayItem] = useState(false);
   const [waterBill, setWaterBill] = useState([]);
-  const [waterBillPrev, setWaterBillPrev] = useState([]);
-  const [data, setData] = useState([])
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null); // To store the selected record for printing
 
@@ -24,89 +22,18 @@ export default function Billing() {
   useEffect(() => {
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
-      if (readings.curr_cons1) {
-        let previous_readings = {
-          ...readings,
-          curr_cons: readings.curr_cons1,
-          curr_rdg: readings.curr_rdg1,
-          pre_cons: readings.pre_cons1,
-          last_rdg: readings.curr_rdg,
-          meter_stts: readings.meter_stts1,
-        }
-        console.log('calculateWaterBill(previous_readings)', calculateWaterBill(previous_readings))
-        setWaterBillPrev(calculateWaterBill(previous_readings));
 
-
-
-      }
-    
 
       setDisplayItem(true);
     }
-  }, [readings, waterBillPrev]);
+  }, [readings]);
 
-  useEffect(() => {
-    if(waterBill.length && waterBillPrev.length) {
+  console.log('waterBill', waterBill)
 
-      let merged = mergedArray(waterBill, waterBillPrev)
-      console.log('merged', merged)
-      setData(merged);
-    }
-  },[waterBill.length, waterBillPrev.length])
 
-  const mergedArray = (array1, array2) => {
-    return array1.map(obj1 => {
-      console.log('obj1', obj1)
-      console.log('array2', array2)
-      const obj2 = array2.find(obj => obj.cid === obj1.cid);
-      return {
-        ...obj1,
-        ...(obj2 ? { prev: obj2 } : {})
-      };
-    });
-  }
 
-  // const getUI = () =>
-  //   waterBill?.map((r, i) => {
-  //     // console.log("value of waterbill array ",r?.stp?.toFixed(1))
-  //     return (
-  //       <tr key={i}  className="odd:bg-white even:bg-gray-100">
-  //         <td className="px-4 py-2 border"> {r.cid}</td>
-  //         <td className="px-4 py-2 border"> {r.category}</td>
-  //         <td className="px-4 py-2 border"> {r.meter_size}</td>
-  //         <td className="px-4 py-2 border"> {r.connection_type}</td>
-  //         <td className="px-4 py-2 border"> {r.consumption}</td>
-  //         {/* <td className="px-4 py-2 border"> {r.averageConsumption}</td> */}
-  //         <td className="px-4 py-2 border"> {r.meter_stts}</td>
-  //         <td className="px-4 py-2 border"> {r.basicCharge?.toFixed(2)}</td>
-  //         <td className="px-4 py-2 border"> {r.minimum?.toFixed(1)}</td>
-  //         <td className="px-4 py-2 border"> {r.waterCharge?.toFixed(1)}</td>
-  //         <td className="px-4 py-2 border"> {r.curr_watr}</td>
-  //         <td className="px-4 py-2 border"> {r.sewerageCharge?.toFixed(1)}</td>
 
-  //         <td className="px-4 py-2 border"> {r.stpCharge?.toFixed(1)}</td>
-  //         <td className="px-4 py-2 border">
-  //           {r.curr_swtx}
-  //         </td>
-  //         <td className="px-4 py-2 border"> {r.fixedCharge?.fixed_charge}</td>
-  //         <td className="px-4 py-2 border"> {r.fixedCharge?.service_charge}</td>
-  //         <td className="px-4 py-2 border"> {r.fixedCharge?.total_fixed_charge}</td>
-  //         <td className="px-4 py-2 border"> {r.idc?.toFixed(1)}</td>
-  //         <td className="px-4 py-2 border">{r.curr_devp}</td>
-  //         {/* <td className="px-4 py-2 border"> {Math.round(r.bill)}</td> */}
-  //         <td className="px-4 py-2 border"> {r.bill?.toFixed(1)}</td>
-  //         <td className="px-4 py-2 border"> {r.rebate}</td>
-//   <td>
-//   <button
-//     onClick={() => handleDownloadClick(r)} // Pass the entire record
-//     className="text-blue-600 underline hover:text-blue-800"
-//   >
-//     Download
-//   </button>
-// </td>
-  //       </tr>
-  //     );
-  //   });
+
   const resetData = () => {
     // console.log("value of displayItem", displayItem)
     // readings.length = 0;
@@ -191,23 +118,62 @@ export default function Billing() {
     { header: "conn. type", accessor: "connection_type" },
     { header: "Cnsmp", accessor: "consumption" },
     { header: "Mtr status", accessor: "meter_stts" },
-    { header: "Basic ch.", accessor: "basicCharge" },
+    { header: "Basic ch.", accessor: "basicCharge", Cell: (row) => 
+      (row.basicCharge).toFixed(1) },
     { header: "Min. ch.", accessor: "minimum" },
-    { header: "Water ch.", accessor: "waterCharge" },
+    { header: "Water ch.", accessor: "waterCharge", Cell: (row) => 
+      (row.basicCharge).toFixed(1) },
     { header: "xls Water ch.", accessor: "curr_watr" },
     { header: "Swrge ch.", accessor: "sewerageCharge" },
     { header: "STP", accessor: "stpCharge" },
     { header: "xls Swrge ch.", accessor: "curr_swtx" },
     { header: "Fixed ch.", accessor: "fixedCharge.fixed_charge" },
     { header: "Mtr Srvc ch.", accessor: "fixedCharge.service_charge" },
-    { header: "IDC", accessor: "idc" },
+    { header: "IDC", accessor: "idc", Cell: (row) => 
+      (row.idc).toFixed(1) },
     { header: "xls IDC", accessor: "curr_devp" },
-    { header: "Bill", accessor: "bill" },
+
+    { header: "Bill", accessor: "bill", Cell: (row) => 
+       Math.round(row.bill) },
+
     { header: "Rebate", accessor: "rebate" },
 
 
-  ];
 
+
+    { header: "Prev Cnsmp", accessor: "prev.consumption" },
+    { header: "Prev Mtr status", accessor: "prev.meter_stts" },
+    { header: "Prev Basic ch.", accessor: "prev.basicCharge", Cell: (row) => 
+      (row.prev.basicCharge).toFixed(1) },
+    { header: "Prev Min. ch.", accessor: "prev.minimum" },
+    { header: "Prev Water ch.", accessor: "prev.waterCharge", Cell: (row) => 
+      (row.prev.waterCharge).toFixed(1) },
+    { header: "Prev xls Water ch.", accessor: "curr_watr1" },
+    { header: "Prev Swrge ch.", accessor: "prev.sewerageCharge" },
+    { header: "Prev STP", accessor: "prev.stpCharge" },
+    { header: "Prev xls Swrge ch.", accessor: "curr_swtx1" },
+    { header: "Prev Fixed ch.", accessor: "prev.fixedCharge.fixed_charge" },
+    { header: "Prev Mtr Srvc ch.", accessor: "prev.fixedCharge.service_charge" },
+    { header: "Prev IDC", accessor: "prev.idc", Cell: (row) => 
+      (row.prev.idc).toFixed(1) },
+
+
+    { header: "Prev Bill", accessor: "prev.bill", Cell: (row) => 
+      (row.prev.bill).toFixed(1) },
+    { header: "Prev Rebate", accessor: "prev.rebate" },
+
+
+//   <button
+//     onClick={() => handleDownloadClick(r)} // Pass the entire record
+//     className="text-blue-600 underline hover:text-blue-800"
+//   >
+//     Download
+//   </button>
+
+
+
+
+  ];
 
   return (
     <>
@@ -247,41 +213,10 @@ export default function Billing() {
                     Water Bill Calculation
                   </h2>
 
-                  {/* <table
-                    className="table table-striped mt-6 text-lg leading-8 "
-                    style={{ width: "100%" }}
-                  >
-                    <thead>
-                      <tr className="row-auto ">
-                        <th>CID</th>
-                        <th>Ctgry</th>
-                        <th>Conn.Size</th>
-                        <th>Conn.Type</th>
-                        <th>Cnsmp.</th>
-                     
-                        <th>Mtr status</th>
-                        <th>Basic ch.</th>
-                        <th>Min. ch.</th>
-                        <th>Water ch.</th>
-                        <th>xls Water ch.</th>
-                        <th>Swrge ch.</th>
-                        <th>STP</th>
-                        <th>xls Swrge ch.</th>
-                        <th>( Fixed ch.+</th>
-                        <th>Mtr Srvc ch.=</th>
-                        <th>Ttl Fxd ch.)</th>
-                        <th>IDC</th>
-                        <th>xls IDC</th>
-                        <th>Bill</th>
-                        <th>Rebate</th>
-                     
-                      </tr>
-                    </thead>
-                    <tbody>{getUI()}</tbody>
-                  </table> */}
+                 
 
 
-                  <DataTable data={data} columns={columns} />
+                  <DataTable data={waterBill} columns={columns} />
                 </div>
                  {/* Print Modal */}
                  {showPrintModal && selectedRecord && (
