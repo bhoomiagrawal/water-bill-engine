@@ -10,65 +10,26 @@ import {
 
 export function calculateWaterBill(readings) {
 
-  for (const reading of readings) {
-    let { curr_cons, curr_rdg, last_rdg,  category, meter_size, meter_stts } = reading;
-    let basicCharge = 0;
-    if (meter_stts == "ok") {
-      reading.consumption = curr_cons;
-      let rdg = curr_rdg - last_rdg
-      reading.rdg = rdg
-      if (
-        getZeroOnConsumption(meter_size, category, curr_cons)
-      ) {
-        basicCharge = 0;
-      } else {
-        basicCharge = getBasicCharge(reading);
+  for (let reading of readings) {
+
+    let calculation = getCalculation(reading);
+    let previous_readings = {};
+    let calculation_prev = {}
+    console.log('calculation', calculation)
+    if (reading.curr_cons1) {
+      previous_readings = {
+        ...reading,
+        curr_cons: readings.curr_cons1,
+        curr_rdg: readings.curr_rdg1,
+        pre_cons: readings.pre_cons1,
+        last_rdg: readings.curr_rdg,
+        meter_stts: readings.meter_stts1,
       }
-    } else {
-      let getRuleConsumption = consumptionRules.find(
-        (c) => c.meter_status == meter_stts
-      );
-
-      if (getRuleConsumption?.rule == "average") {
-        // reading.averageConsumption = getAverageConsumption(reading);
-        // reading.consumption = reading.averageConsumption;
-        reading.averageConsumption = reading.pre_cons
-        reading.consumption = reading.averageConsumption
-      basicCharge = getBasicCharge(reading);
-
-      } else if (getRuleConsumption?.rule == "minimum") {
-        reading.basicCharge = 0;
-
-
-        reading.consumption = reading.meter_stts;
-        
-      }
-
+      calculation_prev = getCalculation(reading)
 
     }
-
-    reading.basicCharge =
-      reading.connection_type == "t" ? basicCharge * 1.5 : basicCharge;
-    reading.minimum = getMinimumCharge(reading);
-    // check for rebate in domestic connection
-
-    // compare water charge with minimum charge
-
-    reading.waterCharge =
-      reading.basicCharge >= reading.minimum
-        ? reading.basicCharge
-        : reading.minimum;
-
-    reading.fixedCharge = addFixedCharge(reading);
-    reading.sewerageCharge = getSewerageCharge(reading, reading.basicCharge);
-
-    if (reading.stp == "y") {
-      reading.stpCharge = getStpCharge(reading);
-    } else {
-      reading.stpCharge = 0;
-    }
-
-    reading.idc = getIDC(reading);
+    reading.prev = calculation_prev
+    console.log('reading', reading)
 
     reading.bill =
       reading.waterCharge +
@@ -77,15 +38,79 @@ export function calculateWaterBill(readings) {
       reading.stpCharge +
       reading.idc;
 
-    let rebate = 0;
-    if (reading.rebate) {
-      rebate = getRebate(reading);
-    }
-    reading.bill = reading.bill - rebate;
-    reading.rebate = rebate;
+
+    reading.bill = reading.bill - reading.rebate_amount;
+    // reading.rebate = rebate;
+
   }
 
   return readings;
+}
+
+function getCalculation(reading) {
+  let { curr_cons, curr_rdg, last_rdg, category, meter_size, meter_stts } = reading;
+  let basicCharge = 0;
+  if (meter_stts == "ok") {
+    reading.consumption = curr_cons;
+    let rdg = curr_rdg - last_rdg
+    reading.rdg = rdg
+    if (
+      getZeroOnConsumption(meter_size, category, curr_cons)
+    ) {
+      basicCharge = 0;
+    } else {
+      basicCharge = getBasicCharge(reading);
+    }
+  } else {
+    let getRuleConsumption = consumptionRules.find(
+      (c) => c.meter_status == meter_stts
+    );
+
+    if (getRuleConsumption?.rule == "average") {
+      // reading.averageConsumption = getAverageConsumption(reading);
+      // reading.consumption = reading.averageConsumption;
+      reading.averageConsumption = reading.pre_cons
+      reading.consumption = reading.averageConsumption
+      basicCharge = getBasicCharge(reading);
+
+    } else if (getRuleConsumption?.rule == "minimum") {
+      reading.basicCharge = 0;
+
+
+      reading.consumption = reading.meter_stts;
+
+    }
+
+
+  }
+
+  reading.basicCharge =
+    reading.connection_type == "t" ? basicCharge * 1.5 : basicCharge;
+  reading.minimum = getMinimumCharge(reading);
+  // check for rebate in domestic connection
+
+  // compare water charge with minimum charge
+
+  reading.waterCharge =
+    reading.basicCharge >= reading.minimum
+      ? reading.basicCharge
+      : reading.minimum;
+
+  reading.fixedCharge = addFixedCharge(reading);
+  reading.sewerageCharge = getSewerageCharge(reading, reading.basicCharge);
+
+  if (reading.stp == "y") {
+    reading.stpCharge = getStpCharge(reading);
+  } else {
+    reading.stpCharge = 0;
+  }
+
+  reading.idc = getIDC(reading);
+  let rebate_amount = 0;
+  if (reading.rebate) {
+    reading.rebate_amount = getRebate(reading);
+  }
+  return reading
 }
 
 function getBasicCharge(reading) {
