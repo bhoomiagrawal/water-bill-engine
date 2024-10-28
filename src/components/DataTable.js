@@ -61,6 +61,7 @@
 
 // components/DataTable.js
 import { useState } from "react";
+import * as XLSX from "xlsx";
 
 const DataTable = ({ data, columns }) => {
   const [sortConfig, setSortConfig] = useState(null);
@@ -93,9 +94,57 @@ const getNestedValue = (obj, path) => {
   //   setSortConfig({ key, direction });
   // };
 
+  // Export data to Excel
+  const exportToExcel = () => {
+    const exportData = data.map((row) => {
+      // Extract displayed data
+      let rowData = {};
+      // column.header
+      // myArray.filter(callbackFn)
+
+      let filteredColumns = columns.filter((c) => {
+        return (c.header != 'Computation Sheet')})
+      filteredColumns.forEach((column) => {
+        rowData[column.header] = getNestedValue(row, column.accessor);
+      });
+      
+      // Add extra columns (e.g., calculated fields)
+      // extraExportColumns.forEach((extraColumn) => {
+      //   rowData[extraColumn.header] = extraColumn.value(row);
+      // });
+      
+      return rowData;
+    });
+
+    // Convert data to sheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+     // Custom Formatting of Local Date and Time
+     const now = new Date();
+
+     const year = now.getFullYear();
+     const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+     const day = String(now.getDate()).padStart(2, "0");
+     const hours = String(now.getHours()).padStart(2, "0");
+     const minutes = String(now.getMinutes()).padStart(2, "0");
+     const seconds = String(now.getSeconds()).padStart(2, "0");
+ 
+     const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    // Download the Excel file
+    XLSX.writeFile(workbook,`calculatedBilling${formattedDateTime}.csv`);
+  };
+
   console.log('data asdfgh', data)
   return (
     <div className="max-w-full overflow-x-auto">
+      <button
+        onClick={exportToExcel}
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        Export to Excel
+      </button>
       <div className="max-h-96 overflow-y-auto">
         <table className="min-w-full border-collapse overflow-scroll">
           <thead>

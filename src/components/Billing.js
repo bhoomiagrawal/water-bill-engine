@@ -40,74 +40,74 @@ export default function Billing() {
     setReadings([]);
     setWaterBill([]);
   };
-  const downloadCSV = (waterBill) => {
-    console.log("waterBill", waterBill)
-    // Mapping for header names
-    const headerMap = {
-      1: "First Month",
-      2: "Second Month",
-      3: "Third Month",
-      4: "Fourth Month",
-      5: "Fifth Month",
-      6: "Sixth Month",
-      7: "Seventh Month",
-      fixedCharge: "Fixed Charge",
-      severageCharge: "Service Charge",
-    };
+  // const downloadCSV = (waterBill) => {
+  //   console.log("waterBill", waterBill)
+  //   // Mapping for header names
+  //   const headerMap = {
+  //     1: "First Month",
+  //     2: "Second Month",
+  //     3: "Third Month",
+  //     4: "Fourth Month",
+  //     5: "Fifth Month",
+  //     6: "Sixth Month",
+  //     7: "Seventh Month",
+  //     fixedCharge: "Fixed Charge",
+  //     severageCharge: "Service Charge",
+  //   };
 
-    const csvRows = [];
+  //   const csvRows = [];
 
-    // Get headers from the data
-    const headers = Object.keys(waterBill[0]);
+  //   // Get headers from the data
+  //   const headers = Object.keys(waterBill[0]);
 
-    // Map headers according to headerMap
-    const mappedHeaders = headers.map((header) => headerMap[header] || header);
-    csvRows.push(mappedHeaders.map((header) => `"${header}"`).join(","));
+  //   // Map headers according to headerMap
+  //   const mappedHeaders = headers.map((header) => headerMap[header] || header);
+  //   csvRows.push(mappedHeaders.map((header) => `"${header}"`).join(","));
 
-    // Format rows
-    for (const row of waterBill) {
-      const values = headers.map((header) => {
-        let value = row[header] || "";
+  //   // Format rows
+  //   for (const row of waterBill) {
+  //     const values = headers.map((header) => {
+  //       let value = row[header] || "";
 
-        if (header === "fixedCharge") {
-          value = row[header]?.fixed_charge || "";
-        } else if (header === "sewerageCharge") {
-          value = row[header]?.service_charge || "";
-        }
+  //       if (header === "fixedCharge") {
+  //         value = row[header]?.fixed_charge || "";
+  //       } else if (header === "sewerageCharge") {
+  //         value = row[header]?.service_charge || "";
+  //       }
 
-        // Handle cases with commas or quotes in the values
-        return `"${value.toString().replace(/"/g, '""')}"`;
-      });
-      csvRows.push(values.join(","));
+  //       // Handle cases with commas or quotes in the values
+  //       return `"${value.toString().replace(/"/g, '""')}"`;
+  //     });
+  //     csvRows.push(values.join(","));
 
-      // console.log("csv data print here ",csvRows);
-    }
+  //     // console.log("csv data print here ",csvRows);
+  //   }
 
-    // Create CSV blob
-    const csvData = new Blob([csvRows.join("\n")], { type: "text/csv" });
-    const csvUrl = URL.createObjectURL(csvData);
-    // Custom Formatting of Local Date and Time
-    const now = new Date();
+  //   // Create CSV blob
+  //   const csvData = new Blob([csvRows.join("\n")], { type: "text/csv" });
+  //   const csvUrl = URL.createObjectURL(csvData);
+  //   // Custom Formatting of Local Date and Time
+  //   const now = new Date();
 
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
+  //   const year = now.getFullYear();
+  //   const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  //   const day = String(now.getDate()).padStart(2, "0");
+  //   const hours = String(now.getHours()).padStart(2, "0");
+  //   const minutes = String(now.getMinutes()).padStart(2, "0");
+  //   const seconds = String(now.getSeconds()).padStart(2, "0");
 
-    const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    // Create a link and click it to download
-    const link = document.createElement("a");
-    link.href = csvUrl;
-    link.download = `calculatedBilling${formattedDateTime}.csv`;
-    document.body.appendChild(link); // Append to body to ensure it's in the DOM
-    link.click();
+  //   const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  //   // Create a link and click it to download
+  //   const link = document.createElement("a");
+  //   link.href = csvUrl;
+  //   link.download = `calculatedBilling${formattedDateTime}.csv`;
+  //   document.body.appendChild(link); // Append to body to ensure it's in the DOM
+  //   link.click();
 
-    // Clean up
-    document.body.removeChild(link); // Remove link from the DOM
-    URL.revokeObjectURL(csvUrl);
-  };
+  //   // Clean up
+  //   document.body.removeChild(link); // Remove link from the DOM
+  //   URL.revokeObjectURL(csvUrl);
+  // };
 
   const columns = [
     { header: "CID", accessor: "cid" },
@@ -233,12 +233,12 @@ export default function Billing() {
                   </button>
                 </div>
                 <div className="p-2 m-2">
-                  <button
+                  {/* <button
                     className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 hover:border-blue-500 rounded float-right"
                     onClick={() => downloadCSV(waterBill)}
                   >
                     Download
-                  </button>
+                  </button> */}
                   <h2 className="p-2 m-2 mt-8 font-bold text-center">
                     Water Bill Calculation
                   </h2>
