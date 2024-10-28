@@ -30,16 +30,22 @@ export function calculateWaterBill(readings) {
     }
     reading.prev = calculation_prev
     console.log('reading', reading)
+    console.log('reading.ostd_amt', reading.ostd_amt)
+    if (reading.category == "d") {
 
-    reading.bill =
-      reading.waterCharge +
-      reading.fixedCharge.total_fixed_charge +
-      reading.sewerageCharge +
-      reading.stpCharge +
-      reading.idc;
+      reading.two_mnth_bill = (reading.bill + reading.prev.bill).toFixed(1);
+      reading.lps = Math.round((reading.bill + reading.prev.bill) * 10) / 100
+      console.log('reading.two_mnth_bill +reading.ostd_amt', reading.two_mnth_bill + reading.ostd_amt, reading.two_mnth_bill, reading.ostd_amt)
+      reading.total_amount = reading.two_mnth_bill + reading.ostd_amt
 
+    } else {
+      reading.two_mnth_bill = (reading.bill).toFixed(1)
 
-    reading.bill = reading.bill - reading.rebate_amount;
+      reading.lps = Math.round((reading.bill) * 10) / 100
+      reading.total_amount = reading.two_mnth_bill + reading.ostd_amt
+
+    }
+
     // reading.rebate = rebate;
 
   }
@@ -106,10 +112,21 @@ function getCalculation(reading) {
   }
 
   reading.idc = getIDC(reading);
-  let rebate_amount = 0;
+  reading.rebate_amount = 0;
   if (reading.rebate) {
     reading.rebate_amount = getRebate(reading);
   }
+
+
+  reading.bill =
+    reading.waterCharge +
+    reading.fixedCharge.total_fixed_charge +
+    reading.sewerageCharge +
+    reading.stpCharge +
+    reading.idc;
+
+
+  reading.bill = reading.bill - reading.rebate_amount;
   return reading
 }
 

@@ -146,7 +146,6 @@ export default function Billing() {
 
 
 
-
     { header: "Prev Cnsmp", accessor: "prev.consumption" },
     { header: "Prev Mtr status", accessor: "prev.meter_stts" },
     {
@@ -175,15 +174,18 @@ export default function Billing() {
         (row.prev.bill)?.toFixed(1)
     },
     { header: "Prev Rebate", accessor: "prev.rebate" },
+    { header: "two month Bill", accessor: "two_mnth_bill" },
+    { header: "xls two month Bill", accessor: "", Cell: (row) => {
+      return row.curr_watr+row.curr_swtx+row.curr_metr+row.curr_capt+row.curr_devp+row.curr_watr1+row.curr_swtx1+row.curr_metr1+row.curr_capt1+row.curr_devp1
+    } },
+    { header: "LPS", accessor: "lps" },
+    { header: "xls LPS", accessor: "lps_amt" },
     { header: "Ostd Amt", accessor: "ostd_amt" },
     { header: "Ostd Int", accessor: "ostd_int" },
-    { header: "total amount", accessor: "", Cell: (row) => {
-      return Math.round(row.bill + row.prev?.bill + row.ostd_amt + row.ostd_int)
-    } },
-    { header: "xls total amount", accessor: "tot_amt_indate" },
-    
 
-    
+    { header: "total amount", accessor: "total_amount"},
+    { header: "xls total amount", accessor: "tot_amt_indate" },
+
     {
       header: "Computation Sheet", accessor: "", Cell: (row) => {
         return (
