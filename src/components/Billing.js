@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import ReadExcel from "./ReadExcel";
 import { calculateWaterBill } from "@/components/calc";
 import DataTable from "./DataTable";
-import ComputationSheet from "./ComputationSheet";
 
 export default function Billing() {
   const [readings, setReadings] = useState([]);
@@ -43,7 +42,6 @@ export default function Billing() {
   };
   const downloadCSV = (waterBill) => {
     console.log("waterBill", waterBill)
-    // console.log("waterBill",waterBill)
     // Mapping for header names
     const headerMap = {
       1: "First Month",
