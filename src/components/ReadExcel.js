@@ -121,8 +121,8 @@ export default function ReadExcel({ setReadings, displayItem }) {
       </div>
       <div className="p-2 m-2">
         <a
-          href="/test cases.xlsx" // This link points directly to the file in the public directory
-          download="test cases.xlsx" // Optional: suggests a default filename
+          href="/sample.xlsx" // This link points directly to the file in the public directory
+          download="sample.xlsx" // Optional: suggests a default filename
           style={{
             textDecoration: "underline",
             color: "blue",
