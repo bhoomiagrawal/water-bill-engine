@@ -13,8 +13,8 @@ export default function Billing() {
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null); // To store the selected record for printing
 
-  const handleDownloadClick = (record) => {
-    console.log("data pass ",record)
+  const toggleComputation = (record) => {
+    console.log("data pass ", record)
     setSelectedRecord(record); // Set the selected record
     setShowPrintModal(true);
   };
@@ -118,23 +118,31 @@ export default function Billing() {
     { header: "conn. type", accessor: "connection_type" },
     { header: "Cnsmp", accessor: "consumption" },
     { header: "Mtr status", accessor: "meter_stts" },
-    { header: "Basic ch.", accessor: "basicCharge", Cell: (row) => 
-      (row.basicCharge).toFixed(1) },
+    {
+      header: "Basic ch.", accessor: "basicCharge", Cell: (row) =>
+        (row.basicCharge).toFixed(1)
+    },
     { header: "Min. ch.", accessor: "minimum" },
-    { header: "Water ch.", accessor: "waterCharge", Cell: (row) => 
-      (row.basicCharge).toFixed(1) },
+    {
+      header: "Water ch.", accessor: "waterCharge", Cell: (row) =>
+        (row.basicCharge).toFixed(1)
+    },
     { header: "xls Water ch.", accessor: "curr_watr" },
     { header: "Swrge ch.", accessor: "sewerageCharge" },
     { header: "STP", accessor: "stpCharge" },
     { header: "xls Swrge ch.", accessor: "curr_swtx" },
     { header: "Fixed ch.", accessor: "fixedCharge.fixed_charge" },
     { header: "Mtr Srvc ch.", accessor: "fixedCharge.service_charge" },
-    { header: "IDC", accessor: "idc", Cell: (row) => 
-      (row.idc).toFixed(1) },
+    {
+      header: "IDC", accessor: "idc", Cell: (row) =>
+        (row.idc).toFixed(1)
+    },
     { header: "xls IDC", accessor: "curr_devp" },
 
-    { header: "Bill", accessor: "bill", Cell: (row) => 
-       Math.round(row.bill) },
+    {
+      header: "Bill", accessor: "bill", Cell: (row) =>
+        Math.round(row.bill)
+    },
 
     { header: "Rebate", accessor: "rebate" },
 
@@ -143,32 +151,56 @@ export default function Billing() {
 
     { header: "Prev Cnsmp", accessor: "prev.consumption" },
     { header: "Prev Mtr status", accessor: "prev.meter_stts" },
-    { header: "Prev Basic ch.", accessor: "prev.basicCharge", Cell: (row) => 
-      (row.prev.basicCharge).toFixed(1) },
+    {
+      header: "Prev Basic ch.", accessor: "prev.basicCharge", Cell: (row) =>
+        (row.prev.basicCharge)?.toFixed(1)
+    },
     { header: "Prev Min. ch.", accessor: "prev.minimum" },
-    { header: "Prev Water ch.", accessor: "prev.waterCharge", Cell: (row) => 
-      (row.prev.waterCharge).toFixed(1) },
-    { header: "Prev xls Water ch.", accessor: "curr_watr1" },
+    {
+      header: "Prev Water ch.", accessor: "prev.waterCharge", Cell: (row) =>
+        (row.prev.waterCharge)?.toFixed(1)
+    },
+    { header: "xls Prev Water ch.", accessor: "curr_watr1" },
     { header: "Prev Swrge ch.", accessor: "prev.sewerageCharge" },
     { header: "Prev STP", accessor: "prev.stpCharge" },
-    { header: "Prev xls Swrge ch.", accessor: "curr_swtx1" },
+    { header: "xls Prev Swrge ch.", accessor: "curr_swtx1" },
     { header: "Prev Fixed ch.", accessor: "prev.fixedCharge.fixed_charge" },
     { header: "Prev Mtr Srvc ch.", accessor: "prev.fixedCharge.service_charge" },
-    { header: "Prev IDC", accessor: "prev.idc", Cell: (row) => 
-      (row.prev.idc).toFixed(1) },
+    {
+      header: "Prev IDC", accessor: "prev.idc", Cell: (row) =>
+        (row.prev.idc)?.toFixed(1)
+    },
 
-
-    { header: "Prev Bill", accessor: "prev.bill", Cell: (row) => 
-      (row.prev.bill).toFixed(1) },
+    { header: "xls Prev IDC", accessor: "prev.curr_devp1" },
+    {
+      header: "Prev Bill", accessor: "prev.bill", Cell: (row) =>
+        (row.prev.bill)?.toFixed(1)
+    },
     { header: "Prev Rebate", accessor: "prev.rebate" },
+    { header: "Ostd Amt", accessor: "ostd_amt" },
+    { header: "Ostd Int", accessor: "ostd_int" },
+    { header: "total amount", accessor: "", Cell: (row) => {
+      return Math.round(row.bill + row.prev?.bill + row.ostd_amt + row.ostd_int)
+    } },
+    { header: "xls total amount", accessor: "tot_amt_indate" },
+    
+
+    
+    {
+      header: "Computation Sheet", accessor: "", Cell: (row) => {
+        return (
+          <button
+            onClick={() => toggleComputation(row)} // Pass the entire record
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            Open
+          </button>
+        )
+      }
+    },
 
 
-//   <button
-//     onClick={() => handleDownloadClick(r)} // Pass the entire record
-//     className="text-blue-600 underline hover:text-blue-800"
-//   >
-//     Download
-//   </button>
+
 
 
 
@@ -213,13 +245,13 @@ export default function Billing() {
                     Water Bill Calculation
                   </h2>
 
-                 
+
 
 
                   <DataTable data={waterBill} columns={columns} />
                 </div>
-                 {/* Print Modal */}
-                 {showPrintModal && selectedRecord && (
+                {/* Print Modal */}
+                {showPrintModal && selectedRecord && (
                   <ComputationSheet
                     selectedRecord={selectedRecord}
                     setShowPrintModal={setShowPrintModal}
