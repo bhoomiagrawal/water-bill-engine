@@ -33,13 +33,13 @@ export function calculateWaterBill(readings) {
     console.log('reading.ostd_amt', reading.ostd_amt)
     if (reading.category == "d") {
 
-      reading.two_mnth_bill = (reading.bill + reading.prev.bill).toFixed(1);
+      reading.two_mnth_bill = +((reading.bill + reading.prev.bill).toFixed(2));
       reading.lps = Math.round((reading.bill + reading.prev.bill) * 10) / 100
       console.log('reading.two_mnth_bill +reading.ostd_amt', reading.two_mnth_bill + reading.ostd_amt, reading.two_mnth_bill, reading.ostd_amt)
-      reading.total_amount = reading.two_mnth_bill + reading.ostd_amt
+      reading.total_amount = (reading.two_mnth_bill) + reading.ostd_amt
 
     } else {
-      reading.two_mnth_bill = (reading.bill).toFixed(1)
+      reading.two_mnth_bill = (reading.bill).toFixed(2)
 
       reading.lps = Math.round((reading.bill) * 10) / 100
       reading.total_amount = reading.two_mnth_bill + reading.ostd_amt

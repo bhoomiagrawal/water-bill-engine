@@ -105,7 +105,8 @@ const getNestedValue = (obj, path) => {
       let filteredColumns = columns.filter((c) => {
         return (c.header != 'Computation Sheet')})
       filteredColumns.forEach((column) => {
-        rowData[column.header] = getNestedValue(row, column.accessor);
+        // rowData[column.header] = getNestedValue(row, column.accessor);
+        rowData[column.header] = column.Cell ? column.Cell(row) : getNestedValue(row, column.accessor)
       });
       
       // Add extra columns (e.g., calculated fields)

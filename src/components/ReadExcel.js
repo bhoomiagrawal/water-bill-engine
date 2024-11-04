@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import readXlsxFile from "read-excel-file";
 
-export default function ReadExcel({ setReadings, displayItem }) {
+export default function ReadExcel({ setReadings, displayItem, setLoading }) {
   const imagRef = useRef();
   useEffect(() => {
     if (!displayItem) {
@@ -13,6 +13,7 @@ export default function ReadExcel({ setReadings, displayItem }) {
 
   //new code start from here
   const handleReadExcel = (file) => {
+    setLoading(true)
     readXlsxFile(file).then((rows) => {
       let header = rows[0];
       let data = rows[1];
