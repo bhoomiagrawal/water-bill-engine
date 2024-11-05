@@ -146,9 +146,6 @@ export default function Billing() {
     },
 
     { header: "Rebate", accessor: "rebate" },
-
-
-
     { header: "Prev Cnsmp", accessor: "prev.consumption" },
     { header: "Prev Mtr status", accessor: "prev.meter_stts" },
     {
@@ -203,13 +200,16 @@ export default function Billing() {
         )
       }
     },
-
-
-
-
-
-
-
+  ];
+  const extraExportColumns = [
+    {
+      header: "Created Date",
+      value: (row) => new Date().toLocaleDateString(), // Example calculated field
+    },
+    {
+      header: "Is Admin",
+      value: (row) => (row.role === "Admin" ? "Yes" : "No"),
+    },
   ];
 
   return (
@@ -258,22 +258,19 @@ export default function Billing() {
 
 
 
-                      <DataTable data={waterBill} columns={columns} />
-                    </div>
-                    {/* Print Modal */}
-                    {showPrintModal && selectedRecord && (
-                      <ComputationSheet
-                        selectedRecord={selectedRecord}
-                        setShowPrintModal={setShowPrintModal}
-                      />
-                    )}
-                  </>
-                ) : (
-                  ""
-                )
-            }
-
-            { }
+                  <DataTable data={waterBill} columns={columns} extraExportColumns={extraExportColumns}/>
+                </div>
+                {/* Print Modal */}
+                {showPrintModal && selectedRecord && (
+                  <ComputationSheet
+                    selectedRecord={selectedRecord}
+                    setShowPrintModal={setShowPrintModal}
+                  />
+                )}
+              </>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </div>
