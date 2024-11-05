@@ -98,7 +98,7 @@ function getCalculation(reading, prevCalc=false) {
   // compare water charge with minimum charge
 
   reading.waterCharge =
-    reading.basicCharge >= reading.minimum
+    reading.basicCharge > reading.minimum
       ? reading.basicCharge
       : reading.minimum;
 
@@ -122,10 +122,12 @@ function getCalculation(reading, prevCalc=false) {
     reading.waterCharge +
     reading.fixedCharge.total_fixed_charge +
     reading.sewerageCharge +
-    reading.stpCharge +
-    reading.idc;
+    reading.stpCharge 
+    // + reading.idc;
 
+  reading.idc = getIDC(reading);
 
+reading.bill = reading.bill + reading.idc;
   reading.bill = reading.bill - reading.rebate_amount;
   return reading
 }
@@ -258,13 +260,12 @@ function getStpCharge(reading) {
 }
 
 function getIDC(reading) {
-  let { consumption, waterCharge } = reading;
+  let { consumption, waterCharge, bill } = reading;
   let idcData = idc.find((id) => {
     return consumption > id.min && consumption < id.max;
   });
-  console.log('idcData', idcData)
-  console.log('waterCharge', waterCharge)
-  let idcharge = idcData ? (waterCharge * idcData.chargePercent) / 100 : 0;
+  // let idcharge = idcData ? (waterCharge * idcData.chargePercent) / 100 : 0;
+  let idcharge = idcData ? (bill * idcData.chargePercent) / 100 : 0;
   return idcharge;
 }
 function getRebate(reading) {

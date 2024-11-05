@@ -126,7 +126,7 @@ export default function Billing() {
     { header: "Min. ch.", accessor: "minimum" },
     {
       header: "Water ch.", accessor: "waterCharge", Cell: (row) =>
-        (row.basicCharge).toFixed(2)
+        (row.waterCharge).toFixed(2)
     },
     { header: "billing agency Water ch.", accessor: "curr_watr" },
     { header: "Swrge ch.", accessor: "sewerageCharge" },
