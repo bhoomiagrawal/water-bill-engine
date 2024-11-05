@@ -25,7 +25,7 @@ export function calculateWaterBill(readings) {
         last_rdg: readings.curr_rdg,
         meter_stts: readings.meter_stts1,
       }
-      calculation_prev = getCalculation(reading)
+      calculation_prev = getCalculation(reading, true)
 
     }
     reading.prev = calculation_prev
@@ -53,7 +53,7 @@ export function calculateWaterBill(readings) {
   return readings;
 }
 
-function getCalculation(reading) {
+function getCalculation(reading, prevCalc=false) {
   let { curr_cons, curr_rdg, last_rdg, category, meter_size, meter_stts } = reading;
   let basicCharge = 0;
   if (meter_stts == "ok") {
@@ -65,7 +65,7 @@ function getCalculation(reading) {
     ) {
       basicCharge = 0;
     } else {
-      basicCharge = getBasicCharge(reading);
+      basicCharge = getBasicCharge(reading, prevCalc);
     }
   } else {
     let getRuleConsumption = consumptionRules.find(
@@ -77,7 +77,7 @@ function getCalculation(reading) {
       // reading.consumption = reading.averageConsumption;
       reading.averageConsumption = reading.pre_cons
       reading.consumption = reading.averageConsumption
-      basicCharge = getBasicCharge(reading);
+      basicCharge = getBasicCharge(reading, prevCalc);
 
     } else if (getRuleConsumption?.rule == "minimum") {
       reading.basicCharge = 0;
@@ -130,7 +130,7 @@ function getCalculation(reading) {
   return reading
 }
 
-function getBasicCharge(reading) {
+function getBasicCharge(reading, prevCalc=false) {
   let { meter_size, consumption } = reading;
 
   let bCharge = 0;
@@ -140,10 +140,16 @@ function getBasicCharge(reading) {
       return meter_size > 25 ? s.isBulk == true : s.isBulk == false;
     }
   });
-
+  reading.slabs = []
+  reading.prevSlabs = []
   for (let i = 0; i < catSlabs?.length; i++) {
     const slab = catSlabs[i];
 
+    reading.slabs.push(slab)
+    if(prevCalc) {
+    reading.prevSlabs.push(slab)
+
+    }
     if (consumption <= slab.max) {
       bCharge += ((consumption - previousMax) / 1000) * slab.ratePerThousand;
 
