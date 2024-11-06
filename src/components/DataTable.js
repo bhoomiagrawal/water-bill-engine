@@ -134,7 +134,7 @@ const getNestedValue = (obj, path) => {
  
      const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     // Download the Excel file
-    XLSX.writeFile(workbook,`calculatedBilling${formattedDateTime}.csv`);
+    XLSX.writeFile(workbook,`calculatedBilling${formattedDateTime}.xlsx`);
   };
 
   console.log('data asdfgh', data)
