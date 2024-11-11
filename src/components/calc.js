@@ -11,12 +11,12 @@ import {
 export function calculateWaterBill(readings) {
 
   for (let reading of readings) {
-
+    console.log('reading', reading)
+const {category} = reading
     let calculation = getCalculation(reading);
     let previous_readings = {};
     let calculation_prev = {}
-    console.log('calculation', calculation)
-    if (reading.curr_cons1) {
+    if ((category == "d" || category == "f") && !reading.prev) {
       previous_readings = {
         ...reading,
         curr_cons: readings.curr_cons1,
@@ -28,14 +28,12 @@ export function calculateWaterBill(readings) {
       calculation_prev = getCalculation(reading, true)
 
     }
-    reading.prev = calculation_prev
-    console.log('reading', reading)
-    console.log('reading.ostd_amt', reading.ostd_amt)
-    if (reading.category == "d") {
+    reading.prev = calculation_prev;
 
-      reading.two_mnth_bill = +((reading.bill + reading.prev.bill).toFixed(2));
+    if (category == "d" || category == "f") {
+      reading.two_mnth_bill = (reading.bill) + (reading.prev.bill);
       reading.lps = Math.round((reading.bill + reading.prev.bill) * 10) / 100
-      console.log('reading.two_mnth_bill +reading.ostd_amt', reading.two_mnth_bill + reading.ostd_amt, reading.two_mnth_bill, reading.ostd_amt)
+
       reading.total_amount = (reading.two_mnth_bill) + reading.ostd_amt
 
     } else {
@@ -47,13 +45,13 @@ export function calculateWaterBill(readings) {
     }
 
     // reading.rebate = rebate;
-
+    reading.waterCharge = reading.waterCharge != undefined ? (reading.waterCharge).toFixed(2) : 0
   }
 
   return readings;
 }
 
-function getCalculation(reading, prevCalc=false) {
+function getCalculation(reading, prevCalc = false) {
   let { curr_cons, curr_rdg, last_rdg, category, meter_size, meter_stts } = reading;
   let basicCharge = 0;
   if (meter_stts == "ok") {
@@ -111,7 +109,7 @@ function getCalculation(reading, prevCalc=false) {
     reading.stpCharge = 0;
   }
 
-  reading.idc = getIDC(reading);
+  // reading.idc = getIDC(reading);
   reading.rebate_amount = 0;
   if (reading.rebate) {
     reading.rebate_amount = getRebate(reading);
@@ -122,17 +120,20 @@ function getCalculation(reading, prevCalc=false) {
     reading.waterCharge +
     reading.fixedCharge.total_fixed_charge +
     reading.sewerageCharge +
-    reading.stpCharge 
-    // + reading.idc;
+    reading.stpCharge
+  // + reading.idc;
 
   reading.idc = getIDC(reading);
 
-reading.bill = reading.bill + reading.idc;
-  reading.bill = reading.bill - reading.rebate_amount;
+  reading.bill = reading.bill + reading.idc;
+  reading.bill = (reading.bill - reading.rebate_amount).toFixed(2);
+  reading.bill = parseFloat(reading.bill)
+  reading.sewerageCharge = parseFloat((reading.sewerageCharge).toFixed(2));
+  reading.stpCharge = parseFloat((reading.stpCharge).toFixed(2))
   return reading
 }
 
-function getBasicCharge(reading, prevCalc=false) {
+function getBasicCharge(reading, prevCalc = false) {
   let { meter_size, consumption } = reading;
 
   let bCharge = 0;
@@ -144,16 +145,23 @@ function getBasicCharge(reading, prevCalc=false) {
   });
   reading.slabs = []
   reading.prevSlabs = []
+ 
   for (let i = 0; i < catSlabs?.length; i++) {
     const slab = catSlabs[i];
 
     reading.slabs.push(slab)
-    if(prevCalc) {
-    reading.prevSlabs.push(slab)
+    if (prevCalc) {
+      reading.prevSlabs.push(slab)
 
     }
     if (consumption <= slab.max) {
-      bCharge += ((consumption - previousMax) / 1000) * slab.ratePerThousand;
+      if(reading.category == "f") {
+        
+        bCharge = slab.ratePerThousand;
+      } else {
+        bCharge += ((consumption - previousMax) / 1000) * slab.ratePerThousand;
+
+      }
 
       break;
     } else {
@@ -162,6 +170,7 @@ function getBasicCharge(reading, prevCalc=false) {
       previousMax = slab.max;
     }
   }
+
   return bCharge;
 }
 
@@ -172,7 +181,6 @@ function getZeroOnConsumption(meter_size, category, curr_cons) {
 }
 
 function getMinimumCharge(reading) {
-  reading.cid == "140110108119" && console.log("minimum readings", reading);
   let minimumChargeData = minimumCharges.find((m) => {
     return (
       m.meter_size == reading.meter_size &&
@@ -180,10 +188,10 @@ function getMinimumCharge(reading) {
     );
   });
 
-  reading.cid == "140110108119" && console.log('minimumChargeData', minimumChargeData)
   let minimumCharge = minimumChargeData?.min_charges;
   if (
     reading.meter_size == 15 &&
+    reading.category == "d" &&
     reading.meter_stts.toLowerCase() == "ok" &&
     reading.curr_cons <= 15000
   ) {
@@ -201,7 +209,6 @@ function getMinimumCharge(reading) {
 
 function addFixedCharge(reading) {
   let fixedChargeData = fixedCharges.find((f) => {
-    // console.log("value of f ",f)
     return (
       f.meter_size == reading.meter_size &&
       f.category == reading.category
@@ -209,10 +216,10 @@ function addFixedCharge(reading) {
   });
 
   let meterServiceData = meterServiceCharges.find((m) => {
-    return m.meter_size == reading.meter_size;
+    return m.meter_size == reading.meter_size && reading.category != "f";
   });
-  let fixedCharge = fixedChargeData?.fixed_charges;
-  let meterServiceCharge = meterServiceData.meter_service;
+  let fixedCharge = fixedChargeData?.fixed_charges ;
+  let meterServiceCharge = meterServiceData?.meter_service || 0;
 
   return {
     service_charge: meterServiceCharge,
@@ -255,14 +262,14 @@ function getAverageConsumption(reading) {
 function getStpCharge(reading) {
   // 13% of water charge whatever the connection category is
   let stpCharge = (reading.waterCharge * 13) / 100;
-  // console.log(stp,"stp charge ")
   return stpCharge;
 }
 
 function getIDC(reading) {
   let { consumption, waterCharge, bill } = reading;
   let idcData = idc.find((id) => {
-    return consumption > id.min && consumption < id.max;
+   
+    return consumption >= id.min && consumption <= id.max;
   });
   // let idcharge = idcData ? (waterCharge * idcData.chargePercent) / 100 : 0;
   let idcharge = idcData ? (bill * idcData.chargePercent) / 100 : 0;
@@ -273,7 +280,6 @@ function getRebate(reading) {
 
   let rebateCharge =
     rebate === "y" ? (waterCharge * rebates[0]?.discount) / 100 : 0;
-  // console.log("rebate charges on water charge will be apply water charge of 75%", rebateCharge);
 
   return rebateCharge.toFixed(2);
 }

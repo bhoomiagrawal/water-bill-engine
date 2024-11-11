@@ -14,7 +14,7 @@
   { max: 15000, ratePerThousand: 38.5, category: "id", isBulk: false },
   { max: 40000, ratePerThousand: 49.5, category: "id", isBulk: false },
   { max: Infinity, ratePerThousand: 55.0, category: "id", isBulk: false },
-  { max: Infinity, ratePerThousand: 55.0, category: "id", isBulk: true },
+  { max: 0, ratePerThousand: 27.50, category: "f", isBulk: false },
 ]),
   (exports.minimumCharges = [
     { meter_size: 15, min_charges: 55, category: "d" },
@@ -43,6 +43,8 @@
     { meter_size: 80, min_charges: 18700, category: "id" },
     { meter_size: 100, min_charges: 29700, category: "id" },
     { meter_size: 150, min_charges: 66550, category: "id" },
+    { meter_size: 15, min_charges: 0, category: "f" },
+
   ]);
 
 exports.fixedCharges = [
@@ -72,6 +74,8 @@ exports.fixedCharges = [
   { meter_size: 80, fixed_charges: 440, category: "id" },
   { meter_size: 100, fixed_charges: 550, category: "id" },
   { meter_size: 150, fixed_charges: 660, category: "id" },
+  { meter_size: 15, fixed_charges: 27.5, category: "f" },
+
 ];
 
 exports.meterServiceCharges = [

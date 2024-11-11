@@ -16,7 +16,6 @@ export default function Billing() {
   const [loading, setLoading] = useState(false)
 
   const toggleComputation = (record) => {
-    console.log("data pass ", record)
     setSelectedRecord(record); // Set the selected record
     setShowPrintModal(true);
   };
@@ -126,7 +125,7 @@ export default function Billing() {
     { header: "Min. ch.", accessor: "minimum" },
     {
       header: "Water ch.", accessor: "waterCharge", Cell: (row) =>
-        (row.waterCharge).toFixed(2)
+        (row.waterCharge)
     },
     { header: "billing agency Water ch.", accessor: "curr_watr" },
     { header: "Swrge ch.", accessor: "sewerageCharge" },
@@ -142,7 +141,7 @@ export default function Billing() {
 
     {
       header: "Bill", accessor: "bill", Cell: (row) =>
-        Math.round(row.bill)
+        (row.bill)
     },
 
     { header: "Rebate", accessor: "rebate" },
@@ -155,7 +154,9 @@ export default function Billing() {
     { header: "Prev Min. ch.", accessor: "prev.minimum" },
     {
       header: "Prev Water ch.", accessor: "prev.waterCharge", Cell: (row) =>
-        (row.prev.waterCharge)?.toFixed(2)
+      {
+       return  row?.prev?.waterCharge != undefined ?  (row?.prev?.waterCharge) : 0
+      }
     },
     { header: "billing agency Prev Water ch.", accessor: "curr_watr1" },
     { header: "Prev Swrge ch.", accessor: "prev.sewerageCharge" },
@@ -171,7 +172,7 @@ export default function Billing() {
     { header: "billing agency Prev IDC", accessor: "prev.curr_devp1" },
     {
       header: "Prev Bill", accessor: "prev.bill", Cell: (row) =>
-        (row.prev.bill)?.toFixed(2)
+        (row.prev.bill)
     },
     { header: "Prev Rebate", accessor: "prev.rebate" },
     { header: "two month Bill", accessor: "two_mnth_bill" },

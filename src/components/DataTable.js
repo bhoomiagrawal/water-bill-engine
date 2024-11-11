@@ -137,7 +137,6 @@ const getNestedValue = (obj, path) => {
     XLSX.writeFile(workbook,`calculatedBilling${formattedDateTime}.xlsx`);
   };
 
-  console.log('data asdfgh', data)
   return (
     <div className="max-w-full overflow-x-auto">
       <button
