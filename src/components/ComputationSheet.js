@@ -292,10 +292,22 @@ const ComputationSheet = ({ selectedRecord, setShowPrintModal }) => {
 
         <div className="p-4 mx-auto printable-content">
           <div className="mb-4 text-center">
+            <div className="float-left ml-20" width="5%" style={{width:'5%',
+              //  position: 'absolute'
+               }}>
+            <img src="/../RajneerLogo.png"alt="bakwass h sab kuch"/>
+            </div>
+            <div className="float-right" width="5%" style={{width:'5%',
+              //  position: 'absolute'
+               }}>
+            <img src="/../PHED-Logo-small-Photoroom.png"alt="bakwass h sab kuch"/>
+            </div>
+            <div>
             <h2 className="text-blue-700 divide-y divide-x font-bold text-2xl">
               PUBLIC HEALTH ENGINEERING DEPARTMENT
             </h2>
             <h2 className="text-2xl">RAJASTHAN JAIPUR</h2>
+            </div>
             <div className="border-t border-gray-950 mt-6"></div>
           </div>
           <h2 className="font-bold text-center mb-6 text-2xl pt-5 pb-2">
@@ -332,6 +344,7 @@ const ComputationSheet = ({ selectedRecord, setShowPrintModal }) => {
                  {selectedRecord?.category == 'd' ? 'Domestic' 
                       : selectedRecord?.category == 'nd' ? 'Non Domestic'
                       : selectedRecord?.category == 'id' ? 'Industrial'
+                      : selectedRecord?.category == 'f' ? 'Flat'
                       :selectedRecord?.category
                       } {` - `}
                       {selectedRecord?.connection_type == 'p' ? 'Permanent': 'Temporary'}
@@ -346,82 +359,93 @@ const ComputationSheet = ({ selectedRecord, setShowPrintModal }) => {
                 </tr>
                 <tr>
                   <td className="border px-4 py-2">
-                    Last Month, Average Three Months & Last 12 Month Readings:
+                  Average Last Six Month Readings:
                   </td>
-                  <td className="border px-4 py-2">{selectedRecord?.consumption},{selectedRecord?.averageConsumption} & {selectedRecord?.averageConsumption}</td>
+                  <td className="border px-4 py-2">{selectedRecord?.averageConsumption}</td>
                   {/* <td className="border px-4 py-2">
                     {selectedRecord?.meter_size || "N/A"}
                   </td> */}
                 </tr>
                <ComputationData data={selectedRecord} slabs = {selectedRecord.slabs}/>
-                <hr className="py-2"></hr>
+                {/* <hr className="py-2"></hr> */}
               {Object.keys(selectedRecord.prev).length ?  <ComputationData data={selectedRecord.prev} slabs = {selectedRecord.prevSlabs}/> : ""}
                 {/* second month code start  */}
 
                 {/* second month code end here */}
                 <tr>
+                <div className=" border-gray-950 mt-6"></div>
+                </tr>
+                <tr>
+                  <td className="border px-4 py-2 text-right">["L"] Rebate (If any)</td>
+                  <td className="border px-4 py-2">{selectedRecord?.rebate == 'n' ? 'N/A' :'Y'}</td>
                   <td className="border px-4 py-2">
-                    <strong>Rebate (If any)</strong>
-                  </td>
-                  <td className="border px-4 py-2">
-                    <strong>
-                    {selectedRecord?.rebate == 'n' ? 'N/A' 
+                    {selectedRecord?.rebate == 'n' ? selectedRecord?.rebate_amount 
                       : selectedRecord?.rebate == 'y' ? selectedRecord?.rebate_amount
                       :selectedRecord?.rebate_amount}
-                    </strong>
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">
-                    <strong>Previous Outstanding Amount (If any)</strong>
-                  </td>
-                  <td className="border px-4 py-2">
-                    <strong>{selectedRecord?.ostd_amt}</strong>
-                  </td>
+                  <td className="border px-4 py-2 text-right">["M"] Previous Outstanding Amount (If any)</td>
+                  <td className="border px-4 py-2"></td>
+                      {/* {console.log('rebat!!!!!!!!!!!!!!!!e number hai value k sth', typeof(selectedRecord?.ostd_amt))} */}
+                  <td className="border px-4 py-2">{selectedRecord?.ostd_amt}</td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">
-                    <strong>Previous Edit Bill Outstanding (If any)</strong>
-                  </td>
-                  <td className="border px-4 py-2">
-                    <strong>N/A</strong>
-                  </td>
+                  <td className="border px-4 py-2 text-right">["N"] Previous Edit Bill Outstanding (If any)</td>
+                  <td className="border px-4 py-2"></td>
+                  <td className="border px-4 py-2">N/A</td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">
-                    <strong>Interest (If any)</strong>
-                  </td>
-                  <td className="border px-4 py-2">
-                    <strong>N/A</strong>
-                  </td>
+                  <td className="border px-4 py-2 text-right">["O"] Interest (If any)</td>
+                  <td className="border px-4 py-2"></td>
+                  <td className="border px-4 py-2">N/A</td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">
-                    <strong>Advance Deposit (If any):</strong>
-                  </td>
-                  <td className="border px-4 py-2">
-                    <strong>N/A</strong>
-                  </td>
+                  <td className="border px-4 py-2 text-right">["P"] Advance Deposit (If any)</td>
+                  <td className="border px-4 py-2"></td>
+                  <td className="border px-4 py-2">N/A</td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">
-                    <strong>Total Amount Payable:</strong>
+                  <td className="border px-4 py-2 text-right">
+                    <strong>["Q"] Total Amount Payable(Till Due Date, (J+K+L+M+N+O+P))</strong>
                   </td>
+                  <td className="border px-4 py-2"></td>
                   <td className="border px-4 py-2">
                     <strong>{selectedRecord?.tot_amt_indate}</strong>
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2" colSpan={2}>
-                    <strong>All amounts shown are in INR.</strong>
+                  <td className="border px-4 py-2 text-right">["R"] LPS</td>
+                  <td className="border px-4 py-2">10% of ["Q"]</td>
+                  <td className="border px-4 py-2">{selectedRecord?.lps}</td>
+                </tr>
+                <tr>
+                  <td className="border px-4 py-2 text-right">
+                    <strong>["S"] Total Amount Payable(After Due Date, (Q+R))</strong>
+                  </td>
+                  <td className="border px-4 py-2"></td>
+                  <td className="border px-4 py-2">
+                    <strong>{selectedRecord?.lps + selectedRecord?.tot_amt_indate}</strong>
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-4" colSpan={2}></td>
+                  <td className="border px-4 py-2 text-right">Last/Due Date For Cheque</td>
+                  <td className="border px-4 py-2">-</td>
+                  <td className="border px-4 py-2">{selectedRecord?.chequedate}</td>
+                </tr>
+                <tr>
+                  <td className="border px-4 py-2 text-right">Last/Due Date For Cash</td>
+                  <td className="border px-4 py-2">-</td>
+                  <td className="border px-4 py-2">{selectedRecord?.cashdate}</td>
+                </tr>
+                <tr>
+                  <td className="border px-4 py-2" colSpan={3}>
+                    <strong>All amounts shown are in INR.</strong>
+                  </td>
                 </tr>
               </tbody>
             </table>
-            <div className="border-b border-gray-200 pb-4 mb-4 mt-1">
+            {/* <div className="border-b border-gray-200 pb-4 mb-4 mt-1">
               <table className="min-w-full border-collapse">
                 <tbody>
                   <tr>
@@ -485,7 +509,6 @@ const ComputationSheet = ({ selectedRecord, setShowPrintModal }) => {
                   </tr>
                   <tr>
                     <td className="border px-4 py-2">Meter Service Charge</td>
-                    {/* <td className="border px-4 py-2">22</td> */}
                     <td className="border px-4 py-2">{selectedRecord?.fixedCharge?.service_charge}</td>
                     {selectedRecord.category == "d" ? <td className="border px-4 py-2">{prev?.fixedCharge?.service_charge}</td> : ""}
                   </tr>
@@ -499,22 +522,19 @@ const ComputationSheet = ({ selectedRecord, setShowPrintModal }) => {
                   </tr>
                   <tr>
                     <td className="border px-4 py-2">IDC Charge</td>
-                    {/* <td className="border px-4 py-2">30.66</td> */}
                     <td className="border px-4 py-2">{selectedRecord?.idc}</td>
                     {selectedRecord.category == "d" ? <td className="border px-4 py-2">{prev?.idc}</td> : ""}
 
                   </tr>
                   <tr>
                     <td className="border px-4 py-2">Total Bill Amount</td>
-                    {/* <td className="border px-4 py-2">614</td> */}
-                    {/* <td className="border px-4 py-2">{selectedRecord?.tot_amt_indate}</td> */}
                     <td className="border px-4 py-2">{selectedRecord?.bill}</td>
                     {selectedRecord.category == "d" ? <td className="border px-4 py-2">{prev?.bill}</td> : ""}
 
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </div> */}
           </div>
           {/* <div className="mt-4">
             <button

@@ -1,21 +1,27 @@
 export default function ComputationData ({data, slabs}) {
-    console.log('data', data)
-    console.log('slabs', slabs)
+    // console.log('data', data)
+    // console.log('slabs', slabs)
 
-    console.log('PREV data', data.prev)
+    // console.log('PREV data', data.prev)
 
     const getSlabsUI = () => {
 
         return slabs?.map((slab, i) => {
-            let maxConsumption = data.averageConsumption <= slab.max ? data.averageConsumption : slab.max
+          let  consumption = data.averageConsumption || data?.curr_cons
+            let maxConsumption = consumption <= slab.max ? consumption : slab.max;
+            console.log('consumption', consumption)
+            console.log('maxConsumption, slab, i', maxConsumption, slab, i)
         let higherSlab = i <1 ? maxConsumption : maxConsumption - slabs[i-1].max;
+        // console.log(higherSlab,"slab value")
+        console.log(maxConsumption,"maxConsumption")
+        console.log(i <1 ? maxConsumption : maxConsumption - slabs[i-1].max,"i <1 ? maxConsumption : maxConsumption - slabs[i-1].max")
         let currIndex = i
            return  <tr>
                   <td className="border px-4 py-2">Water slab Charge:</td>
                   <td className="border px-4 py-2">{i <1 ? `0 - ${slab.max}` : `${slabs[i-1].max} - ${slab.max}`}</td>
                   <td className="border px-4 py-2">{slab.ratePerThousand}</td>
-                  <td className="border px-4 py-2">{higherSlab}</td>
-                  <td className="border px-4 py-2">{higherSlab/1000 * (slab.ratePerThousand)}</td>
+                  <td className="border px-4 py-2">{higherSlab/1000}</td>
+                  <td className="border px-4 py-2">{(higherSlab/1000 * (slab.ratePerThousand)).toFixed(2)}</td>
                 </tr>
         })
 //         return (
@@ -56,122 +62,127 @@ export default function ComputationData ({data, slabs}) {
         <>
           <tr>
                   <td className="border px-4 py-2">
-                    <strong>Month:</strong>
+                    <strong>Month</strong>
                   </td>
-                  <td className="border px-4 py-2">MAY-2021</td>
-                  <td className="border px-4 py-2">Average Consumption:</td>
+                  <td className="border px-4 py-2">MAY-2021 not dynamic</td>
+                  <td className="border px-4 py-2">Average Consumption</td>
                   <td className="border px-4 py-2">{data?.averageConsumption}</td>
                 </tr>
                 <tr>
                   <td className="border px-4 py-2">
-                    <strong>Previous Reading:</strong>
+                    <strong>Previous Reading</strong>
                   </td>
                   <td className="border px-4 py-2">{data?.curr_rdg1}</td>
-                  <td className="border px-4 py-2">Current Reading:</td>
+                  <td className="border px-4 py-2">Current Reading</td>
                   <td className="border px-4 py-2">{data?.curr_rdg}</td>
                 </tr>
                 <tr>
                   <td className="border px-4 py-2">
-                    <strong>Fault Code:</strong>
+                    <strong>Fault Code</strong>
                   </td>
                   <td className="border px-4 py-2">{data?.meter_stts.toUpperCase()}</td>
-                  <td className="border px-4 py-2">Total Consumption:</td>
+                  <td className="border px-4 py-2">Total Consumption</td>
                   <td className="border px-4 py-2">{data?.curr_cons}</td>
-                </tr>
+                </tr>                
                 <tr>
                   <td className="border px-4 py-2">
-                    <strong>Charge Name:</strong>
+                    <strong>Charge Name</strong>
                   </td>
                   <td className="border px-4 py-2">
-                    <strong>Consumption slab</strong>
+                    <strong>["A"] Consumption slab </strong>
                   </td>
                   <td className="border px-4 py-2">
-                    <strong>Rate (Per 1000 ltr.):</strong>
+                    <strong>["B"] Rate (Per 1000 LTR.)</strong>
                   </td>
                   <td className="border px-4 py-2">
-                    <strong>Unit Consumed:</strong>
+                    <strong>["C"] Unit Consumed (KL)</strong>
                   </td>
                   <td className="border px-4 py-2">
-                    <strong>Amount:</strong>
+                    <strong>["D"] Amount (B*C)</strong>
                   </td>
                 </tr>
                {getSlabsUI()}           
                 <tr>
-                  <td className="border px-4 py-2">
-                    <strong>Total Consumption Amount:</strong>
+                  <td className="border px-4 py-2 text-right">
+                    <strong>Total Consumption Amount</strong>
                   </td>
                   <td className="border px-4 py-2">
-                    <strong>{data?.basicCharge}</strong>
+                  </td>
+                  <td className="border px-4 py-2">
+                    <strong>{data?.basicCharge.toFixed}</strong>
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">Minimum Charge:</td>
+                  <td className="border px-4 py-2">Minimum Charge</td>
+                  <td className="border px-4 py-2"></td>
                   <td className="border px-4 py-2">
-                  {data?.minimum}
-                  </td>
-                  <td className="border px-4 py-2" colSpan={2}>
                   {data?.minimum}
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2" colSpan={4}>
+                  <td className="border px-4 py-2">
                     <strong>
-                      Applied Water Charge as it is higher than Minimum Charge.
+                        {data?.basicCharge > data?.minimum ? '["E"] Applied Water Charge as it is higher than Minimum Charge.' : '["E"] Applied Minimum Charge as it is higher than Water Charge.'}                  
                     </strong>
                   </td>
+                  <td className="border px-4 py-2"></td>
+                  <td className="border px-4 py-2">{data?.waterCharge}</td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">Sewerage Charge:</td>
+                  <td className="border px-4 py-2">["F"] Sewerage Charge</td>
                   {/* <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td> */}
-                  <td className="border px-4 py-2">20%</td>
+                  <td className="border px-4 py-2">20% of ["E"]</td>
                   <td className="border px-4 py-2">
                   {data?.sewerage_tax == 'n' ? 'N/A' 
-                      : data?.sewerage_tax == 'y' ? data?.sewerage_tax
-                      :data?.sewerage_tax
+                      : data?.sewerage_tax == 'Y' ? data?.sewerageCharge
+                      :data?.sewerageCharge
                       }
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">STP Charge:</td>
+                  <td className="border px-4 py-2">["G"] STP Charge</td>
                   {/* <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td> */}
-                  <td className="border px-4 py-2">13%</td>
+                  <td className="border px-4 py-2">13% of ["E"]</td>
                   <td className="border px-4 py-2">
                   {data?.stp == 'n' ? 'N/A' 
-                      : data?.stp == 'y' ? data?.stp
-                      :data?.stp
+                      : data?.stp == 'y' ? data?.stpCharge
+                      :data?.stpCharge
                       }
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">Meter Service Charge: </td>
+                  <td className="border px-4 py-2">["H"] Meter Service Charge</td>
                   {/* <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td> */}
+                  <td className="border px-4 py-2"></td>
                   <td className="border px-4 py-2">{data?.fixedCharge?.service_charge}</td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">Fixed Charge:</td>
+                  <td className="border px-4 py-2">["I"] Fixed Charge</td>
                   {/* <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td> */}
+                  <td className="border px-4 py-2"></td>
                   <td className="border px-4 py-2">{data?.fixedCharge?.fixed_charge}</td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">
-                    <strong>Bill Sub Total </strong>{" "}
+                  <td className="border px-4 py-2 text-right">
+                    <strong >["J"] Bill Sub Total (E+F+G+H+I)</strong>{" "}
                   </td>
+                  <td className="border px-4 py-2"> </td>
                   <td className="border px-4 py-2">
-                    {/* <strong>416.44</strong> */}
                     <strong>
-                      {data?.waterCharge + data?.fixedCharge?.total_fixed_charge}                 
+                      {Number(data?.waterCharge) + Number(data?.fixedCharge?.total_fixed_charge)}                 
                     </strong>
                   </td>
                 </tr>
                 <tr>
-                  <td className="border px-4 py-2">IDC Charge:</td>
-                  <td className="border px-4 py-2">{data?.idc}</td>
+                  <td className="border px-4 py-2">["K"] IDC Charge</td>
+                  <td className="border px-4 py-2"></td>
+                  <td className="border px-4 py-2">{data?.idc.toFixed(2)}</td>
                   {/* <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">55</td> */}
