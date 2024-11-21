@@ -1,5 +1,5 @@
 import DefaultLayout from '@/components/Layouts/DefaultLayout'
-import TypeProperty from '@/components/Master/TypeProperty/TypeProperty'
+import TypeProperty from '@/components/Master/TypeProperty'
 import React from 'react'
 
 const TypePropertyPage = () => {

@@ -1,9 +1,11 @@
 // components/FirstUI.js
 
 import { useEffect, useState } from "react";
-import ReadExcel from "./ReadExcel";
-import DataTable from "./DataTable";
-import {calculateWaterBill} from './calc'
+import ReadExcel from "../Bill/ReadExcel";
+import { calculateWaterBill } from "../Bill/calc";
+import DataTable from "../Bill/DataTable";
+import ComputationSheet from "../Bill/ComputationSheet";
+import Loader from "@/svg/Loader";
 
 export default function Billing() {
   const [readings, setReadings] = useState([]);
@@ -11,9 +13,9 @@ export default function Billing() {
   const [waterBill, setWaterBill] = useState([]);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null); // To store the selected record for printing
+  const [loading, setLoading] = useState(false)
 
   const toggleComputation = (record) => {
-    console.log("data pass ", record)
     setSelectedRecord(record); // Set the selected record
     setShowPrintModal(true);
   };
@@ -22,7 +24,9 @@ export default function Billing() {
     if (readings.length) {
       setWaterBill(calculateWaterBill(readings));
 
+
       setDisplayItem(true);
+      setLoading(false)
     }
   }, [readings]);
 
@@ -116,73 +120,74 @@ export default function Billing() {
     { header: "Mtr status", accessor: "meter_stts" },
     {
       header: "Basic ch.", accessor: "basicCharge", Cell: (row) =>
-        (row.basicCharge).toFixed(1)
+        (row.basicCharge).toFixed(2)
     },
     { header: "Min. ch.", accessor: "minimum" },
     {
       header: "Water ch.", accessor: "waterCharge", Cell: (row) =>
-        (row.basicCharge).toFixed(1)
+        (row.waterCharge)
     },
-    { header: "xls Water ch.", accessor: "curr_watr" },
+    { header: "billing agency Water ch.", accessor: "curr_watr" },
     { header: "Swrge ch.", accessor: "sewerageCharge" },
     { header: "STP", accessor: "stpCharge" },
-    { header: "xls Swrge ch.", accessor: "curr_swtx" },
+    { header: "billing agency Swrge ch.", accessor: "curr_swtx" },
     { header: "Fixed ch.", accessor: "fixedCharge.fixed_charge" },
     { header: "Mtr Srvc ch.", accessor: "fixedCharge.service_charge" },
     {
       header: "IDC", accessor: "idc", Cell: (row) =>
-        (row.idc).toFixed(1)
+        (row.idc).toFixed(2)
     },
-    { header: "xls IDC", accessor: "curr_devp" },
+    { header: "billing agency IDC", accessor: "curr_devp" },
 
     {
       header: "Bill", accessor: "bill", Cell: (row) =>
-        Math.round(row.bill)
+        (row.bill)
     },
 
     { header: "Rebate", accessor: "rebate" },
-
-
-
     { header: "Prev Cnsmp", accessor: "prev.consumption" },
     { header: "Prev Mtr status", accessor: "prev.meter_stts" },
     {
       header: "Prev Basic ch.", accessor: "prev.basicCharge", Cell: (row) =>
-        (row.prev.basicCharge)?.toFixed(1)
+        (row.prev.basicCharge)?.toFixed(2)
     },
     { header: "Prev Min. ch.", accessor: "prev.minimum" },
     {
       header: "Prev Water ch.", accessor: "prev.waterCharge", Cell: (row) =>
-        (row.prev.waterCharge)?.toFixed(1)
+      {
+       return  row?.prev?.waterCharge != undefined ?  (row?.prev?.waterCharge) : 0
+      }
     },
-    { header: "xls Prev Water ch.", accessor: "curr_watr1" },
+    { header: "billing agency Prev Water ch.", accessor: "curr_watr1" },
     { header: "Prev Swrge ch.", accessor: "prev.sewerageCharge" },
     { header: "Prev STP", accessor: "prev.stpCharge" },
-    { header: "xls Prev Swrge ch.", accessor: "curr_swtx1" },
+    { header: "billing agency Prev Swrge ch.", accessor: "curr_swtx1" },
     { header: "Prev Fixed ch.", accessor: "prev.fixedCharge.fixed_charge" },
     { header: "Prev Mtr Srvc ch.", accessor: "prev.fixedCharge.service_charge" },
     {
       header: "Prev IDC", accessor: "prev.idc", Cell: (row) =>
-        (row.prev.idc)?.toFixed(1)
+        (row.prev.idc)?.toFixed(2)
     },
 
-    { header: "xls Prev IDC", accessor: "prev.curr_devp1" },
+    { header: "billing agency Prev IDC", accessor: "prev.curr_devp1" },
     {
       header: "Prev Bill", accessor: "prev.bill", Cell: (row) =>
-        (row.prev.bill)?.toFixed(1)
+        (row.prev.bill)
     },
     { header: "Prev Rebate", accessor: "prev.rebate" },
     { header: "two month Bill", accessor: "two_mnth_bill" },
-    { header: "xls two month Bill", accessor: "", Cell: (row) => {
-      return row.curr_watr+row.curr_swtx+row.curr_metr+row.curr_capt+row.curr_devp+row.curr_watr1+row.curr_swtx1+row.curr_metr1+row.curr_capt1+row.curr_devp1
-    } },
+    {
+      header: "billing agency two month Bill", accessor: "", Cell: (row) => {
+        return row.curr_watr + row.curr_swtx + row.curr_metr + row.curr_capt + row.curr_devp + row.curr_watr1 + row.curr_swtx1 + row.curr_metr1 + row.curr_capt1 + row.curr_devp1
+      }
+    },
     { header: "LPS", accessor: "lps" },
-    { header: "xls LPS", accessor: "lps_amt" },
+    { header: "billing agency LPS", accessor: "lps_amt" },
     { header: "Ostd Amt", accessor: "ostd_amt" },
     { header: "Ostd Int", accessor: "ostd_int" },
 
-    { header: "total amount", accessor: "total_amount"},
-    { header: "xls total amount", accessor: "tot_amt_indate" },
+    { header: "total amount (2mnth bill+ostd amt)", accessor: "total_amount" },
+    { header: "billing agency total amount (2mnth bill+ostd amt)", accessor: "tot_amt_indate" },
 
     {
       header: "Computation Sheet", accessor: "", Cell: (row) => {
@@ -196,18 +201,23 @@ export default function Billing() {
         )
       }
     },
-
-
-
-
-
-
-
+  ];
+  const extraExportColumns = [
+    {
+      header: "Created Date",
+      value: (row) => new Date().toLocaleDateString(), // Example calculated field
+    },
+    {
+      header: "Is Admin",
+      value: (row) => (row.role === "Admin" ? "Yes" : "No"),
+    },
   ];
 
   return (
+
     <>
       <div className="bg-blue-100 relative isolate overflow-hidden py-24 sm:py-32 min-h-screen">
+
         <img
           alt=""
           src="/water-1560478_1280.png"
@@ -217,36 +227,39 @@ export default function Billing() {
         />
         <div className="m-4">
           <div className=" max-w-full lg:mx-0">
-            <h2 className="m-2 text-4xl font-bold tracking-tight  text-black -mt-20">
+            <h2 className="m-2 text-4xl font-bold tracking-tight text-gray -mt-20">
               Water Billing System
             </h2>
-            <ReadExcel setReadings={setReadings} displayItem={displayItem} />
-
-            {displayItem ? (
-              <>
-                <div className="p-2 m-2 mt-8">
-                  <button
-                    className="bg-gray-500 hover:bg-gray-500 text-white font-bold py-2 px-4 hover:border-gray-400 rounded"
-                    onClick={resetData}
-                  >
-                    Reset
-                  </button>
-                </div>
-                <div className="p-2 m-2">
-                  {/* <button
-                    className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 hover:border-blue-500 rounded float-right"
-                    onClick={() => downloadCSV(waterBill)}
-                  >
-                    Download
-                  </button> */}
-                  <h2 className="p-2 m-2 mt-8 font-bold text-center">
-                    Water Bill Calculation
-                  </h2>
+            <ReadExcel setReadings={setReadings} displayItem={displayItem} setLoading={setLoading}/>
 
 
+            {
+              loading ? <Loader /> :
+                displayItem ? (
+                  <>
+                    <div className="p-2 m-2 mt-8">
+                      <button
+                        className="bg-gray-500 hover:bg-gray-500 text-white font-bold py-2 px-4 hover:border-gray-400 rounded"
+                        onClick={resetData}
+                      >
+                        Reset
+                      </button>
+                    </div>
+                    <div className="p-2 m-2">
+                      {/* <button
+                      className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 hover:border-blue-500 rounded float-right"
+                      onClick={() => downloadCSV(waterBill)}
+                    >
+                      Download
+                    </button> */}
+                      <h2 className="p-2 m-2 mt-8 font-bold text-center">
+                        Water Bill Calculation
+                      </h2>
 
 
-                  <DataTable data={waterBill} columns={columns} />
+
+
+                  <DataTable data={waterBill} columns={columns} extraExportColumns={extraExportColumns}/>
                 </div>
                 {/* Print Modal */}
                 {showPrintModal && selectedRecord && (

@@ -2,29 +2,29 @@
 import React, { useState } from 'react';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
-import AddAccount from './AddAccount';
+import AddTypeConnection from './AddTypeConnection';
 
 
-interface account {
+interface TypeConnection {
   id: number;
-  accountName: string;
+  TypeConnection: string;
 }
 
-const Account: React.FC = () => {
-  const [account, setAccount] = useState<account[]>([
-    { id: 1, accountName: ' 66D-1-215' },
-    { id: 2, accountName: '66D-2-212' },
-    { id: 3, accountName: '66F-3-216'},
+const TypeConnection: React.FC = () => {
+  const [typeConnection, setTypeConnection] = useState<TypeConnection[]>([
+    { id: 1, TypeConnection: ' Permanent ' },
+    { id: 2, TypeConnection: 'temporary' },
+    { id: 3, TypeConnection: 'In case of temporary connection charges the water charges will be 1. times'},
   ]);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false); 
-  const [newchowkriName, setnewchowkriName] = useState<string>(''); 
+  // const [typeConnection, setTypeConnection] = useState<string>(''); 
   const handleEdit = (id: number) => {
     console.log('Edit chowkri with id:', id);
   };
 
   const handleDelete = (id: number) => {
-    const filteredchowkri = account.filter(account => account.id !== id);
-    setAccount(filteredchowkri);
+    const filteredchowkri = typeConnection.filter(typeConnection => typeConnection.id !== id);
+    setTypeConnection(filteredchowkri);
     console.log('Deleted chowkri with id:', id);
   };
 
@@ -32,23 +32,12 @@ const Account: React.FC = () => {
     console.log('View category with id:', id);
   };
 
-  const handleAddCategory = () => {
-    if (newchowkriName.trim()) {
-      const newCategory: account = {
-        id: account.length + 1,
-        accountName: newchowkriName.trim(),
-      
-      };
-      setAccount([...account, newCategory]);
-      setnewchowkriName('');
-      setIsFormOpen(false); 
-    }
-  };
+ 
 
   return (
     <div className=" mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Account</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Type of Connection</h1>
       </div>
 
       <div className="flex justify-end mb-4">
@@ -56,14 +45,14 @@ const Account: React.FC = () => {
           onClick={() => setIsFormOpen(!isFormOpen)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
         >
-         Add Account
+         Add Type Connection
         </button>
       </div>
 
    
      {
       isFormOpen && <>
-    <AddAccount setIsFormOpen={setIsFormOpen}/>
+    <AddTypeConnection setIsFormOpen={setIsFormOpen}/>
       </>
      }
       <div className="overflow-x-auto shadow-md rounded-lg">
@@ -71,20 +60,20 @@ const Account: React.FC = () => {
           <thead className="bg-gray-400 text-white">
             <tr>
             <th className="px-6 py-4 text-lg font-semibold text-left">S.No.</th>
-              <th className="px-6 py-4 text-lg font-semibold text-left">Account Name</th>
+              <th className="px-6 py-4 text-lg font-semibold text-left">Type Connection</th>
               <th className="px-6 py-4 text-lg font-semibold text-left">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {account.map((account) => (
-              <tr key={account.id} className="border-t hover:bg-gray-100">
-                                <td className="px-6 py-4 text-sm text-gray-800">{account.id}</td>
-                <td className="px-6 py-4 text-sm text-gray-800">{account.accountName}</td>
+            {typeConnection.map((TypeConnection) => (
+              <tr key={TypeConnection.id} className="border-t hover:bg-gray-100">
+                                <td className="px-6 py-4 text-sm text-gray-800">{TypeConnection.id}</td>
+                <td className="px-6 py-4 text-sm text-gray-800">{TypeConnection.TypeConnection}</td>
 
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
-                    <MdEdit onClick={() => handleEdit(account.id)} className=' w-15  h-6  cursor-pointer'  />
-                    <MdDelete onClick={() => handleDelete(account.id)} className=' w-15  h-6  cursor-pointer'/>
+                    <MdEdit onClick={() => handleEdit(TypeConnection.id)} className=' w-15  h-6  cursor-pointer'  />
+                    <MdDelete onClick={() => handleDelete(TypeConnection.id)} className=' w-15  h-6  cursor-pointer'/>
                   </div>
                 </td>
               </tr>
@@ -96,7 +85,24 @@ const Account: React.FC = () => {
   );
 };
 
-export default Account;
+export default TypeConnection;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

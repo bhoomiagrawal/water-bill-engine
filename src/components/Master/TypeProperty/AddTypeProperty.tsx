@@ -5,9 +5,9 @@ import React, { useState } from "react";
   setIsFormOpen:(value:boolean)=>void;
  }
 
-const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
+const AddTypeOfProperty: React.FC <formOpenProps>= ({setIsFormOpen}) => {
   const [formValues, setFormValues] = useState({
-    cinNumber: "",
+    typeOfProperty: "",
   });
 
 
@@ -21,7 +21,7 @@ const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
 
   const validate = () => {
     const newErrors: Partial<typeof formValues> = {};
-    if (!formValues.cinNumber) newErrors.cinNumber = "Account Number is required";
+    if (!formValues.typeOfProperty) newErrors.typeOfProperty = "Account Number is required";
 
     return newErrors;
   };
@@ -45,18 +45,18 @@ const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
           >
             <div className="border-b border-stroke px-6 py-4 dark:border-strokedark">
               <h3 className="text-xl  font-bold text-gray-800 dark:text-white">
-                Create CIN Number
+                Create Type Of Property
               </h3>
             </div>
 
             <div>
               <div>
                 <input
-                  type="number"
-                  name="cinNumber"
-                  value={formValues.cinNumber}
+                  type="text"
+                  name="typeOfProperty"
+                  value={formValues.typeOfProperty}
                   onChange={handleChange}
-                  placeholder="Enter CIN Number"
+                  placeholder="Enter type of Property"
                   className="w-full rounded-lg   border-2 border-[#aeaeaf]  bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none  dark:text-white dark:focus:border-primary"
                 />
               </div>
@@ -86,6 +86,7 @@ const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
   );
 };
 
-export default AddAccount;
+export default AddTypeOfProperty;
+
 
 
