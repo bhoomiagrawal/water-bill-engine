@@ -227,7 +227,7 @@ export default function Billing() {
         />
         <div className="m-4">
           <div className=" max-w-full lg:mx-0">
-            <h2 className="m-2 text-4xl font-bold tracking-tight text-gray -mt-20">
+            <h2 className="m-2 text-4xl font-bold tracking-tight text-gray-800 -mt-20">
               Water Billing System
             </h2>
             <ReadExcel setReadings={setReadings} displayItem={displayItem} setLoading={setLoading}/>

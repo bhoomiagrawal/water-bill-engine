@@ -1,5 +1,6 @@
 "use client";
 
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Billing from "../../components/Bill/Billing";
 
 // import Head from 'next/head';
@@ -12,18 +13,20 @@ import Billing from "../../components/Bill/Billing";
 
 export default function Bill() {
 
-  
+
     return (
         <main className=" min-h-screen">
             {/* MY UI CODE START FROM HEAR */}
-            
-    
-       <Billing/>
-      {/* <ReadExcel /> */}
 
-     
+            <DefaultLayout>
+
+                <Billing />
+            </DefaultLayout>
+            {/* <ReadExcel /> */}
+
+
             {/* MY UI CODE END HEAR */}
-           
+
 
         </main>
     );
