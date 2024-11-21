@@ -61,7 +61,7 @@
 
 // components/DataTable.js
 import { useState } from "react";
-import * as  XLSX from 'xlsx'
+import * as XLSX from "xlsx";
 
 const DataTable = ({ data, columns }) => {
   const [sortConfig, setSortConfig] = useState(null);
@@ -105,7 +105,8 @@ const getNestedValue = (obj, path) => {
       let filteredColumns = columns.filter((c) => {
         return (c.header != 'Computation Sheet')})
       filteredColumns.forEach((column) => {
-        rowData[column.header] = getNestedValue(row, column.accessor);
+        // rowData[column.header] = getNestedValue(row, column.accessor);
+        rowData[column.header] = column.Cell ? column.Cell(row) : getNestedValue(row, column.accessor)
       });
       
       // Add extra columns (e.g., calculated fields)
@@ -133,10 +134,9 @@ const getNestedValue = (obj, path) => {
  
      const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     // Download the Excel file
-    XLSX.writeFile(workbook,`calculatedBilling${formattedDateTime}.csv`);
+    XLSX.writeFile(workbook,`calculatedBilling${formattedDateTime}.xlsx`);
   };
 
-  console.log('data asdfgh', data)
   return (
     <div className="max-w-full overflow-x-auto">
       <button

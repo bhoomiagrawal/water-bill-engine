@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import readXlsxFile from "read-excel-file";
 
-export default function ReadExcel({ setReadings, displayItem }) {
+export default function ReadExcel({ setReadings, displayItem, setLoading }) {
   const imagRef = useRef();
   useEffect(() => {
     if (!displayItem) {
@@ -13,6 +13,7 @@ export default function ReadExcel({ setReadings, displayItem }) {
 
   //new code start from here
   const handleReadExcel = (file) => {
+    setLoading(true)
     readXlsxFile(file).then((rows) => {
       let header = rows[0];
       let data = rows[1];
@@ -104,7 +105,7 @@ export default function ReadExcel({ setReadings, displayItem }) {
   return (
     <>
       <div className="p-2 m-2 mt-8">
-        <label className=" text-black mt-6 text-lg leading-8 font-bold">
+        <label className="mt-6 text-lg leading-8 font-bold text-gray">
           Upload your file{" "}
         </label>
         <input

@@ -1,5 +1,5 @@
 import DefaultLayout from '@/components/Layouts/DefaultLayout'
-import OwnPrivateSupply from '@/components/Master/OwnPrivateSupply/OwnPrivateSupply'
+import OwnPrivateSupply from '@/components/Master/OwnPrivateSupply'
 import React from 'react'
 
 const OwnPrivateSupplyPage = () => {
