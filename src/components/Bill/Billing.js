@@ -181,13 +181,14 @@ export default function Billing() {
         return row.curr_watr + row.curr_swtx + row.curr_metr + row.curr_capt + row.curr_devp + row.curr_watr1 + row.curr_swtx1 + row.curr_metr1 + row.curr_capt1 + row.curr_devp1
       }
     },
-    { header: "LPS", accessor: "lps" },
-    { header: "billing agency LPS", accessor: "lps_amt" },
+   
     { header: "Ostd Amt", accessor: "ostd_amt" },
     { header: "Ostd Int", accessor: "ostd_int" },
-
+    
     { header: "total amount (2mnth bill+ostd amt)", accessor: "total_amount" },
     { header: "billing agency total amount (2mnth bill+ostd amt)", accessor: "tot_amt_indate" },
+    { header: "LPS", accessor: "lps" },
+    { header: "billing agency LPS", accessor: "lps_amt" },
 
     {
       header: "Computation Sheet", accessor: "", Cell: (row) => {

@@ -12,7 +12,7 @@ export function calculateWaterBill(readings) {
 
   for (let reading of readings) {
     console.log('reading', reading)
-const {category} = reading
+    const { category } = reading
     let calculation = getCalculation(reading);
     let previous_readings = {};
     let calculation_prev = {}
@@ -32,9 +32,9 @@ const {category} = reading
 
     if (category == "d" || category == "f") {
       reading.two_mnth_bill = (reading.bill) + (reading.prev.bill);
-      reading.lps = Math.round((reading.bill + reading.prev.bill) * 10) / 100
 
       reading.total_amount = (reading.two_mnth_bill) + reading.ostd_amt
+
 
     } else {
       reading.two_mnth_bill = (reading.bill).toFixed(2)
@@ -45,6 +45,8 @@ const {category} = reading
     }
 
     // reading.rebate = rebate;
+    reading.lps = Math.round((reading.total_amount) * 10) / 100
+
     reading.waterCharge = reading.waterCharge != undefined ? (reading.waterCharge).toFixed(2) : 0
   }
 
@@ -145,7 +147,7 @@ function getBasicCharge(reading, prevCalc = false) {
   });
   reading.slabs = []
   reading.prevSlabs = []
- 
+
   for (let i = 0; i < catSlabs?.length; i++) {
     const slab = catSlabs[i];
 
@@ -155,8 +157,8 @@ function getBasicCharge(reading, prevCalc = false) {
 
     }
     if (consumption <= slab.max) {
-      if(reading.category == "f") {
-        
+      if (reading.category == "f") {
+
         bCharge = slab.ratePerThousand;
       } else {
         bCharge += ((consumption - previousMax) / 1000) * slab.ratePerThousand;
@@ -218,7 +220,7 @@ function addFixedCharge(reading) {
   let meterServiceData = meterServiceCharges.find((m) => {
     return m.meter_size == reading.meter_size && reading.category != "f";
   });
-  let fixedCharge = fixedChargeData?.fixed_charges ;
+  let fixedCharge = fixedChargeData?.fixed_charges;
   let meterServiceCharge = meterServiceData?.meter_service || 0;
 
   return {
@@ -268,7 +270,7 @@ function getStpCharge(reading) {
 function getIDC(reading) {
   let { consumption, waterCharge, bill } = reading;
   let idcData = idc.find((id) => {
-   
+
     return consumption >= id.min && consumption <= id.max;
   });
   // let idcharge = idcData ? (waterCharge * idcData.chargePercent) / 100 : 0;
