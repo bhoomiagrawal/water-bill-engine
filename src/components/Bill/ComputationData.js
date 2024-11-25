@@ -108,8 +108,9 @@ export default function ComputationData ({data, slabs}) {
                   </td>
                   <td className="border px-4 py-2">
                   </td>
+                  {}
                   <td className="border px-4 py-2">
-                    <strong>{data?.basicCharge.toFixed}</strong>
+                    <strong>{data?.basicCharge.toFixed(2)}</strong>
                   </td>
                 </tr>
                 <tr>
