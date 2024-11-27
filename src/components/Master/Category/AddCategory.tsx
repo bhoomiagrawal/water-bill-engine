@@ -7,6 +7,7 @@ interface AddCategoryProps {
 const AddCategory: React.FC<AddCategoryProps> = ({ setIsPopupOpen }) => {
   const [formValues, setFormValues] = useState({
     category: "",
+    categoryCode:""
   });
 
   const [errors, setErrors] = useState<Partial<typeof formValues>>({});
@@ -47,13 +48,21 @@ const AddCategory: React.FC<AddCategoryProps> = ({ setIsPopupOpen }) => {
               </div>
 
               <div>
-                <div>
+                <div className=" flex  flex-col gap-y-4">
                   <input
                     type="text"
                     name="category"
                     value={formValues.category}
                     onChange={handleChange}
                     placeholder="Enter Category Name"
+                    className="w-full rounded-lg border-2 border-[#aeaeaf] bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
+                  />
+                       <input
+                    type="text"
+                    name="categoryCode"
+                    value={formValues.categoryCode}
+                    onChange={handleChange}
+                    placeholder="Enter category Code"
                     className="w-full rounded-lg border-2 border-[#aeaeaf] bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
                   />
                 </div>
