@@ -3,7 +3,7 @@ import { useState } from "react";
 interface PropData {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE'; 
-  initialValues?: Record<string, any>; 
+  initialValues?: Record<string, any> | null; 
 }
 
 interface ApiResponse {

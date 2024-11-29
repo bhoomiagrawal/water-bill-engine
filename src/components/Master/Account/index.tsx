@@ -1,8 +1,9 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import AddAccount from './AddAccount';
+import { useInternalService } from '@/components/hook/useInternalService';
 
 
 interface account {
@@ -11,7 +12,19 @@ interface account {
 }
 
 const Account: React.FC = () => {
-  const [account, setAccount] = useState<account[]>([
+
+  const [fetchData, fetchDataResult, fetchDataProgress, fetchDataError] = useInternalService({
+    url: "http://localhost:8080/api/category",
+    method: "GET",
+    initialValues: null, 
+  });
+
+  useEffect(()=>{
+    fetchData({body:null});
+  },[])
+
+  console.log("fetchDataResult",fetchDataResult)
+    const [account, setAccount] = useState<account[]>([
     { id: 1, accountName: ' 66D-1-215' },
     { id: 2, accountName: '66D-2-212' },
     { id: 3, accountName: '66F-3-216'},
