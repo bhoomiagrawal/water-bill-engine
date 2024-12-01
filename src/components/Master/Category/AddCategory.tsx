@@ -33,7 +33,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({ setIsPopupOpen }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18   ">
+    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black  mt-24   ">
       <div className="mt-10 bg-gray-100 relative w-[900px] m-auto ">
         {/* Cross Icon */}
         {/* <div className="absolute top-2 right-2 cursor-pointer">
