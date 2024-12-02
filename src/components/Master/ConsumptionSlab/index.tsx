@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import AddConsumptionSlab from "./AddConsumptionSlab";
+import { useInternalService } from "@/components/hook/useInternalService";
 
 interface ConsumptionSlab {
   id: number;
@@ -26,9 +27,17 @@ const ConsumptionSlab = () => {
 
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
 
+  const [fetchRequest, result, inProgress, error] = useInternalService("https://dummyjson.com/products",'GET',null);
+
+  useEffect(()=>{fetchRequest()},[])
+
+  console.log(result)
+
   const handleSearchChange = (event:React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value)
   };
+const filteredConsumptionSlab = search === "    " ? consumptionSlab : consumptionSlab.filter(consumption=>consumption.consumption.toString().includes(search));
+console.log(filteredConsumptionSlab)
 
   const handleEdit = (id: number) => {};
   const handleDelete = (id: number) => {};
@@ -82,7 +91,7 @@ const ConsumptionSlab = () => {
             </tr>
           </thead>
           <tbody>
-            {consumptionSlab.map((consumption) => (
+            {filteredConsumptionSlab.map((consumption) => (
               <tr key={consumption.id} className="border-t hover:bg-gray-100">
                 <td className="px-6 py-4 text-sm text-gray-800">
                   {consumption.id}

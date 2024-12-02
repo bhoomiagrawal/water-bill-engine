@@ -30,7 +30,7 @@ const ConnectionSize: React.FC = () => {
     setSearch(value);
   };
 
-  const filteredAccounts =
+  const filterconnectionSize =
     search === ""
       ? connectionSize
       : connectionSize.filter((connection) =>
@@ -47,7 +47,7 @@ const ConnectionSize: React.FC = () => {
     setSortConfig({ key, direction });
   };
 
-  const sortedAccounts = [...filteredAccounts].sort((a, b) => {
+  const sortedAccounts = [...filterconnectionSize].sort((a, b) => {
     if (!sortConfig) return 0;
 
     const { key, direction } = sortConfig;
