@@ -1,10 +1,5 @@
 import { useState } from "react";
 
-interface PropData {
-  url: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE'; 
-  initialValues?: Record<string, any> | null; 
-}
 
 interface ApiResponse {
   result: null | any; 
@@ -12,20 +7,25 @@ interface ApiResponse {
   error: string | null;
 }
 
+
 interface FetchRequestOptions {
   body?: Record<string, unknown> | FormData;
   params?: string[];
   query?: Record<string, string>;
 }
 
-export function useInternalService({ url, method, initialValues }: PropData) {
+export function useInternalService(url: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', initialValues: Record<string, any> | null) {
   const [response, setResponse] = useState<ApiResponse>({
     result: null,
     inProgress: false,
     error: null,
   });
 
-  const fetchRequest = async ({ body = {}, params = [], query = {} }: FetchRequestOptions): Promise<void> => {
+  const fetchRequest = async (
+    body?: Record<string, unknown> | FormData,
+    params?: string[],
+    query?: Record<string, string>
+  ): Promise<void> => {
     setResponse({
       result: null,
       inProgress: true,
