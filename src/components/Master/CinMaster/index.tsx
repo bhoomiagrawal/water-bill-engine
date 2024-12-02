@@ -16,7 +16,7 @@ const CinMaster: React.FC = () => {
     { id: 2, cinNumber: '140120413864' },
     { id: 3, cinNumber: '140120413868'},
     { id: 4, cinNumber: '140120413862'},
-    { id: 4, cinNumber: '140120413861' },
+    { id: 5, cinNumber: '140120413861' },
   ]);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false); 
   const [newchowkriName, setnewchowkriName] = useState<string>(''); 

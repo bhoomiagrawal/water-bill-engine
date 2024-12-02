@@ -17,7 +17,7 @@ const ConsumptionSlab = () => {
     { id: 3, category: "Industrial", consumption: "15001-40000" },
     { id: 4, category: "Flat", consumption: "M 40001-60000" },
     {
-      id: 4,
+      id: 5,
       category: "Own/private water supply",
       consumption: "More Then 60000",
     },
