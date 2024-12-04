@@ -6,15 +6,16 @@ import AddMeterStatus from './AddMeterStatus';
 
 interface MeterStatus{
   id:number,
-  MeterStatus:string
+  MeterStatus:string,
+  MeterCode:string
 }
 
 const MeterStatus:React.FC = () => {
 
   const [MeterStatus,setMeterStatus]= useState<MeterStatus[]>([
-    { id: 1, MeterStatus: 'ok' },
-    { id: 2, MeterStatus: 'Now Meter Status is Good' },
-    { id: 3, MeterStatus: 'Meter is not Working' },
+    { id: 1, MeterStatus: 'MeterStatus rule' ,MeterCode:"MD"},
+    { id: 2, MeterStatus:"",MeterCode:'ok' },
+    { id: 3, MeterStatus: '',MeterCode:"MNW" },
   ]);
 
 const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false); 
@@ -49,6 +50,7 @@ const handleDelete=(id:number)=>{}
             <tr>
             <th className="px-6 py-4 text-lg font-semibold text-left">S.No.</th>
               <th className="px-6 py-4 text-lg font-semibold text-left">Meter Status</th>
+              <th className="px-6 py-4 text-lg font-semibold text-left">Meter Code</th>
               <th className="px-6 py-4 text-lg font-semibold text-left">Actions</th>
             </tr>
           </thead>
@@ -57,6 +59,7 @@ const handleDelete=(id:number)=>{}
               <tr key={MeterStatus.id} className="border-t hover:bg-gray-100">
                                 <td className="px-6 py-4 text-sm text-gray-800">{MeterStatus.id}</td>
                 <td className="px-6 py-4 text-sm text-gray-800">{MeterStatus.MeterStatus}</td>
+                <td className="px-6 py-4 text-sm text-gray-800">{MeterStatus.MeterCode}</td>
 
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">

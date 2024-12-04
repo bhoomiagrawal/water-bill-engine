@@ -35,11 +35,6 @@ const AddCategory: React.FC<AddCategoryProps> = ({ setIsPopupOpen }) => {
   return (
     <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black  mt-24   ">
       <div className="mt-10 bg-gray-100 relative w-[900px] m-auto ">
-        {/* Cross Icon */}
-        {/* <div className="absolute top-2 right-2 cursor-pointer">
-          <ImCross className="w-6 h-6 text-gray-800" onClick={() => setIsFormOpen(false)} />
-        </div> */}
-
         <div className="mx-auto max-w-6xl">
           <div className="rounded-lg border shadow-lg dark:border-strokedark dark:bg-boxdark">
             <form onSubmit={handleSubmit} className="flex flex-col gap-10 space-x-13 p-10">

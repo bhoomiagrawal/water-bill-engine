@@ -77,7 +77,7 @@ const AddConsumptionSlab: React.FC<PopupOpen> = ({setIsPopupOpen}) => {
                 type="number"
                 name="consumptionSlab"
                 value={formValues.consumptionSlab}
-                placeholder="Enter Consumption Slab"
+                placeholder="Enter Consumption Slab (Litres) From-To"
                 onChange={handleChange}
                 className="w-full rounded-lg border-2 border-[#aeaeaf] bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
               />
