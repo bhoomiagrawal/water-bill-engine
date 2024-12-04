@@ -4,12 +4,17 @@ import React, { useState } from "react";
 const AddSingleConsumer: React.FC = () => {
   const [formValues, setFormValues] = useState({
     category: "",
+
+  
+   
   });
-
+  const [showInputField,setShowInputField] =useState('')
   const [errors, setErrors] = useState<Partial<typeof formValues>>({});
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+const [privateWaterSupply,setPrivateWaterSupply]= useState('')
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    setShowInputField(value)
+  
     setFormValues((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: undefined })); // Clear the error for the field being edited
   };
@@ -147,15 +152,15 @@ const AddSingleConsumer: React.FC = () => {
 
               <div className="flex flex-col">
                 <label
-                  htmlFor="connectionCategory "
+                  htmlFor="category "
                   className="mb-1 font-medium"
                 >
                   Select Connection Category :
                 </label>
                 <select
-                  name="connectionCategory"
-                  // value={formValues.SelectChowkriCode}
-                  // onChange={handleChange}
+                  name="category"
+                  value={formValues.category}
+                  onChange={handleChange}
                   className="w-full rounded border border-gray-300 p-2"
                   // disabled={!formValues.SelectSubdivisionOffice}
                 >
@@ -169,6 +174,50 @@ const AddSingleConsumer: React.FC = () => {
                   </option>
                 </select>
               </div>
+              {
+                showInputField==="Own/private water supply" ? <> <div className="flex flex-col">
+                <label
+                  htmlFor="privateWaterSupply "
+                  className="mb-1 font-medium"
+                >
+                  Select Own/Private Water Supply :
+                </label>
+                <select
+                  name="privateWaterSupply"
+                  value={privateWaterSupply}
+                  onChange={(e)=>setPrivateWaterSupply(e.target.value)}
+                  className="w-full rounded border border-gray-300 p-2"
+                  // disabled={!formValues.SelectSubdivisionOffice}
+                >
+                  <option value="">Select</option>
+                  <option value="Hotel">Hotel</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Cinema">Cinema</option>
+                  <option value="Cinema">Cinema</option>
+                  <option value="Scooter/two wheeler service station">
+                  Scooter/two wheeler service station           
+                         </option>
+                  <option value="Scooter/two wheeler service station">
+                  Scooter/two wheeler service station             
+                     </option>
+                </select>
+              </div></>:''
+              }
+
+              {privateWaterSupply==="Hotel"?<>       <div className="flex flex-col">
+                <label htmlFor="ChildBinderSheet" className="mb-1 font-medium">
+                  Add Number of Room:
+                </label>
+                <input
+                  type="text"
+                  name="numberRoom"
+                  // value={formValues.category}
+                  placeholder="Enter Number Room"
+                  onChange={handleChange}
+                  className="w-full rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {/* {errors.category && <div className="mt-1 text-red-600">{errors.category}</div>} */}
+              </div></>:''}
 
               <div className="flex flex-col">
                 <label htmlFor="SelectChowkriCode" className="mb-1 font-medium">

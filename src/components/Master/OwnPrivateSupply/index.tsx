@@ -41,7 +41,7 @@ const OwnPrivateSupply: React.FC = () => {
   return (
     <div className=" mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Own Private Supply</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Own/Private Water Supply</h1>
       </div>
 
       <div className="flex justify-end mb-4">
@@ -49,7 +49,7 @@ const OwnPrivateSupply: React.FC = () => {
           onClick={() => setIsFormOpen(!isFormOpen)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
         >
-         Add Own Private Supply
+         Add Own/Private Water Supply
         </button>
       </div>
 
@@ -64,7 +64,7 @@ const OwnPrivateSupply: React.FC = () => {
           <thead className="bg-gray-400 text-white">
             <tr>
             <th className="px-6 py-4 text-lg font-semibold text-left">S.No.</th>
-              <th className="px-6 py-4 text-lg font-semibold text-left">Own Private Supply </th>
+              <th className="px-6 py-4 text-lg font-semibold text-left">Own/Private Water Supply </th>
               <th className="px-6 py-4 text-lg font-semibold text-left">Actions</th>
             </tr>
           </thead>
