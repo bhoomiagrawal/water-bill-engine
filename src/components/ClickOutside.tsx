@@ -6,7 +6,7 @@ interface Props {
   onClick: () => void;
   className?: string;
 }
-
+//TODO: Make this coustom hook. why the hell is this function component
 const ClickOutside: React.FC<Props> = ({
   children,
   exceptionRef,

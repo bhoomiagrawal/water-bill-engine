@@ -1,12 +1,10 @@
 import { useState } from "react";
 
-
 interface ApiResponse {
   result: null | any; 
   inProgress: boolean;
   error: string | null;
 }
-
 
 interface FetchRequestOptions {
   body?: Record<string, unknown> | FormData;
@@ -21,6 +19,7 @@ export function useInternalService(url: string, method: 'GET' | 'POST' | 'PUT' |
     error: null,
   });
 
+
   const fetchRequest = async (
     body?: Record<string, unknown> | FormData,
     params?: string[],
@@ -31,43 +30,48 @@ export function useInternalService(url: string, method: 'GET' | 'POST' | 'PUT' |
       inProgress: true,
       error: null,
     });
-
+  
     try {
-      let location = url;
-
+      let baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL;
+      let location = `${baseUrl}/${url}`;
+  
       if (params && params.length > 0) {
-        location = `${url}/${params.join("/")}`;
+        location = `${location}/${params.join("/")}`; 
       }
 
+  
       if (query && Object.keys(query).length > 0) {
         const queryString = new URLSearchParams(query).toString();
         location = `${location}?${queryString}`;
       }
-
+  
+  
       const options: RequestInit = {
         method: method.toUpperCase(),
         headers: {},
       };
-
+  
       if (body && (method === "POST" || method === "PUT")) {
-        if (body instanceof FormData) {
-          options.body = body;
-        } else {
-          options.body = JSON.stringify(body);
-          options.headers = { "Content-Type": "application/json" };
-        }
+        options.body = JSON.stringify(body);
+        options.headers = { "Content-Type": "application/json" };
       }
-
+  
       const res = await fetch(location, options);
-
+  
       if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Fetch error:", errorData);
-        throw new Error(errorData.error || "Unknown error");
+        const errorText = await res.text();
+        console.error("Fetch error:", errorText);
+        throw new Error(errorText || "Unknown error");
       }
-
-      const result = await res.json();
-
+  
+      let result;
+      try {
+        result = await res.json();
+      } catch (error) {
+        console.error("Failed to parse JSON response:", error);
+        result = null;
+      }
+  
       setResponse({
         result,
         inProgress: false,
@@ -82,6 +86,7 @@ export function useInternalService(url: string, method: 'GET' | 'POST' | 'PUT' |
       });
     }
   };
+  
 
   return [fetchRequest, response.result, response.inProgress, response.error];
 }

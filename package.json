@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "antd": "^5.22.6",
     "apexcharts": "^3.45.2",
     "flatpickr": "^4.6.13",
     "inquirer": "^12.0.0",
@@ -18,9 +19,11 @@
     "react-apexcharts": "^1.4.1",
     "react-dom": "^18",
     "react-icons": "^5.3.0",
+    "react-toastify": "^10.0.6",
     "read-excel-file": "^5.8.6",
     "slabs": "^2.0.5",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.7",

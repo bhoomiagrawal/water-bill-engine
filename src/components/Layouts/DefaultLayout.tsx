@@ -22,7 +22,7 @@ export default function DefaultLayout({
         <div className="relative flex flex-1 flex-col ">
           {/* <!-- ===== Header Start ===== --> */}
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-          <div className=" w-screen"><HoverHeader/></div>
+          <div ><HoverHeader/></div>
           {/* <!-- ===== Header End ===== --> */}
 
           {/* <!-- ===== Main Content Start ===== --> */}
