@@ -1,15 +1,14 @@
-'use client'
-import React, { useState } from "react";
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import DropDown from "@/components/HelperComponents/DropDown/DropDown";
-
-const cycleNumbers = Array.from({ length: 15 }, (_, i) => (i + 1).toString());
+import { useInternalService } from "@/components/hook/useInternalService";
 
 interface FormValues {
   typeCharges: string;
   category: string;
-  selectConnectionSize: number;
-  consumptionSlab: number;
+  selectConnectionSize: string;
+  consumptionSlab: string;
   waterChargesRate: number;
 }
 
@@ -19,27 +18,114 @@ const Configure: React.FC = () => {
   const [formValues, setFormValues] = useState<FormValues>({
     typeCharges: "",
     category: "",
-    selectConnectionSize: 0,
-    consumptionSlab: 0,
-    waterChargesRate: 0 
+    selectConnectionSize: "",
+    consumptionSlab: "",
+    waterChargesRate: 0,
   });
 
+  const [rows, setRows] = useState<FormValues[]>([
+    {
+      consumptionSlab: "",
+      waterChargesRate: 0,
+      typeCharges: "",
+      category: "",
+      selectConnectionSize: "",
+    },
+  ]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const [
+    fetchtypeCharges,
+    resultypeCharges,
+    inProgressypeCharges,
+    errorypeCharges,
+  ] = useInternalService(`chargeType`, "GET", null);
+
+  const [
+    fetchRequestCategories,
+    resultCategories,
+    inProgressCategories,
+    errorCategories,
+  ] = useInternalService(`category`, "GET", null);
+
+  const [
+    fetchRequestConnectionSize,
+    resultConnectionSize,
+    inProgressConnectionSize,
+    errorConnectionSize,
+  ] = useInternalService(
+    `ConnectionSize`,
+    "GET",
+    null
+  );
+
+  const [fetchRequestSlab, resultSlab, inProgressSlab, errorSlab] =
+    useInternalService(`slab`, "GET", null);
+
+  useEffect(() => {
+    fetchtypeCharges();
+    fetchRequestCategories();
+    fetchRequestConnectionSize();
+    fetchRequestSlab();
+  }, []);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    index?: number
+  ) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
 
+    if (index === undefined) {
+      setFormValues((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    } else {
+      const updatedRows = [...rows];
+      updatedRows[index] = { ...updatedRows[index], [name]: value };
+      setRows(updatedRows);
+    }
+  };
+
+  const handleAddRow = () => {
+    setRows([
+      ...rows,
+      {
+        consumptionSlab: "",
+        waterChargesRate: 0,
+        typeCharges: "",
+        category: "",
+        selectConnectionSize: "",
+      },
+    ]);
+  };
+
+  const handleRemoveRow = (index: number) => {
+    const updatedRows = rows.filter((_, rowIndex) => rowIndex !== index);
+    setRows(updatedRows);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formValues);
-    // router.push('/readingSheet'); // Navigate to readingSheet page
+    console.log(rows);
   };
-  const options = ['Domestic', 'Non-domestic', 'Industrial', 'Flat','Own/private water supply'];
-  const options1 = ['15(MM)', '20(MM)','25(MM)', '40(MM)','160(MM)'];
-  const options2 = ['0-8000', '8001-1500','8001-1500', '8001-1500','15001-40000'];
 
+  const categoryOptions =
+    resultCategories?.data?.data?.category?.map(
+      (item: { category_name: string }) => item.category_name
+    ) || [];
+  const connectionSizeOptions =
+    resultConnectionSize?.data?.data?.connectionSize?.map(
+      (item: { size: string }) => item.size
+    ) || [];
+  const slabOptions =
+    resultSlab?.data?.data?.slab?.map(
+      (item: { max_consumption: number; min_consumption: number }) =>
+        `${item.max_consumption} - ${item.min_consumption}`
+    ) || [];
+  const chargeTypeOptions =
+    resultypeCharges?.data?.data?.ChargeType?.map(
+      (item: { charge_name: string }) => item.charge_name
+    ) || [];
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -49,110 +135,135 @@ const Configure: React.FC = () => {
             <h3 className="text-xl font-semibold">Configure</h3>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4 p-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="flex flex-col">
-                <label htmlFor="TypeCharges" className="mb-1 font-medium">Select Type of charges :</label>
-                <select
-                  name="TypeCharges"
-                  value={formValues.typeCharges}
-                  onChange={handleChange}
-                  className="w-full rounded border border-gray-300 p-2"
-                >
-                  <option value="Water Charges">Water Charges</option>
-                  <option value="">Minimum Charges</option>
-                  <option value=""> Meter service chrges</option>
-                  <option value="">Fixed Charges</option>
-                  <option value="">Sewarage tax</option>
-                  <option value="">STP charges </option>
-                  <option value="">IDC</option>
-                  <option value="">LPS</option>
-                  <option value="">Interest</option>
-                  <option value="">Meter tempering charges</option>
-                  <option value="">Meter damaging charges</option>
-                  <option value="">meter theft charges</option>
-                  <option value="">Penalty for connecting mechanical or electrical equipment in service line</option>
-
-
-                </select>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
+              {/* Type Charges Dropdown and Category Dropdown in Same Row */}
+              <div className="flex flex-col">
+                {inProgressypeCharges ? (
+                  <p>Loading typeCharges...</p>
+                ) : errorypeCharges ? (
+                  <p>Error loading typeCharges</p>
+                ) : (
+                  <DropDown
+                    options={chargeTypeOptions}
+                    isMultiSelect={false}
+                    label="Select Charge of Type"
+                    name="typeCharges"
+                    value={formValues.typeCharges}
+                    onChange={handleChange} // Updates formValues
+                  />
+                )}
               </div>
-              <DropDown options={options} isMultiSelect={true} label="Select Category " />
-
-              {/* <div className="flex flex-col">
-                <label htmlFor="SelectSubdivisionOffice" className="mb-1 font-medium">Select Category :</label>
-                <select
-                  name="category"
-                  value={formValues.category}
-                  onChange={handleChange}
-                  className="w-full rounded border border-gray-300 p-2"
-                  // disabled={!formValues.category}
-                 
-                >
-                  <option value="">Select</option>
-                  <option value="Domestic">Domestic</option>
-                  <option value="Non-domestic">Non-domestic</option>
-                  <option value="Industrial">Industrial</option>
-                  <option value="Flat">Flat</option>
-                  <option value="Own/private water supply">Own/private water supply</option>
-
-                </select>
-              </div> */}
-              <DropDown options={options1} isMultiSelect={true} label="Select Connection size" />
-
-              {/* <div className="flex flex-col">
-                <label htmlFor="SelectChowkriCode" className="mb-1 font-medium">Select Connection size:</label>
-                <select
-                  name="selectConnectionSize"
-                  value={formValues.selectConnectionSize}
-                  onChange={handleChange}
-                  className="w-full rounded border border-gray-300 p-2"
-                  // disabled={!formValues.selectConnectionSize}  
-                  
-                >
-                  <option value="15">15(MM)</option>
-                  <option value="20">20(MM)</option>
-                  <option value="25">25(MM)</option>
-                  <option value="40">40(MM)</option>
-                  <option value="40">160(MM)</option>
-                </select>
-              </div> */}
-              <DropDown options={options2} isMultiSelect={true} label="Select Connection size" />
-
-              {/* <div className="flex flex-col">
-                <label htmlFor="consumptionSlab" className="mb-1 font-medium">Select Consumption slab:</label>
-                <select
-                  name="consumptionSlab"
-                  value={formValues.consumptionSlab}
-                  onChange={handleChange}
-                  className="w-full rounded border border-gray-300 p-2"
-                >
-                  <option value="">Select</option>
-                  <option value="0-800">0-8000</option>
-                  <option value="8001-1500">8001-1500</option>
-                  <option value="8001-1500">8001-1500</option>
-                  <option value="15001-40000">15001-40000</option>
-
-                </select>
-              </div> */}
 
               <div className="flex flex-col">
-                <label htmlFor="waterChargesRate" className="mb-1 font-medium">Select water charges Rate /1000 litres:</label>
-                <select
-                  name="waterChargesRate"
-                  value={formValues.waterChargesRate}
-                  onChange={handleChange}
-                  className="w-full rounded border border-gray-300 p-2"
-                >
-                  <option value="">Select</option>
-                  <option value="500">500 ₹</option>
-                  <option value="500">5000 ₹</option>
-                  <option value="500">15000 ₹</option>
-                  <option value="500">20000 ₹</option>
-                  <option value="500">20000 ₹</option>
-                  <option value="500">25000 ₹</option>
-
-                </select>
+                {inProgressCategories ? (
+                  <p>Loading categories...</p>
+                ) : errorCategories ? (
+                  <p>Error loading categories</p>
+                ) : (
+                  <DropDown
+                    options={categoryOptions}
+                    isMultiSelect={false}
+                    label="Select Category"
+                    name="category"
+                    value={formValues.category}
+                    onChange={handleChange} // Updates formValues
+                  />
+                )}
               </div>
             </div>
+
+            {/* Select Connection Size in a New Row */}
+            <div className="flex flex-col">
+              {inProgressConnectionSize ? (
+                <p>Loading connection sizes...</p>
+              ) : errorConnectionSize ? (
+                <p>Error loading connection sizes</p>
+              ) : (
+                <DropDown
+                  options={connectionSizeOptions}
+                  isMultiSelect={false}
+                  label="Select Connection Size"
+                  name="selectConnectionSize"
+                  value={formValues.selectConnectionSize}
+                  onChange={handleChange} // Updates formValues
+                />
+              )}
+            </div>
+
+            {/* Conditionally Render Consumption Slab Dropdown for each row */}
+            {formValues.typeCharges === "Water Charges" ? (
+              <>
+                {rows.map((row, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"
+                  >
+                    {/* Consumption Slab Dropdown */}
+                    <div className="flex flex-col">
+                      {inProgressSlab ? (
+                        <p>Loading consumption slabs...</p>
+                      ) : errorSlab ? (
+                        <p>Error loading consumption slabs</p>
+                      ) : (
+                        <DropDown
+                          options={slabOptions}
+                          isMultiSelect={false}
+                          label="Select Consumption Slab"
+                          name="consumptionSlab"
+                          value={row.consumptionSlab}
+                          onChange={(e) => handleChange(e, index)} // Updates specific row
+                        />
+                      )}
+                    </div>
+
+                    {/* Water Charges Rate /1000 litres */}
+                    <div className="flex flex-col">
+                      <label
+                        htmlFor="waterChargesRate"
+                        className="mb-1 font-medium"
+                      >
+                        Enter water charges Rate /1000 litres:
+                      </label>
+                      <input
+                        type="number"
+                        name="waterChargesRate"
+                        value={row.waterChargesRate}
+                        onChange={(e) => handleChange(e, index)} // Updates specific row
+                        className="w-full rounded border border-gray-300 p-2"
+                        placeholder="Enter rate"
+                      />
+                    </div>
+
+                    {/* Remove Button */}
+                    {rows.length > 1 && (
+                      <div className="flex justify-start">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRow(index)}
+                          className="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
+                        >
+                          -
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Add New Row Button */}
+                <div className="flex justify-start">
+                  <button
+                    type="button"
+                    onClick={handleAddRow}
+                    className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600"
+                  >
+                    +
+                  </button>
+                </div>
+              </>
+            ) : (
+              ""
+            )}
+
             <div className="text-end">
               <button
                 type="submit"
@@ -169,4 +280,3 @@ const Configure: React.FC = () => {
 };
 
 export default Configure;
-
