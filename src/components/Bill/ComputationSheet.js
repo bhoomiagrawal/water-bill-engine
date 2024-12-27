@@ -411,7 +411,7 @@ const ComputationSheet = ({ selectedRecord, setShowPrintModal }) => {
                   </td>
                   <td className="border px-4 py-2"></td>
                   <td className="border px-4 py-2">
-                    <strong>{selectedRecord?.tot_amt_indate}</strong>
+                    <strong>{selectedRecord?.total_amount}</strong>
                   </td>
                 </tr>
                 <tr>
@@ -425,7 +425,7 @@ const ComputationSheet = ({ selectedRecord, setShowPrintModal }) => {
                   </td>
                   <td className="border px-4 py-2"></td>
                   <td className="border px-4 py-2">
-                    <strong>{selectedRecord?.lps + selectedRecord?.tot_amt_indate}</strong>
+                    <strong>{selectedRecord?.lps + selectedRecord?.total_amount}</strong>
                   </td>
                 </tr>
                 <tr>

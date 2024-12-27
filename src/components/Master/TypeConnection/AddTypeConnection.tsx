@@ -45,7 +45,7 @@ const AddTypeConnection: React.FC <formOpenProps>= ({setIsFormOpen}) => {
           >
             <div className="border-b border-stroke px-6 py-4 dark:border-strokedark">
               <h3 className="text-xl  font-bold text-gray-800 dark:text-white">
-                Create Type of Charge 
+                Create Type of Connection
               </h3>
             </div>
 
@@ -56,7 +56,7 @@ const AddTypeConnection: React.FC <formOpenProps>= ({setIsFormOpen}) => {
                   name="typeCharge"
                   value={formValues.TypeConnection}
                   onChange={handleChange}
-                  placeholder="Enter Type of Charge"
+                  placeholder="Enter Type of Connection"
                   className="w-full rounded-lg   border-2 border-[#aeaeaf]  bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none  dark:text-white dark:focus:border-primary"
                 />
               </div>

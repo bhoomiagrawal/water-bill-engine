@@ -36,7 +36,7 @@ const AddSubCategory: React.FC<SubCategory> = ({setIsPopupOpen}) => {
   };
 
   return (
-    <div className="fixed inset-0 mt-18 bg-black bg-opacity-50 backdrop-blur-sm   ">
+    <div className="fixed inset-0 mt-24 bg-black bg-opacity-50 backdrop-blur-sm   ">
       <div className=" mt-10 bg-gray-100 relative w-[900px] m-auto">
         <div className="mx-auto max-w-6xl">
           <div className="rounded-lg border shadow-lg dark:border-strokedark dark:bg-boxdark">

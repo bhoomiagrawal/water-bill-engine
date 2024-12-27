@@ -7,16 +7,19 @@ import React, { useState } from "react";
 
 const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
   const [formValues, setFormValues] = useState({
+    chowkri:"",
     accountNumber: "",
   });
 
 
   const [errors, setErrors] = useState<Partial<typeof formValues>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: undefined })); 
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
   const validate = () => {
@@ -35,7 +38,7 @@ const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18   ">
+    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-24   ">
       <div className="mt-10 bg-gray-100 relative w-[900px] m-auto ">
       <div className="mx-auto max-w-6xl">
         <div className="rounded-lg border shadow-lg dark:border-strokedark dark:bg-boxdark ">
@@ -49,6 +52,27 @@ const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
               </h3>
             </div>
 
+            <div className="flex flex-col">
+                <label htmlFor="category" className="mb-1 font-medium">
+                  Select chowkri Code:
+                </label>
+                <select
+                  name="chowkri"
+                  value={formValues.chowkri}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border-2 border-[#aeaeaf] bg-transparent py-4 pl-6 pr-10 text-black outline-none focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
+                >
+                  <option value="">Select</option>
+                  <option value="0H1">0H1</option>
+                  <option value="0A1">0A1</option>
+                  <option value="03C">03C</option>
+                  <option value="03D">03D</option>
+                  <option value="03E">
+                  03E
+                  </option>
+                </select>
+              </div>
+
             <div>
               <div>
                 <input
@@ -56,7 +80,7 @@ const AddAccount: React.FC <formOpenProps>= ({setIsFormOpen}) => {
                   name="accountNumber"
                   value={formValues.accountNumber}
                   onChange={handleChange}
-                  placeholder="Enter Account Number"
+                  placeholder="Enter Cycle Number"
                   className="w-full rounded-lg   border-2 border-[#aeaeaf]  bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none  dark:text-white dark:focus:border-primary"
                 />
               </div>

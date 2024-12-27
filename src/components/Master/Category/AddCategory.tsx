@@ -7,6 +7,7 @@ interface AddCategoryProps {
 const AddCategory: React.FC<AddCategoryProps> = ({ setIsPopupOpen }) => {
   const [formValues, setFormValues] = useState({
     category: "",
+    categoryCode:""
   });
 
   const [errors, setErrors] = useState<Partial<typeof formValues>>({});
@@ -32,13 +33,8 @@ const AddCategory: React.FC<AddCategoryProps> = ({ setIsPopupOpen }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18   ">
+    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black  mt-24   ">
       <div className="mt-10 bg-gray-100 relative w-[900px] m-auto ">
-        {/* Cross Icon */}
-        {/* <div className="absolute top-2 right-2 cursor-pointer">
-          <ImCross className="w-6 h-6 text-gray-800" onClick={() => setIsFormOpen(false)} />
-        </div> */}
-
         <div className="mx-auto max-w-6xl">
           <div className="rounded-lg border shadow-lg dark:border-strokedark dark:bg-boxdark">
             <form onSubmit={handleSubmit} className="flex flex-col gap-10 space-x-13 p-10">
@@ -47,13 +43,21 @@ const AddCategory: React.FC<AddCategoryProps> = ({ setIsPopupOpen }) => {
               </div>
 
               <div>
-                <div>
+                <div className=" flex  flex-col gap-y-4">
                   <input
                     type="text"
                     name="category"
                     value={formValues.category}
                     onChange={handleChange}
                     placeholder="Enter Category Name"
+                    className="w-full rounded-lg border-2 border-[#aeaeaf] bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
+                  />
+                       <input
+                    type="text"
+                    name="categoryCode"
+                    value={formValues.categoryCode}
+                    onChange={handleChange}
+                    placeholder="Enter category Code"
                     className="w-full rounded-lg border-2 border-[#aeaeaf] bg-transparent py-4 pl-6 pr-10 text-2xl text-black outline-none focus:border-primary focus-visible:shadow-none dark:text-white dark:focus:border-primary"
                   />
                 </div>
