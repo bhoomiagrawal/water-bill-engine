@@ -21,6 +21,8 @@ const BillAgencyEnrollment: React.FC = () => {
     documents: [],
   });
 
+  console.log("0000",{...formData})
+
   const handleFormOneSubmit = (data: any) => {
     setFormData((prev: FormData) => ({ ...prev, registration: data }));
     setCurrentStep(2);
@@ -37,6 +39,7 @@ const BillAgencyEnrollment: React.FC = () => {
   };
 
   const handleFormFourSubmit = (data: any) => {
+    console.log("data00",data)
     setFormData((prev: FormData) => ({ ...prev, documents: data }));
     console.log("Final Data:", { ...formData, documents: data });
   };

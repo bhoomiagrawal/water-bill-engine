@@ -108,7 +108,7 @@ const HoverHeader: React.FC = () => {
       label: "Billing Agency",
       key: "billingAgency",
       submenu: [
-        { label: "Registration", path: "/list/billAgencyEnrollment" },
+        { label: "Registration", path: "/billAgencyList" },
       ],
     },
     { label: "Bill Payment Receipt", key: "billPaymentReceipt" },
