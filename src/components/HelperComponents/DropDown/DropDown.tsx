@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 
+interface Option {
+  label: string;
+  value: string | number;
+}
+
 interface DropDownProps {
-  options: string[];
+  options: Option[]; // Change this to expect an array of objects with `label` and `value`
   isMultiSelect: boolean;
   label: string;
-  name: string; // Add `name` prop to handle changes
-  value: string | number; // Ensure `value` matches the `formValues`
+  name: string;
+  value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
 }
 
@@ -29,7 +34,7 @@ const DropDown: React.FC<DropDownProps> = ({
     } else {
       setSelectedValues([selectedValue]);
     }
-    onChange({ target: { name, value: selectedValue } } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>);
+    onChange({ target: { name, value: label } } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>);
   };
 
   return (
@@ -44,8 +49,8 @@ const DropDown: React.FC<DropDownProps> = ({
         {/* Empty option for no default selection */}
         <option value="">Select an option</option>
         {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>

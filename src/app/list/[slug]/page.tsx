@@ -17,6 +17,7 @@ interface Category {
 
 const Page = ({ params }: any) => {
   const { slug }: any = params;
+  
   const columns = resource[slug];
   const column = resources[slug];
   const router = useRouter();
@@ -46,7 +47,6 @@ const Page = ({ params }: any) => {
       ...newError,
     }));
   };
-
 
   const [fetchResource, resourceResult, resourceInProgress, resourceError] =
     useInternalService(`${slug?.toLowerCase()}`, "GET", null);
@@ -181,6 +181,14 @@ const Page = ({ params }: any) => {
     }
   }, [search]);
 
+  const handlePopupeForm = () => {
+    // if (slug !== "billAgencyEnrollment") {
+      setIsPopupe(!isPopupe);
+    // } else {
+      // router.push("/billAgencyEnrollment");
+    }
+
+
   return (
     <div>
       <DefaultLayout>
@@ -230,7 +238,7 @@ const Page = ({ params }: any) => {
                 </div>
               </form>
               <button
-                onClick={() => setIsPopupe(!isPopupe)}
+                onClick={handlePopupeForm}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md"
               >
                 Add {slug.charAt(0).toUpperCase() + slug.slice(1)}

@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useRouter } from "next/navigation";
 import Chart from "@/components/Charts/page";
+import WaterBill from "@/components/WaterBill";
 
 
 
@@ -18,7 +19,8 @@ const SignIn: React.FC = () => {
   };
   return (
     <DefaultLayout>
-      <Chart/>
+      {/* <Chart/> */}
+      <WaterBill/>
 
     </DefaultLayout>
   );

@@ -6,7 +6,7 @@ const connectionType=[
         type:"number"
     },
     {
-        title:"connectionb type Name",
+        title:"Connection type",
         column:"conn_type",
         type:"text"
     },

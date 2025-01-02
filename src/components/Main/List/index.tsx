@@ -24,10 +24,10 @@ interface ListProps {
 }
 
 const List: React.FC<ListProps> = ({ columns, data, handleEdit, handleDelete }) => {
+  console.log("dataoooo",data)
   const columnsWithActions = columns?.map((col) => ({
     ...col,
     render: (_: any, record: Data, index: number) => {
-      console.log("col99",col.columnsecond)
       if (col.type === "actions") {
         return (
           <div className="flex space-x-4">
