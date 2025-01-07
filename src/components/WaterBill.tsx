@@ -12,10 +12,20 @@ const WaterBill: React.FC<WaterBillProps> = ({
   reponse,
   payload,
 }) => {
-
+console.log("reponse44",reponse)
+;
   const formattedDateCurrent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const currentMonthData = new Date(reponse?.detailsByMonth[0]?.reading_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const previousMonthData = new Date(reponse?.detailsByMonth[1]?.reading_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const currentMonthData = new Date(reponse?.detailsByMonth[0]?.reading_date).toLocaleDateString('en-US', {
+    month: 'short',  
+    year: 'numeric'  
+  });
+
+  const previousMonthData = new Date(reponse?.detailsByMonth[1]?.reading_date).toLocaleDateString('en-US', {
+    month: 'short',  
+    year: 'numeric'  
+  });
+  
+    // const previousMonthData = new Date(reponse?.detailsByMonth[1]?.reading_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
     // <div className="flex justify-center items-center min-h-screen p-4 bg-gray-100">
@@ -251,10 +261,13 @@ const WaterBill: React.FC<WaterBillProps> = ({
                         सीवरेज शुल्क(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[0]?.sewerageCharge}
+                        {reponse?.detailsByMonth[0]?.sewerageCharge + reponse?.detailsByMonth[0]?.stpCharge}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[1]?.sewerageCharge}
+                        {/* {reponse?.detailsByMonth[1]?.sewerageCharge} */}
+                        {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ?reponse?.detailsByMonth[1]?.sewerageCharge + reponse?.detailsByMonth[0]?.stpCharge:  <td className=" px-4 border-[#6666d7]"></td>}
+
+
                       </td>
                     </tr>
                     <tr>
@@ -318,7 +331,7 @@ const WaterBill: React.FC<WaterBillProps> = ({
                         {reponse?.detailsByMonth[0]?.bill}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                      {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? reponse?.detailsByMonth[0]?.bill:  <td className=" px-4 border-[#6666d7]"></td>}
+                      {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? reponse?.detailsByMonth[1]?.bill:  <td className=" px-4 border-[#6666d7]"></td>}
                       
                       </td>
                     </tr>

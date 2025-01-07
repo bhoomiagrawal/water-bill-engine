@@ -81,7 +81,7 @@ const Configure: React.FC = () => {
   const handleChange = (name: string, value: any, index?: number) => {
     // const { name, value } = e.target;
     if (name === "typeCharges") {
-      if (formValues.typeCharges === "43" || value === "43") {
+      if (formValues.typeCharges === "1" || value === "1") {
       }
     }
     if (index === undefined) {
@@ -181,7 +181,7 @@ const Configure: React.FC = () => {
       sso_id: "user123",
     };
 
-    if (formValues.typeCharges !== "43") {
+    if (formValues.typeCharges !== "1") {
       payload = {
         ...payload,
         charge_type_id: formValues.typeCharges,
@@ -199,7 +199,7 @@ const Configure: React.FC = () => {
         // ],
         extra_details: "Water charge details",
       };
-    } else if (formValues.typeCharges === "43") {
+    } else if (formValues.typeCharges === "1") {
       payload = {
         ...payload,
         charge_type_id: formValues.typeCharges,
@@ -321,7 +321,7 @@ const Configure: React.FC = () => {
             </div>
 
             {/* Conditional rendering for "water charge" type */}
-            {formValues.typeCharges === "43" ? (
+            {formValues.typeCharges === "1" ? (
               <div className="flex flex-col">
                 {inProgressConnectionSize ? (
                   <p>Loading connection sizes...</p>
@@ -343,7 +343,7 @@ const Configure: React.FC = () => {
             ) : null}
 
             {/* Conditional rendering for other types */}
-            {formValues.typeCharges !== "43" ? (
+            {formValues.typeCharges !== "1" ? (
               <>
                 {formValues.rows.map((row, index) => (
                   <div
@@ -425,7 +425,7 @@ const Configure: React.FC = () => {
               </>
             ) : null}
 
-            {formValues.typeCharges === "43" && (
+            {formValues.typeCharges === "1" && (
               <>
                 {formValues.rows.map((row, index) => (
                   <div
