@@ -324,7 +324,7 @@ const Reading: React.FC = () => {
           consumerInfo: string;
           category_id: string;
           sewerage: boolean;
-          stpCharges: boolean;
+          stp: boolean;
           rebate: boolean;
           connection_size_id: string;
           currMonth: {
@@ -342,7 +342,7 @@ const Reading: React.FC = () => {
           consumerInfo: row.consumerInfo,
           category_id: row.category.id,
           sewerage: row.sewerage,
-          stpCharges: row.stpCharges,
+          stp: row.stpCharges,
           rebate: row.rebate,
           connection_size_id: row.connectionSize.id,
           currMonth: row.currMonth,
