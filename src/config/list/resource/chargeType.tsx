@@ -1,4 +1,3 @@
-
 const chargeType =[
     {
         title:"S.No",
@@ -6,7 +5,7 @@ const chargeType =[
         type:"number"
     },
     {
-        title:"charge Name",
+        title:"Charge Name",
         column:"charge_name",
         type:"text"
     },
@@ -16,11 +15,11 @@ const chargeType =[
         Boolean:"displayStatus",
         type:"text"
     },
-    {
-        title:"Actions",
-        column:"actions",
-        type:"actions"
-    },
+    // {
+    //     title:"Actions",
+    //     column:"actions",
+    //     type:"actions"
+    // },
 ]
 
 export default chargeType ;

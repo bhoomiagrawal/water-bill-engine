@@ -1,5 +1,6 @@
 "use client";
 import React, { FormEvent } from "react";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useRouter } from "next/navigation";
@@ -8,21 +9,17 @@ import WaterBill from "@/components/WaterBill";
 
 
 
-const SignIn: React.FC = () => {
+const WaterBillPage: React.FC = () => {
   const router = useRouter();
 
-  const handleSubmit = (e: FormEvent) => {
-    console.log("ram")
-    e.preventDefault();
-    router.push("/verifyByCIN");
-  };
+
   return (
     <DefaultLayout>
-      <Chart/>
+      <WaterBill/>
       {/* <WaterBill/> */}
 
     </DefaultLayout>
   );
 };
 
-export default SignIn;
+export default WaterBillPage;

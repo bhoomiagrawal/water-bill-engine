@@ -1,273 +1,853 @@
-import React, { useState, ChangeEvent } from 'react';
+"use client";
+import { useInternalService } from "@/components/hook/useInternalService";
+import WaterBill from "@/components/WaterBill";
+import React, { useState, ChangeEvent, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
-interface FirstMonth {
+interface Meter_status_id{
+  id: string;
+  name: string;
+}
+interface prevMonth {
   reading: number;
-  stts: string;
-  cons: number;
-  cw: string;
+  meter_status_id: Meter_status_id;
+  consumption: number;
+  cw: boolean;
+  reading_date: string;
 }
 
-interface SecondMonth {
+interface Category_id {
+  id: string;
+  name: string;
+}
+
+// interface Category_id {
+//   id: string;
+//   name: string;
+// }
+
+interface currMonth {
   reading: number;
-  stts: string;
-  cons: number;
-  cw: string;
+  meter_status_id: Meter_status_id;
+  consumption: number;
+  cw: boolean;
+  reading_date: string;
+}
+interface Category {
+  id: number;
+  category_name: string;
+  category_code: string;
+}
+
+interface MeterStatus {
+  id: number;
+  meter_status: string;
+  description: string;
+}
+
+interface ConnectionSize {
+  id: string;
+  size: string;
 }
 
 interface Row {
   id: number;
   accountNumber: string;
   consumerInfo: string;
-  category: string;
-  sewerage: string;
-  stpCharges: string;
-  rebate: string;
-  meterInfo: string;
+  category: Category_id;
+  sewerage: boolean;
+  stpCharges: boolean;
+  rebate: boolean;
+  connectionSize: ConnectionSize;
+  lastRDG: number;
   readingStatus: string;
-  firstMonth: FirstMonth;
-  secondMonth: SecondMonth;
-  readingDateI: string;  // Added readingDateI
-  readingDateII: string; // Added readingDateII
+  prevMonth: prevMonth;
+  currMonth: currMonth;
+  // readingDateI: string; // Added readingDateI
+  // readingDateII: string; // Added readingDateII
 }
 
+const d = new Date();
+
+const formattedDate = d.toISOString().split("T")[0];
+
 const Reading: React.FC = () => {
-  const [rows, setRows] = useState<Row[]>([
+  const router = useRouter();
+  const [waterBillOpen, setWaterBillOpen] = useState(false);
+
+  const [billData, setBillData] = useState({});
+  const [payload, setPayload] = useState({});
+  // const [errors, setErrors] = useState<Partial<any>>({});
+
+  const [rows, setRows] = useState<Partial<any>[]>([
     {
       id: 1,
-      accountNumber: '1',
-      consumerInfo: 'MOTWANI ARJUN F-316 VASHALI NAGAR',
-      category: 'Domestic',
-      sewerage: 'Yes',
-      stpCharges: 'No',
-      rebate: 'Yes',
-      meterInfo: '4530 Gov. 1/2"',
-      readingStatus: '',
-      firstMonth: { reading: 550, stts: 'Active', cons: 150, cw: 'yes' },
-      secondMonth: { reading: 600, stts: 'Active', cons: 170, cw: 'No' },
-      readingDateI: '2024-01-01',  // Default value for Reading Date (I)
-      readingDateII: '2024-02-01', // Default value for Reading Date (II)
+      accountNumber: "1",
+      consumerInfo: "MOTWANI ARJUN F-316 VASHALI NAGAR",
+      category: { id: "", name: "" },
+      sewerage: false,
+      stpCharges: false,
+      rebate: false,
+      connectionSize: { id: "", size: "" },
+      lastRDG: 20000,
+      readingStatus: "",
+      prevMonth: {
+        reading: 0,
+        meter_status_id: { id: "", meter_status: "" },
+        consumption: 0,
+        reading_date: "2025-01-07",
+        cw: false,
+      },
+      currMonth: {
+        reading: 0,
+        meter_status_id: { id: "", meter_status: "" },
+        reading_date: "2025-01-07",
+        consumption: 0,
+        cw: false,
+      },
     },
   ]);
+
+
+  const [categores, setCategores] = useState<Category[]>([]);
+  const [meterStatus, setMeterStatus] = useState<MeterStatus[]>([]);
+  const [connectionSize, setConnectionSize] = useState<ConnectionSize[]>([]);
+
+  const [secondReading, setSetSecondReading] = useState(1);
+
+  const [
+    fetchResourceCategory,
+    resourceResultCategory,
+    resourceInProgress,
+    resourceError,
+  ] = useInternalService("category", "GET", null);
+  const [
+    fetchResourceMeterStatus,
+    resourceResultMeterStatus,
+    meterStatusInProgress,
+    meterStatusresourceError,
+  ] = useInternalService("meterStatus", "GET", null);
+
+  const [
+    fetchResourceConnectionSize,
+    resultConnectionSize,
+    ConnectionSizeInProgress,
+    ConnectionSizeresourceError,
+  ] = useInternalService("connectionSize", "GET", null);
+
+  const [createBill, billResult, BillInProgress, BillError] =
+    useInternalService("billing/generate-bill", "POST", null);
+
+  useEffect(() => {
+    fetchResourceCategory();
+    fetchResourceMeterStatus();
+    fetchResourceConnectionSize();
+  }, []);
+
+  useEffect(() => {
+    if (resourceResultCategory?.data?.data?.category) {
+      setCategores(resourceResultCategory.data.data.category);
+    }
+  }, [resourceResultCategory]);
+
+  useEffect(() => {
+    if (resourceResultMeterStatus?.data?.data?.meteStatusCode) {
+      setMeterStatus(resourceResultMeterStatus?.data?.data?.meteStatusCode);
+    }
+  }, [resourceResultMeterStatus]);
+
+  useEffect(() => {
+    if (resultConnectionSize?.data?.data?.connectionSize) {
+      setConnectionSize(resultConnectionSize?.data?.data?.connectionSize);
+    }
+  }, [resultConnectionSize]);
+
+
+  useEffect(() => {
+    rows.map((item) => {
+      return setSetSecondReading(item.category.id);
+    });
+  }, [rows]);
 
   const handleChange = (rowIndex: number, field: string, value: any) => {
     const updatedRows = [...rows];
     const updatedRow = { ...updatedRows[rowIndex] };
 
-    if (field === 'firstMonth' || field === 'secondMonth') {
+    if (field === "firstMonth" || field === "secondMonth") {
       updatedRow[field] = { ...updatedRow[field], ...value };
     } else {
       updatedRow[field] = value;
+    }
+
+    if (field === "prevMonth" || field === "currMonth") {
+      const firstMonthReading = updatedRow.prevMonth.reading;
+      const secondMonthReading = updatedRow.currMonth.reading;
+
+      updatedRow.prevMonth.consumption = firstMonthReading - updatedRow.lastRDG;
+      updatedRow.currMonth.consumption =
+        secondMonthReading - updatedRow.lastRDG;
     }
 
     updatedRows[rowIndex] = updatedRow;
     setRows(updatedRows);
   };
 
-  // Handle change for input fields (specifically for number inputs)
+  // handleInputChange function
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     rowIndex: number,
     field: string,
     subField?: string
   ) => {
-    const value = subField ? { [subField]: e.target.value } : e.target.value;
-    handleChange(rowIndex, field, subField ? value : e.target.value);
+    let value: any;
+
+    if (e.target instanceof HTMLSelectElement) {
+      if (field === "category") {
+        const selectedCategory = categores?.find(
+          (cat) => cat.id === parseInt(e.target.value)
+        );
+        if (selectedCategory) {
+          value = {
+            id: selectedCategory.id,
+            name: selectedCategory.category_name,
+          };
+        } else {
+          value = { id: "", name: "" };
+        }
+      } 
+     
+      else if (field === "connectionSize") {
+        const selectedConnectionSize = connectionSize?.find(
+          (cat) => cat.id === parseInt(e.target.value)
+        );
+        if (selectedConnectionSize) {
+          value = {
+            id: selectedConnectionSize.id,
+            name: selectedConnectionSize.size,
+          };
+        } else {
+          value = { id: "", size: "" };
+        }
+      } else if ( subField === "meter_status_id") {
+        const selectedMeterStatus = meterStatus?.find(
+          (cat) => cat.id === parseInt(e.target.value)
+        );
+        if (selectedMeterStatus) {
+          value = {
+            id: selectedMeterStatus.id,
+            name: selectedMeterStatus.meter_status,
+          };
+        } else {
+          value = { id: "", size: "" };
+        }
+      }
+      else {
+        value = e.target.value;
+      }
+     
+    } else if (e.target instanceof HTMLInputElement) {
+      if (e.target.type === "number") {
+        value = parseFloat(e.target.value);
+      } else {
+        value = e.target.value;
+      }
+    } else {
+      value = e.target.value;
+    }
+
+    const updatedRows = [...rows];
+    const updatedRow = { ...updatedRows[rowIndex] };
+
+    if (subField) {
+      updatedRow[field] = { ...updatedRow[field], [subField]: value };
+    } else {
+      updatedRow[field] = value;
+    }
+
+    if (field === "prevMonth" || field === "currMonth") {
+      const firstMonthReading = updatedRow.prevMonth.reading || 0;
+      const secondMonthReading = updatedRow.currMonth.reading || 0;
+
+      updatedRow.prevMonth.consumption = firstMonthReading - updatedRow.lastRDG;
+      updatedRow.currMonth.consumption =
+        secondMonthReading - updatedRow.lastRDG;
+    }
+
+    updatedRows[rowIndex] = updatedRow;
+    setRows(updatedRows);
   };
 
+  const handleGenerateBill = () => {
+    if (secondReading === 1) {
+      const payload: {
+        [key: string]: {
+          consumerInfo: string;
+          category_id: string;
+          sewerage: boolean;
+          stpCharges: string;
+          rebate: boolean;
+          connection_type_id: string;
+          prevMonth: {
+            reading: string;
+            meter_status_id: Meter_status_id;
+            consumption: number;
+            reading_date: string;
+            cw: boolean;
+          };
+          currMonth: {
+            reading: string;
+            meter_status_id: Meter_status_id;
+            reading_date: string;
+            consumption: number;
+            cw: boolean;
+          };
+        };
+      } = {};
+
+      rows.forEach((row) => {
+        payload[row.accountNumber] = {
+          consumerInfo: row.consumerInfo,
+          category_id: row?.category.id,
+          sewerage: row.sewerage,
+          stpCharges: row.stpCharges,
+          rebate: row.rebate,
+          connection_size_id: row?.connectionSize?.id,
+          prevMonth: row.prevMonth,
+          currMonth: row.currMonth,
+        };
+      });
+      const result = payload[Object.keys(payload)[0]];
+      createBill(result);
+      setPayload(rows);
+
+    }  if(secondReading !==1) {
+      const payload: {
+        [key: string]: {
+          consumerInfo: string;
+          category_id: string;
+          sewerage: boolean;
+          stpCharges: string;
+          rebate: boolean;
+          connection_size_id: string;
+          currMonth: {
+            reading: string;
+            meter_status_id: Meter_status_id;
+            reading_date: string;
+            consumption: number;
+            cw: boolean;
+          };
+        };
+      } = {};
+
+      rows.forEach((row) => {
+        payload[row.accountNumber] = {
+          consumerInfo: row.consumerInfo,
+          category_id: row.category.id,
+          sewerage: row.sewerage,
+          stpCharges: row.stpCharges,
+          rebate: row.rebate,
+          connection_size_id: row.connectionSize.id,
+          currMonth: row.currMonth,
+        };
+      });
+
+      const result = payload[Object.keys(payload)[0]];
+      createBill(result);
+      setPayload(rows);
+    }
+
+  };
+  useEffect(() => {
+    if (billResult) {
+      toast.success(` ${billResult?.data?.data?.message}.`, {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
+      setBillData(billResult?.data?.data?.billDetails);
+      setWaterBillOpen(!waterBillOpen);
+    }
+  }, [billResult]);
+
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="overflow-x-auto">
-        <div className="max-h-96 overflow-y-auto">
-          <table className="min-w-full table-auto border border-gray-300">
-            <thead className="bg-gray-100">
-              <tr>
-                <td colSpan={2} className="border border-gray-300 px-4 py-2 text-left">
-                  PHED Jaipur - Reading Sheet (Bi-monthly)
-                </td>
-                <td colSpan={2} className="border border-gray-300 px-4 py-2 text-left">JUL 24</td>
-              </tr>
-              <tr>
-                <td colSpan={6} className="border border-gray-300 px-4 py-2 text-left">
-                  <strong>SubDivision Name:</strong> Sub Divison Drilling-I, Jaipur, <strong>Sub Division Code  :</strong> S2-9, <strong>Chowkri/Area Code :</strong> 95b, <strong>Cycle No:</strong> 12
-                </td>
-                <td colSpan={3} className="border border-gray-300 px-4 py-2 text-left">
-                  Last Rdg Date: 28/12/2023
-                </td>
-                {/* Keep labels and allow editing */}
-                <td colSpan={1} className="border border-gray-300 px-4 py-2 text-left">
-                  <label className="block text-sm font-medium">Reading Date(I):</label>
-                  <input
-                    type="date"
-                    value={rows[0].readingDateI}
-                    onChange={(e) => handleInputChange(e, 0, 'readingDateI', '')}
-                    className="w-full p-2 border border-gray-300 rounded"
-                  />
-                </td>
-                <td colSpan={1} className="border border-gray-300 px-4 py-2 text-left">
-                  <label className="block text-sm font-medium">Reading Date(II):</label>
-                  <input
-                    type="date"
-                    value={rows[0].readingDateII}
-                    onChange={(e) => handleInputChange(e, 0, 'readingDateII', '')}
-                    className="w-full p-2 border border-gray-300 rounded"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 text-left">Acnt No</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">Consumer Name Address</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">Category</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">Sewarage</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">STP Charges</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">Rebate</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">Meter No, Owner/Size</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">Last RDG, Cons/Stts</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">Acnt No</td>
-                <td className="border border-gray-300 px-4 py-2 text-left">
-                  <div className="font-bold">First Month</div>
-                  <div className="flex justify-between w-[200px]">
-                    <div className="text-sm">Reading</div>
-                    <div className="text-sm">Stts</div>
-                    <div className="text-sm">CONS</div>
-                    <div className="text-sm">CW</div>
-                  </div>
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-left">
-                  <div className="font-bold">Second Month</div>
-                  <div className="flex justify-between w-[200px]">
-                    <div className="text-sm">Reading</div>
-                    <div className="text-sm">Stts</div>
-                    <div className="text-sm">CONS</div>
-                    <div className="text-sm">CW</div>
-                  </div>
-                </td>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={row.id}>
-                  <td className="border border-gray-300 px-4 py-2">{row.accountNumber}</td>
-                  <td className="border border-gray-300 px-4 py-2">{row.consumerInfo}</td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <select
-                      value={row.category}
-                      onChange={(e) => handleInputChange(e, index, 'category')}
-                      className="w-full p-2 border border-gray-300 rounded"
-                    >
-                      <option value="Domestic">Domestic</option>
-                <option value="Non-domestic">Non-domestic</option>
-                <option value="Industrial">Industrial</option>
-                <option value="Flat">Flat</option>
-                <option value="Own/Private Water Supply">Own/Private Water Supply</option>
-                    </select>
+    <>
+      {waterBillOpen && (
+        <WaterBill
+          setWaterBillOpen={setWaterBillOpen} // Ensure this properly closes the modal
+          reponse={billData}
+          payload={payload}
+        />
+      )}
+      <div className="container mx-auto px-4 py-6">
+        <div className="overflow-x-auto">
+          <div className=" overflow-y-auto">
+            <table className="min-w-full table-auto border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <td
+                    colSpan={2}
+                    className="border border-gray-300 px-4 py-2 text-left"
+                  >
+                    PHED Jaipur - Reading Sheet (Bi-monthly)
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <input
-                      type="text"
-                      value={row.sewerage}
-                      onChange={(e) => handleInputChange(e, index, 'sewerage')}
-                      className="w-full p-2 border border-gray-300 rounded"
-                    />
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <input
-                      type="text"
-                      value={row.stpCharges}
-                      onChange={(e) => handleInputChange(e, index, 'stpCharges')}
-                      className="w-full p-2 border border-gray-300 rounded"
-                    />
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <input
-                      type="text"
-                      value={row.rebate}
-                      onChange={(e) => handleInputChange(e, index, 'rebate')}
-                      className="w-full p-2 border border-gray-300 rounded"
-                    />
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">{row.meterInfo}</td>
-                  <td className="border border-gray-300 px-4 py-2">{row.readingStatus}</td>
-                  <td className="border border-gray-300 px-4 py-2">{row.accountNumber}</td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <div className="flex justify-between">
-                      <input
-                        type="number"
-                        value={row.firstMonth.reading}
-                        onChange={(e) => handleInputChange(e, index, 'firstMonth', 'reading')}
-                        className="text-sm w-[50px] border border-gray-300 p-1"
-                      />
-                        <td className="border border-gray-300 ">
-                    <select
-                      value={row.category}
-                      onChange={(e) => handleInputChange(e, index, 'category')}
-                      className="text-sm w-[50px] border border-gray-300 p-1"
-
-                    >
-                      <option value="Domestic">ok</option>
-                <option value="Non-domestic">No</option>
-                    </select>
-                  </td>
-                      <input
-                        type="number"
-                        value={row.firstMonth.cons}
-                        onChange={(e) => handleInputChange(e, index, 'firstMonth', 'cons')}
-                        className="text-sm w-[50px] border border-gray-300 p-1"
-                      />
-                      <input
-                        type="text"
-                        value={row.firstMonth.cw}
-                        onChange={(e) => handleInputChange(e, index, 'firstMonth', 'cw')}
-                        className="text-sm w-[50px] border border-gray-300 p-1"
-                      />
-                    </div>
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <div className="flex justify-between">
-                      <input
-                        type="number"
-                        value={row.secondMonth.reading}
-                        onChange={(e) => handleInputChange(e, index, 'secondMonth', 'reading')}
-                        className="text-sm w-[50px] border border-gray-300 p-1"
-                      />
-                        <td className="border border-gray-300 ">
-                    <select
-                      value={row.category}
-                      onChange={(e) => handleInputChange(e, index, 'category')}
-                      className="text-sm w-[50px] border border-gray-300 p-1"
-
-                    >
-                      <option value="Domestic">ok</option>
-                <option value="Non-domestic">No</option>
-                    </select>
-                  </td>
-                      <input
-                        type="number"
-                        value={row.secondMonth.cons}
-                        onChange={(e) => handleInputChange(e, index, 'secondMonth', 'cons')}
-                        className="text-sm w-[50px] border border-gray-300 p-1"
-                      />
-                      <input
-                        type="text"
-                        value={row.secondMonth.cw}
-                        onChange={(e) => handleInputChange(e, index, 'secondMonth', 'cw')}
-                        className="text-sm w-[50px] border border-gray-300 p-1"
-                      />
-                    </div>
+                  <td
+                    colSpan={2}
+                    className="border border-gray-300 px-4 py-2 text-left"
+                  >
+                    JUL 24
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="border border-gray-300 px-4 py-2 text-left"
+                  >
+                    <strong>SubDivision Name:</strong> Sub Divison Drilling-I,
+                    Jaipur, <strong>Sub Division Code :</strong> S2-9,{" "}
+                    <strong>Chowkri/Area Code :</strong> 95b,{" "}
+                    <strong>Cycle No:</strong> 12
+                  </td>
+                  <td
+                    colSpan={3}
+                    className="border border-gray-300 px-4 py-2 text-left"
+                  >
+                    {secondReading === 1
+                      ? "Last Rdg Date: Oct/2024"
+                      : "Last Rdg Date: Dec/2024"}
+                  </td>
+                  {secondReading === 1 ? (
+                    <>
+                      <td
+                        colSpan={1}
+                        className="border border-gray-300 px-4 py-2 text-left"
+                      >
+                        <label className="block text-sm font-medium">
+                          Reading Date(I):
+                        </label>
+                        <input
+                          type="date"
+                          value={
+                            rows[0]?.prevMonth?.reading_date || formattedDate
+                          }
+                          onChange={(e) =>
+                            handleInputChange(e, 0, "prevMonth", "reading_date")
+                          }
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                      </td>
+
+                      <td
+                        colSpan={1}
+                        className="border border-gray-300 px-4 py-2 text-left"
+                      >
+                        <label className="block text-sm font-medium">
+                          Reading Date(II):
+                        </label>
+                        <input
+                          type="date"
+                          value={
+                            rows[0]?.currMonth?.reading_date || formattedDate
+                          }
+                          onChange={(e) =>
+                            handleInputChange(e, 0, "currMonth", "reading_date")
+                          }
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      <td
+                        colSpan={1}
+                        className="border border-gray-300 px-4 py-2 text-left"
+                      >
+                        <label className="block text-sm font-medium">
+                          Reading Date(II):
+                        </label>
+                        <input
+                          type="date"
+                          value={
+                            rows[0]?.currMonth?.reading_date || formattedDate
+                          }
+                          onChange={(e) =>
+                            handleInputChange(e, 0, "currMonth", "reading_date")
+                          }
+                          className="w-full p-2 border border-gray-300 rounded"
+                        />
+                      </td>
+                    </>
+                  )}
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Acnt No
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Consumer Name Address
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Category
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Sewarage
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    STP Charges
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Rebate
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Size Connection
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Last RDG, Cons/Stts
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
+                    Acnt No
+                  </td>
+                  {secondReading === 1 ? (
+                    <>
+                      {" "}
+                      <td className="border border-gray-300 px-4 py-2 text-left">
+                        <div className="font-bold">Previous Month </div>
+                        <div className="flex justify-between w-[200px]">
+                          <div className="text-sm">Reading</div>
+                          <div className="text-sm">Stts</div>
+                          <div className="text-sm">CONS</div>
+                          <div className="text-sm">CW</div>
+                        </div>
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 text-left">
+                        <div className="font-bold">Current Month</div>
+                        <div className="flex justify-between w-[200px]">
+                          <div className="text-sm">Reading</div>
+                          <div className="text-sm">Stts</div>
+                          <div className="text-sm">CONS</div>
+                          <div className="text-sm">CW</div>
+                        </div>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      <td className="border border-gray-300 px-4 py-2 text-left">
+                        <div className="font-bold">Current Month</div>
+                        <div className="flex justify-between w-[200px]">
+                          <div className="text-sm">Reading</div>
+                          <div className="text-sm">Stts</div>
+                          <div className="text-sm">CONS</div>
+                          <div className="text-sm">CW</div>
+                        </div>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={row.id}>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {row.accountNumber}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {row.consumerInfo}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <select
+                        value={row?.category?.id || ""} // Bind to category.id to avoid NaN or empty values
+                        onChange={(e) =>
+                          handleInputChange(e, index, "category")
+                        } // Pass 'category' as field name
+                        className="w-full p-2 border border-gray-300 rounded"
+                      >
+                        <option value="">Select Category</option>{" "}
+                        {/* Default empty option */}
+                        {categores?.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.category_name} {/* Display category name */}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+
+                    <td className="border border-gray-300 px-4 py-2">
+                      <select
+                        value={row.sewerage ? true : false}
+                        onChange={(e) =>
+                          handleInputChange(e, index, "sewerage")
+                        }
+                        className="w-full p-2 border border-gray-300 rounded"
+                      >
+                        <option value={true}>Yes</option>
+                        <option value={false}>No</option>
+                      </select>
+                    </td>
+
+                    <td className="border border-gray-300 px-4 py-2">
+                      <select
+                        value={row.stpCharges ? true : false}
+                        onChange={(e) =>
+                          handleInputChange(e, index, "stpCharges")
+                        }
+                        className="w-full p-2 border border-gray-300 rounded"
+                        disabled={!row.sewerage}
+                      >
+                        <option value={true}>Yes</option>
+                        <option value={false}>No</option>
+                      </select>
+                    </td>
+
+                    <td className="border border-gray-300 px-4 py-2">
+                      <select
+                        value={row.rebate ? true : false}
+                        onChange={(e) => handleInputChange(e, index, "rebate")}
+                        className="w-full p-2 border border-gray-300 rounded"
+                      >
+                        <option value={true}>Yes</option>
+                        <option value={false}>No</option>
+                      </select>
+                    </td>
+
+        
+                    
+                    <td className="border border-gray-300 px-4 py-2">
+                      <select
+                        value={row?.connectionSize.id || ""}
+                        onChange={
+                          (e) =>
+                            handleInputChange(e, index, "connectionSize") // Pass 'category_id' instead of 'category_name'
+                        }
+                        className="w-full p-2 border border-gray-300 rounded"
+                      >
+                        <option>Select Connection Size</option>
+
+                        {connectionSize?.map((conn) => (
+                          <option key={conn.id} value={conn.id}>
+                            {conn.size}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+
+                    {/* Set the lastRDG value directly here */}
+                    <td className="border border-gray-300 px-4 py-2">
+                      {row.lastRDG ? row.lastRDG : "Set Value Here"}
+                    </td>
+
+                    <td className="border border-gray-300 px-4 py-2">
+                      {row.accountNumber}
+                    </td>
+                    {secondReading === 1 ? (
+                      <>
+                        {" "}
+                        <td className="border border-gray-300 px-4 py-2">
+                          <div className="flex justify-between">
+                            <input
+                              type="text"
+                              value={row.prevMonth.reading}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "prevMonth",
+                                  "reading"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            />
+
+
+                            <select
+                              value={row.prevMonth.meter_status_id?.id || ""}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "prevMonth",
+                                  "meter_status_id"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            >
+                              <option>Select Meter Status</option>
+                              {meterStatus.map((status) => (
+                                <option key={status.id} value={status.id}>
+                                  {status.meter_status}
+                                </option>
+                              ))}
+                            </select>
+                            <input
+                              type="text"
+                              value={row.prevMonth.consumption}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "prevMonth",
+                                  "consumption"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            />
+                            <select
+                              value={row.prevMonth.cw ? true : false}
+                              onChange={(e) =>
+                                handleInputChange(e, index, "prevMonth", "cw")
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            >
+                              <option value={true}>Yes</option>
+                              <option value={false}>No</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <div className="flex justify-between">
+                            <input
+                              type="text"
+                              value={row.currMonth.reading}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "currMonth",
+                                  "reading"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            />
+                            <select
+                                value={row.currMonth.meter_status_id?.id || ""}
+                                
+                              // value={row.currMonth.meter_status_id}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "currMonth",
+                                  "meter_status_id"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            >
+                              <option>Select Meter Status</option>
+                              {meterStatus.map((status) => (
+                                <option key={status.id} value={status.id}>
+                                  {status.meter_status}
+                                </option>
+                              ))}
+                            </select>
+                            <input
+                              type="text"
+                              value={row.currMonth.consumption}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "currMonth",
+                                  "consumption"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            />
+                            <select
+                              value={row.currMonth.cw ? true : false}
+                              onChange={(e) =>
+                                handleInputChange(e, index, "currMonth", "cw")
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            >
+                              <option value={true}>Yes</option>
+                              <option value={false}>No</option>
+                            </select>
+                          </div>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <div className="flex justify-between">
+                            <input
+                              type="text"
+                              value={row.currMonth.reading}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "currMonth",
+                                  "reading"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            />
+                            <select
+                                value={row.currMonth.meter_status_id?.id || ""}
+
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "currMonth",
+                                  "meter_status_id"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            >
+                              <option>Select Meter Status</option>
+                              {meterStatus.map((status) => (
+                                <option key={status.id} value={status.id}>
+                                  {status.meter_status}
+                                </option>
+                              ))}
+                            </select>
+                            <input
+                              type="text"
+                              value={row.currMonth.consumption}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "currMonth",
+                                  "consumption"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            />
+                            <select
+                              value={row.currMonth.cw ? true : false}
+                              onChange={(e) =>
+                                handleInputChange(e, index, "currMonth", "cw")
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            >
+                              <option value={true}>Yes</option>
+                              <option value={false}>No</option>
+                            </select>
+                          </div>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className=" text-right">
+          {" "}
+          <button
+            onClick={handleGenerateBill}
+            type="submit"
+            className="w-36 mt-6 rounded bg-blue-500 py-3 text-xl font-bold text-white transition hover:bg-blue-600"
+          >
+            Generate Bill
+          </button>
         </div>
       </div>
-      <div className=' text-right'> <button
-                  type="submit"
-                  className="w-36 mt-6 rounded bg-blue-500 py-3 text-xl font-bold text-white transition hover:bg-blue-600"
-                >
-                  Generate Bill
-                </button></div>
-     
-    </div>
+    </>
   );
 };
 

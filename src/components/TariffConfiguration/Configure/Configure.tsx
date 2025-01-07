@@ -169,7 +169,7 @@ const Configure: React.FC = () => {
     createResourceResult,
     createResourceInProgress,
     createResourceError,
-  ] = useInternalService(`tariff-configure`, "POST", null);
+  ] = useInternalService(`tariffConfigure`, "POST", null);
 
   console.log("createResourceResult",createResourceResult?.message)
   
@@ -213,16 +213,17 @@ const Configure: React.FC = () => {
       };
     }
 
-    console.log("Payload", payload);
+    // console.log("Payload", payload);
     createResource(payload);
 
     // Simulate API call
   };
+    console.log("createResourceResult", createResourceResult);
 
     useEffect(() => {
       if (createResourceResult ) {
         toast.success(
-           `${createResourceResult?.message}`,
+           `${createResourceResult?.data?.data?.message}`,
           {
             position: "top-right",
             autoClose: 3000,
