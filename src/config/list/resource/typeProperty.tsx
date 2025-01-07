@@ -6,15 +6,15 @@ const typeProperty=[
         type:"number"
     },
     {
-        title:"Category Name",
+        title:"Property Name",
         column:"category_name",
         type:"text"
     },
-    {
-        title:"Sub Category Name",
-        column:"subcategory",
-        type:"text"
-    },
+    // {
+    //     title:"Sub Category Name",
+    //     column:"subcategory",
+    //     type:"text"
+    // },
     {
         title:"Actions",
         column:"actions",

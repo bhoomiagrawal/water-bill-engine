@@ -7,15 +7,11 @@ const account=[
         type:"number"
     },
     {
-        title:"Category Name",
+        title:"Account Number",
         column:"category_name",
         type:"text"
     },
-    {
-        title:"Category Code",
-        column:"category_code",
-        type:"text"
-    },
+  
     {
         title:"Actions",
         column:"actions",

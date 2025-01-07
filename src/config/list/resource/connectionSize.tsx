@@ -7,7 +7,7 @@ const connectionSize=[
         type:"number"
     },
     {
-        title:"Connection Size",
+        title:"Connection Size(MM)",
         column:"size",
         type:"text"
     },

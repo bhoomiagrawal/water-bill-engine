@@ -35,6 +35,7 @@ const Form: React.FC<FormProps> = ({
 
   const router = useRouter();
   const [dataHasChanged, setHasChanged] = useState(false);
+
   const onSubmitData = (e: React.FormEvent) => {
     e.preventDefault();
     column?.forEach((field: any) => {
@@ -43,29 +44,18 @@ const Form: React.FC<FormProps> = ({
         formValid = false;
         handleError({ [field.column]: `${field.title} is required` });
       }
-      
     });
     if (dataHasChanged) {
       handleSubmit();
     }
   };
-  // const [empty,setEmpty] =useState("")
 
-  // if(data.id){
-  //   column.map((_col)=>{
-  //     return (
-  //       console.log("_col9",data[_col.column])
-  //     )
-  //   })
-  // }
-  console.log("column",column)
   const onChange = (field: string, value: any) => {
-    console.log("field", field);
     setHasChanged(true);
     handleChange({ [field]: value });
     handleError({ [field]: undefined });
   };
-  console.log("Data has changed =>>", dataHasChanged);
+
   return (
     <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18 z-99999">
       <div className="mt-10 bg-gray-100 relative w-[900px] m-auto">
@@ -88,12 +78,15 @@ const Form: React.FC<FormProps> = ({
 
               {column?.map((col: any, index: number) => {
                 const FieldComponent = FormField[col.type];
-                // console.log("colpppp",col)
                 let fieldValue;
                 if (col.type === "checkbox") {
                   fieldValue = data[col.column] ?? true;
                 } else {
                   fieldValue = data[col.column] || "";
+                }
+
+                if (col.type === "checkbox" && !data.id) {
+                  return null;
                 }
 
                 return (
@@ -137,8 +130,7 @@ const Form: React.FC<FormProps> = ({
                   <button
                     onClick={(e) => onSubmitData(e)}
                     type="submit"
-                   
-                     className="w-25 rounded bg-gray-600 py-3 text-xl font-bold text-white transition hover:bg-gray-800"
+                    className="w-25 rounded bg-gray-600 py-3 text-xl font-bold text-white transition hover:bg-gray-800"
                   >
                     {data.id ? "Update" : "Create"}
                   </button>
