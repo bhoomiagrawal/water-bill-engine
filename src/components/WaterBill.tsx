@@ -12,7 +12,6 @@ const WaterBill: React.FC<WaterBillProps> = ({
   reponse,
   payload,
 }) => {
-  const d = new Date();
 
   const formattedDateCurrent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const currentMonthData = new Date(reponse?.detailsByMonth[0]?.reading_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });

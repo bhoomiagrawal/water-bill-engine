@@ -5,7 +5,7 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
-interface Meter_status_id{
+interface Meter_status_id {
   id: string;
   name: string;
 }
@@ -109,7 +109,6 @@ const Reading: React.FC = () => {
     },
   ]);
 
-
   const [categores, setCategores] = useState<Category[]>([]);
   const [meterStatus, setMeterStatus] = useState<MeterStatus[]>([]);
   const [connectionSize, setConnectionSize] = useState<ConnectionSize[]>([]);
@@ -163,7 +162,6 @@ const Reading: React.FC = () => {
     }
   }, [resultConnectionSize]);
 
-
   useEffect(() => {
     rows.map((item) => {
       return setSetSecondReading(item.category.id);
@@ -215,9 +213,7 @@ const Reading: React.FC = () => {
         } else {
           value = { id: "", name: "" };
         }
-      } 
-     
-      else if (field === "connectionSize") {
+      } else if (field === "connectionSize") {
         const selectedConnectionSize = connectionSize?.find(
           (cat) => cat.id === parseInt(e.target.value)
         );
@@ -229,7 +225,7 @@ const Reading: React.FC = () => {
         } else {
           value = { id: "", size: "" };
         }
-      } else if ( subField === "meter_status_id") {
+      } else if (subField === "meter_status_id") {
         const selectedMeterStatus = meterStatus?.find(
           (cat) => cat.id === parseInt(e.target.value)
         );
@@ -241,11 +237,11 @@ const Reading: React.FC = () => {
         } else {
           value = { id: "", size: "" };
         }
-      }
-      else {
+      } else if (field === "sewerage" || field ==="stpCharges") {
+        value = e.target.value === "true";
+      } else {
         value = e.target.value;
       }
-     
     } else if (e.target instanceof HTMLInputElement) {
       if (e.target.type === "number") {
         value = parseFloat(e.target.value);
@@ -285,7 +281,7 @@ const Reading: React.FC = () => {
           consumerInfo: string;
           category_id: string;
           sewerage: boolean;
-          stpCharges: string;
+          stp: boolean;
           rebate: boolean;
           connection_type_id: string;
           prevMonth: {
@@ -310,24 +306,25 @@ const Reading: React.FC = () => {
           consumerInfo: row.consumerInfo,
           category_id: row?.category.id,
           sewerage: row.sewerage,
-          stpCharges: row.stpCharges,
+          stp: row.stpCharges,
           rebate: row.rebate,
           connection_size_id: row?.connectionSize?.id,
           prevMonth: row.prevMonth,
           currMonth: row.currMonth,
         };
       });
+      console.log("payload5", payload);
       const result = payload[Object.keys(payload)[0]];
       createBill(result);
       setPayload(rows);
-
-    }  if(secondReading !==1) {
+    }
+    if (secondReading !== 1) {
       const payload: {
         [key: string]: {
           consumerInfo: string;
           category_id: string;
           sewerage: boolean;
-          stpCharges: string;
+          stpCharges: boolean;
           rebate: boolean;
           connection_size_id: string;
           currMonth: {
@@ -353,10 +350,10 @@ const Reading: React.FC = () => {
       });
 
       const result = payload[Object.keys(payload)[0]];
+    
       createBill(result);
       setPayload(rows);
     }
-
   };
   useEffect(() => {
     if (billResult) {
@@ -575,28 +572,29 @@ const Reading: React.FC = () => {
 
                     <td className="border border-gray-300 px-4 py-2">
                       <select
-                        value={row.sewerage ? true : false}
+                        value={row.sewerage ? "true" : "false"}
                         onChange={(e) =>
                           handleInputChange(e, index, "sewerage")
                         }
                         className="w-full p-2 border border-gray-300 rounded"
                       >
-                        <option value={true}>Yes</option>
-                        <option value={false}>No</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
                       </select>
                     </td>
+                    
 
                     <td className="border border-gray-300 px-4 py-2">
                       <select
-                        value={row.stpCharges ? true : false}
+                        value={row.stpCharges ? "true" : "false"}
                         onChange={(e) =>
                           handleInputChange(e, index, "stpCharges")
                         }
                         className="w-full p-2 border border-gray-300 rounded"
                         disabled={!row.sewerage}
                       >
-                        <option value={true}>Yes</option>
-                        <option value={false}>No</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
                       </select>
                     </td>
 
@@ -605,20 +603,18 @@ const Reading: React.FC = () => {
                         value={row.rebate ? true : false}
                         onChange={(e) => handleInputChange(e, index, "rebate")}
                         className="w-full p-2 border border-gray-300 rounded"
+                        disabled={!row.rebate}
                       >
                         <option value={true}>Yes</option>
                         <option value={false}>No</option>
                       </select>
                     </td>
 
-        
-                    
                     <td className="border border-gray-300 px-4 py-2">
                       <select
                         value={row?.connectionSize.id || ""}
                         onChange={
-                          (e) =>
-                            handleInputChange(e, index, "connectionSize") // Pass 'category_id' instead of 'category_name'
+                          (e) => handleInputChange(e, index, "connectionSize") // Pass 'category_id' instead of 'category_name'
                         }
                         className="w-full p-2 border border-gray-300 rounded"
                       >
@@ -659,7 +655,6 @@ const Reading: React.FC = () => {
                               className="text-sm w-[50px] border border-gray-300 p-1"
                             />
 
-
                             <select
                               value={row.prevMonth.meter_status_id?.id || ""}
                               onChange={(e) =>
@@ -698,6 +693,8 @@ const Reading: React.FC = () => {
                                 handleInputChange(e, index, "prevMonth", "cw")
                               }
                               className="text-sm w-[50px] border border-gray-300 p-1"
+                              disabled={!row.prevMonth.cw}
+
                             >
                               <option value={true}>Yes</option>
                               <option value={false}>No</option>
@@ -720,8 +717,7 @@ const Reading: React.FC = () => {
                               className="text-sm w-[50px] border border-gray-300 p-1"
                             />
                             <select
-                                value={row.currMonth.meter_status_id?.id || ""}
-                                
+                              value={row.currMonth.meter_status_id?.id || ""}
                               // value={row.currMonth.meter_status_id}
                               onChange={(e) =>
                                 handleInputChange(
@@ -759,6 +755,8 @@ const Reading: React.FC = () => {
                                 handleInputChange(e, index, "currMonth", "cw")
                               }
                               className="text-sm w-[50px] border border-gray-300 p-1"
+                              disabled={!row.currMonth.cw}
+
                             >
                               <option value={true}>Yes</option>
                               <option value={false}>No</option>
@@ -784,8 +782,7 @@ const Reading: React.FC = () => {
                               className="text-sm w-[50px] border border-gray-300 p-1"
                             />
                             <select
-                                value={row.currMonth.meter_status_id?.id || ""}
-
+                              value={row.currMonth.meter_status_id?.id || ""}
                               onChange={(e) =>
                                 handleInputChange(
                                   e,
@@ -822,6 +819,8 @@ const Reading: React.FC = () => {
                                 handleInputChange(e, index, "currMonth", "cw")
                               }
                               className="text-sm w-[50px] border border-gray-300 p-1"
+                              disabled={!row.currMonth.cw}
+
                             >
                               <option value={true}>Yes</option>
                               <option value={false}>No</option>
