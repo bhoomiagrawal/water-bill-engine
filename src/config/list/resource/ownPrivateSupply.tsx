@@ -5,16 +5,16 @@ const ownPrivateSupply=[
         column:"index",
         type:"number"
     },
-    {
-        title:"Category Name",
-        column:"category_name",
-        type:"text"
-    },
-    {
-        title:"Category Code",
-        column:"category_code",
-        type:"text"
-    },
+    // {
+    //     title:"Category Name",
+    //     column:"category_name",
+    //     type:"text"
+    // },
+    // {
+    //     title:"Category Code",
+    //     column:"category_code",
+    //     type:"text"
+    // },
     {
         title:"Actions",
         column:"actions",

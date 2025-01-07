@@ -1,12 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";  // Import usePathname
+import Link from "next/link";
 
 const HoverHeader: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [submenuHovered, setSubmenuHovered] = useState<string | null>(null); 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); 
   const router = useRouter();
+  const pathname = usePathname();  
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleSubmenuClick = async (path: string) => {
+    if (pathname === path) {
+      return;
+    }
+    setIsLoading(true);
+    await router.push(path);
+  };
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setIsLoading(true); 
+    };
+    
+    const handleRouteChangeComplete = () => {
+      setIsLoading(false); 
+    };
+
+    router?.events?.on("routeChangeStart", handleRouteChangeStart);
+    router?.events?.on("routeChangeComplete", handleRouteChangeComplete);
+    router?.events?.on("routeChangeError", handleRouteChangeComplete); 
+
+    return () => {
+      router?.events?.off("routeChangeStart", handleRouteChangeStart);
+      router?.events?.off("routeChangeComplete", handleRouteChangeComplete);
+      router?.events?.off("routeChangeError", handleRouteChangeComplete);
+    };
+  }, [router]);
 
   const handleMouseEnter = (menu: string) => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
@@ -26,12 +58,6 @@ const HoverHeader: React.FC = () => {
     if (!target.closest(".menu") && !target.closest(".header-item")) {
       setMenuOpen(null);
     }
-  };
-
-  const handleSubmenuClick = (path: string) => {
-    console.log("Navigating to:", path);
-    router.push(path);
-    setMenuOpen(null); // Close the menu after navigation
   };
 
   const handleMobileMenuToggle = () => {
@@ -69,7 +95,10 @@ const HoverHeader: React.FC = () => {
         { label: "Type of Connection", path: "/list/connectionType" },
         { label: "Type of Property", path: "/list/typeProperty" },
         { label: "Supply Zone", path: "/list/supplyZone" },
-        { label: "Payment head v/s budget head master", path: "/list/paymentBudget" },
+        {
+          label: "Payment head v/s budget head master",
+          path: "/list/paymentBudget",
+        },
       ],
     },
     {
@@ -99,17 +128,12 @@ const HoverHeader: React.FC = () => {
     {
       label: "Billing",
       key: "billing",
-      submenu: [
-        { label: "Upload Transactional Data", path: "/bill" },
-        "Publish bill",
-      ],
+      submenu: [{ label: "Upload Transactional Data", path: "/bill" }],
     },
     {
       label: "Billing Agency",
       key: "billingAgency",
-      submenu: [
-        { label: "Registration", path: "/billAgencyList" },
-      ],
+      submenu: [{ label: "Registration", path: "/billAgencyList" }],
     },
     { label: "Bill Payment Receipt", key: "billPaymentReceipt" },
     { label: "Reports", key: "reports" },
@@ -124,13 +148,12 @@ const HoverHeader: React.FC = () => {
       >
         {menuItems.map((item) => (
           <div key={item.key} className="relative menu">
-            {/* Check if it's the "Home" label */}
             <span
               className="header-item mx-4 cursor-pointer text-xl"
               onMouseEnter={() => handleMouseEnter(item.key)}
               onClick={() => {
                 if (item.key === "home") {
-                  router.push(item.path);  
+                  router.push(item.path);
                 } else {
                   handleClickInside(item.key);
                 }
@@ -142,30 +165,19 @@ const HoverHeader: React.FC = () => {
             {/* Submenu */}
             {menuOpen === item.key && item.submenu && (
               <div className="absolute left-0 top-full z-10 mt-2 w-48 rounded-md bg-gray-800 shadow-lg">
-                <ul className="list-none p-2">
+                <ul className="list-none p-2 space-y-2">
                   {item.submenu.map((subItem, index) => (
-                    typeof subItem === "string" ? (
-                      <li
-                        key={index}
-                        className="cursor-pointer p-2 transition-colors duration-200 hover:bg-gray-600 rounded-md"
-                        onClick={() => {
-                          const path = `/path/${subItem
-                            .toLowerCase()
-                            .replace(/ /g, "-")}`;
-                          handleSubmenuClick(path);
-                        }}
-                      >
-                        {subItem}
-                      </li>
-                    ) : (
-                      <li
-                        key={index}
-                        className="cursor-pointer p-2 transition-colors duration-200 hover:bg-gray-600 rounded-md"
-                        onClick={() => handleSubmenuClick(subItem.path)}
-                      >
-                        {subItem.label}
-                      </li>
-                    )
+                    <Link
+                      href={subItem.path}
+                      key={index}
+                      onMouseEnter={() => setSubmenuHovered(subItem.label)}
+                      onMouseLeave={() => setSubmenuHovered(null)}
+                      onClick={() => handleSubmenuClick(subItem.path)}
+                    >
+                      <div className={`flex p-2 ${
+                        submenuHovered === subItem.label ? "bg-gray-700" : ""
+                      }`}>{subItem.label}</div>
+                    </Link>
                   ))}
                 </ul>
               </div>
@@ -173,6 +185,12 @@ const HoverHeader: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {isLoading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 z-50">
+          <div className="w-16 h-16 border-4 border-t-4 border-white border-solid rounded-full animate-spin"></div>
+        </div>
+      )}
 
       {/* Mobile Menu */}
       <div className="relative flex items-center justify-between bg-gray-800 p-4 text-white md:hidden">
@@ -201,28 +219,13 @@ const HoverHeader: React.FC = () => {
                 {submenuOpen === item.key && item.submenu && (
                   <ul className="pl-4">
                     {item.submenu.map((subItem, index) => (
-                      typeof subItem === "string" ? (
-                        <li
-                          key={index}
-                          className="cursor-pointer py-2"
-                          onClick={() => {
-                            const path = `/path/${subItem
-                              .toLowerCase()
-                              .replace(/ /g, "-")}`;
-                            handleSubmenuClick(path);
-                          }}
-                        >
-                          {subItem}
-                        </li>
-                      ) : (
-                        <li
-                          key={index}
-                          className="cursor-pointer py-2"
-                          onClick={() => handleSubmenuClick(subItem.path)}
-                        >
-                          {subItem.label}
-                        </li>
-                      )
+                      <li
+                        key={index}
+                        className="cursor-pointer py-2"
+                        onClick={() => handleSubmenuClick(subItem.path)}
+                      >
+                        {subItem.label}
+                      </li>
                     ))}
                   </ul>
                 )}

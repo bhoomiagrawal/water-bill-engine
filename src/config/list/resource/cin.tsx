@@ -6,15 +6,11 @@ const cin=[
         type:"number"
     },
     {
-        title:"Category Name",
+        title:"CIN Number",
         column:"category_name",
         type:"text"
     },
-    {
-        title:"Category Code",
-        column:"category_code",
-        type:"text"
-    },
+   
     {
         title:"Actions",
         column:"actions",

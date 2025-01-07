@@ -12,7 +12,7 @@ const chowkri=[
         type:"text"
     },
     {
-        title:"chowkri Code",
+        title:"Chowkri Code",
         column:"category_code",
         type:"text"
     },

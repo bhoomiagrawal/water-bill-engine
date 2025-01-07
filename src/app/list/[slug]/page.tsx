@@ -24,7 +24,7 @@ const Page = ({ params }: any) => {
   const [data, setData] = useState<Category | any>({});
   const [isPopupDelete, setIsPopupDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [deleteCategoryName, setDeleteCategoryName] = useState<string>("");
+  // const [deleteCategoryName, setDeleteCategoryName] = useState<string>("");
   const [isPopupe, setIsPopupe] = useState(false);
   const [inputeField, setInputeField] = useState<any>([]);
   const [errors, setErrors] = useState<Partial<any>>({});
@@ -114,6 +114,13 @@ const Page = ({ params }: any) => {
     }
   }, [createResourceResult, updateResourceResult]);
 
+  console.log("resourceError",resourceError)
+  // useEffect(()=>{
+  //   if(resourceError){
+  //     toast
+  //   }
+  // },[])
+
   useEffect(() => {
     if (deleteResourceResult) {
       toast.error(`${slug} deleted successfully.`, {
@@ -154,7 +161,6 @@ const Page = ({ params }: any) => {
 
   const handleDelete = (id: string, categoryName: string) => {
     setDeleteId(Number(id));
-    setDeleteCategoryName(categoryName);
     setIsPopupDelete(true);
   };
 
@@ -237,12 +243,12 @@ const Page = ({ params }: any) => {
                   />
                 </div>
               </form>
-              <button
+           {slug !=="chargeType"?<>   <button
                 onClick={handlePopupeForm}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md"
               >
                 Add {slug.charAt(0).toUpperCase() + slug.slice(1)}
-              </button>
+              </button></>:""}
             </div>
           </div>
         </div>
