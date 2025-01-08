@@ -4,10 +4,14 @@ import * as resource from "../../../config/list";
 import * as resources from "../../../config/form";
 import { useRouter } from "next/navigation";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import List from "@/components/Main/List";
+// import List from "@/complnents/Main/List";
 import { useInternalService } from "@/components/hook/useInternalService";
 import { toast } from "react-toastify";
 import Form from "@/components/Main/Form";
+import List from "@/components/Main/List";
+
+// Explicitly type the slug and resource objects
+type SlugType = keyof typeof resource;
 
 interface Category {
   id: number;
@@ -15,31 +19,49 @@ interface Category {
   category_code: string;
 }
 
-const Page = ({ params }: any) => {
-  const { slug }: any = params;
-  
+// Define the FieldType type (adjust based on the actual types you're using)
+type FieldType = "text" | "checkbox" | "select" | "number"; // Example of types, adjust as needed
+
+// Define the Column type with FieldType for the type property
+interface Column {
+  id: string;
+  title: string;
+  column: string;
+  super_column?: string; // Optional
+  type: string;
+  columnsecond?: string; // Optional
+}
+
+
+const Page = ({ params }: { params: { slug: SlugType } }) => {
+  const { slug } = params;
+
   const columns = resource[slug];
   const column = resources[slug];
+  
   const router = useRouter();
   const [data, setData] = useState<Category | any>({});
   const [isPopupDelete, setIsPopupDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  // const [deleteCategoryName, setDeleteCategoryName] = useState<string>("");
   const [isPopupe, setIsPopupe] = useState(false);
-  const [inputeField, setInputeField] = useState<any>([]);
+  const [inputeField, setInputeField] = useState<Column[]>([]); // Ensure inputeField is typed as Column[]
   const [errors, setErrors] = useState<Partial<any>>({});
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    const columnVal = column?.map((field: any) => ({
+    const columnVal = column?.map((field: any, index: number) => ({
+      id: `col-${index}`,  // Ensure 'id' is being added
       title: field.title,
       column: field.column,
-      type: field.type,
+      type: field.type as FieldType,  // Cast type to FieldType
       selectKey: field.selectKey,
-      source: field.source || "",
+      source: field.source || "",  // Default to empty string if not provided
+      super_column: field.super_column,
     }));
     setInputeField(columnVal);
   }, [column]);
+  
+  
 
   const handleError = (newError: any) => {
     setErrors((prevData: any) => ({
@@ -114,13 +136,6 @@ const Page = ({ params }: any) => {
     }
   }, [createResourceResult, updateResourceResult]);
 
-  console.log("resourceError",resourceError)
-  // useEffect(()=>{
-  //   if(resourceError){
-  //     toast
-  //   }
-  // },[])
-
   useEffect(() => {
     if (deleteResourceResult) {
       toast.error(`${slug} deleted successfully.`, {
@@ -159,7 +174,7 @@ const Page = ({ params }: any) => {
     }
   }, [resourceResult]);
 
-  const handleDelete = (id: string, categoryName: string) => {
+  const handleDelete = (id: string) => {
     setDeleteId(Number(id));
     setIsPopupDelete(true);
   };
@@ -188,12 +203,8 @@ const Page = ({ params }: any) => {
   }, [search]);
 
   const handlePopupeForm = () => {
-    // if (slug !== "billAgencyEnrollment") {
-      setIsPopupe(!isPopupe);
-    // } else {
-      // router.push("/billAgencyEnrollment");
-    }
-
+    setIsPopupe(!isPopupe);
+  };
 
   return (
     <div>
@@ -243,12 +254,14 @@ const Page = ({ params }: any) => {
                   />
                 </div>
               </form>
-           {slug !=="chargeType"?<>   <button
-                onClick={handlePopupeForm}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
-              >
-                Add {slug.charAt(0).toUpperCase() + slug.slice(1)}
-              </button></>:""}
+              {slug !== "chargeType" && (
+                <button
+                  onClick={handlePopupeForm}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                >
+                  Add {slug.charAt(0).toUpperCase() + slug.slice(1)}
+                </button>
+              )}
             </div>
           </div>
         </div>

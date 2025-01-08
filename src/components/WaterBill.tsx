@@ -30,7 +30,7 @@ console.log("reponse44",reponse)
   return (
     // <div className="flex justify-center items-center min-h-screen p-4 bg-gray-100">
 
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18     overflow-auto">
+    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18 z-10 overflow-auto">
       <div className="mt-10 bg-gray-100 relative w-[600px] m-auto flex justify-center items-center min-h-screen ">
         <div className="mx-auto max-w-6xl">
           <div className="w-full max-w-xl p-6 border ">
@@ -309,7 +309,7 @@ console.log("reponse44",reponse)
                       </th>
                       <td
                         className="border border-[#6666d7]  "
-                        colSpan="2"
+                        colSpan={2}
                       ></td>
                     </tr>
                     <tr>

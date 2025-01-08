@@ -25,13 +25,14 @@ const SelectHandler: React.FC<SelectHandlerProps> = ({ column, value ,onChange})
       setOptions(column.options);  
     }
   }, []);
+
   useEffect(() => {
     if (!categoryInProgress && categoryResult?.data?.data?.[column.source]) {
       const formattedOptions = categoryResult.data?.data?.[column.source].map((item: any) => ({
-        key: item[column.selectKey],  
-        value: item[column?.selectKey],
-        label: item[column.selectKey]  ,
-        id:item.id
+        key: String(item[column.selectKey]),  // Ensure key is unique
+        id: item.id,  // Ensure id is present
+        value: item[column.selectKey],
+        label: item[column.selectKey]
       }));
       setOptions(formattedOptions);  
     }
@@ -41,9 +42,10 @@ const SelectHandler: React.FC<SelectHandlerProps> = ({ column, value ,onChange})
     <div>
       <SelectInput
         label={column.title}  
-        options={options || []}  
+        options={options || []}  // Ensure options are correctly formatted
         onChange={onChange}
         value={value}
+        id={0}  // Pass a default id if required (can be dynamic)
       />
     </div>
   );

@@ -1,31 +1,41 @@
-
-const connectionType=[
+const connectionType = [
     {
-        title:"S.No",
-        column:"index",
-        type:"number"
+      id: "1", // Added unique id
+      title: "S.No",
+      column: "index",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "number",
     },
     {
-        title:"Connection type",
-        column:"conn_type",
-        type:"text"
+      id: "2", // Added unique id
+      title: "Connection type",
+      column: "conn_type",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "text",
     },
     {
-        title:"Description",
-        column:"description",
-        type:"text"
+      id: "3", // Added unique id
+      title: "Description",
+      column: "description",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "text",
     },
     {
-        title:"Status",
-        column:"status",
-        Boolean:"displayStatus",
-        type:"text"
+      id: "4", // Added unique id
+      title: "Status",
+      column: "status",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      Boolean: "displayStatus", // Adjusted to your needs
+      type: "text",
     },
     {
-        title:"Actions",
-        column:"actions",
-        type:"actions"
+      id: "5", // Added unique id
+      title: "Actions",
+      column: "actions",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "actions",
     },
-]
-
-export default connectionType;
+  ];
+  
+  export default connectionType;
+  

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DropDown from "@/components/HelperComponents/DropDown/DropDown";
 import { useInternalService } from "@/components/hook/useInternalService";
-import Item from "antd/es/list/Item";
 import { toast } from "react-toastify";
 
 interface RowValues {
@@ -81,7 +80,7 @@ const Configure: React.FC = () => {
   const handleChange = (name: string, value: any, index?: number) => {
     // const { name, value } = e.target;
     if (name === "typeCharges") {
-      if (formValues.typeCharges === "1" || value === "1") {
+      if (formValues.typeCharges === "43" || value === "43") {
       }
     }
     if (index === undefined) {
@@ -177,11 +176,11 @@ const Configure: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let payload = {
+    let payload: any = {
       sso_id: "user123",
     };
 
-    if (formValues.typeCharges !== "1") {
+    if (formValues.typeCharges !== "43") {
       payload = {
         ...payload,
         charge_type_id: formValues.typeCharges,
@@ -199,7 +198,7 @@ const Configure: React.FC = () => {
         // ],
         extra_details: "Water charge details",
       };
-    } else if (formValues.typeCharges === "1") {
+    } else if (formValues.typeCharges === "43") {
       payload = {
         ...payload,
         charge_type_id: formValues.typeCharges,
@@ -243,7 +242,7 @@ const Configure: React.FC = () => {
       
       // Filter out the already used slabs from slabOptions
       const filteredSlabs = slabOptions.filter(
-        (slab) => !alreadyUsedSlabs.includes(slab.value)  // Compare by 'value'
+        (slab:any) => !alreadyUsedSlabs.includes(slab.value)  // Compare by 'value'
       );
     
       console.log("alreadyUsedSlabs:", alreadyUsedSlabs);
@@ -321,7 +320,7 @@ const Configure: React.FC = () => {
             </div>
 
             {/* Conditional rendering for "water charge" type */}
-            {formValues.typeCharges === "1" ? (
+            {formValues.typeCharges === "43" ? (
               <div className="flex flex-col">
                 {inProgressConnectionSize ? (
                   <p>Loading connection sizes...</p>
@@ -343,7 +342,7 @@ const Configure: React.FC = () => {
             ) : null}
 
             {/* Conditional rendering for other types */}
-            {formValues.typeCharges !== "1" ? (
+            {formValues.typeCharges !== "43" ? (
               <>
                 {formValues.rows.map((row, index) => (
                   <div
@@ -399,7 +398,7 @@ const Configure: React.FC = () => {
                       />
                     </div>
 
-                    {formValues.rows.length > 1 && (
+                    {formValues.rows.length > 43 && (
                       <div className="flex justify-start">
                         <button
                           type="button"
@@ -425,7 +424,7 @@ const Configure: React.FC = () => {
               </>
             ) : null}
 
-            {formValues.typeCharges === "1" && (
+            {formValues.typeCharges === "43" && (
               <>
                 {formValues.rows.map((row, index) => (
                   <div
@@ -481,7 +480,7 @@ const Configure: React.FC = () => {
                       />
                     </div>
 
-                    {formValues.rows.length > 1 && (
+                    {formValues.rows.length > 43 && (
                       <div className="flex justify-start">
                         <button
                           type="button"
