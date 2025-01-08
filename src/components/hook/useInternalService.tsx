@@ -33,8 +33,7 @@ export function useInternalService(url: string, method: 'GET' | 'POST' | 'PUT' |
   
     try {
       let baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL;
-      let location = `${baseUrl}/${url}`;
-  
+      let location = `${baseUrl}${url}`;
       if (params && params.length > 0) {
         location = `${location}/${params.join("/")}`; 
       }
