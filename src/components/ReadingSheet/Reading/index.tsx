@@ -201,7 +201,7 @@ const Reading: React.FC = () => {
     subField?: string
   ) => {
     let value: any;
-  
+  console.log("subField",subField)
     // First check if the target is an HTMLSelectElement
     if (e.target instanceof HTMLSelectElement) {
       if (field === "category") {
@@ -241,7 +241,7 @@ const Reading: React.FC = () => {
         } else {
           value = { id: "", size: "" };
         }
-      } else if (field === "sewerage" || field === "stpCharges") {
+      } else if (field === "sewerage" || field === "stpCharges" || subField ==="cw") {
         value = e.target.value === "true";
       } else {
         value = e.target.value;
@@ -574,7 +574,6 @@ const Reading: React.FC = () => {
               </thead>
               <tbody>
                 {rows.map((row, index) => {
-                  console.log("vvvvvvv", row.currMonth.consumption);
                   return (
                     <tr key={row.id}>
                       <td className="border border-gray-300 px-4 py-2">
@@ -727,38 +726,26 @@ const Reading: React.FC = () => {
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
 
-                              {/* <input
-                              type="text"
-                              value={row.currMonth.consumption}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "currMonth",
-                                  "consumption"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            /> */}
+                              
                               <select
                                 value={row.prevMonth.cw ? "true" : "false"}
                                 onChange={(e) =>
-                                  handleInputChange(e, index, "currMonth", "cw")
+                                  handleInputChange(e, index, "prevMonth", "cw")
                                 }
-                                className="text-sm w-[50px] border border-gray-300 p-1 z-[-1]"
-                                disabled={!row.currMonth.cw}
+                                className="text-sm w-[50px] border border-gray-300 p-1 z-[1]"
+                                // disabled={!row.currMonth.cw}
                               >
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                               </select>
                             </div>
-                            {errors < row.lastRDG ? (
+                            {/* {errors < row.lastRDG ? (
                               <p style={{ color: "red", fontSize: "10px" }}>
                                 Enter reading more than last reading
                               </p>
                             ) : (
                               ""
-                            )}
+                            )} */}
                           </td>
 
                           <td className="border border-gray-300 px-4 py-2">
@@ -823,20 +810,20 @@ const Reading: React.FC = () => {
                                 onChange={(e) =>
                                   handleInputChange(e, index, "currMonth", "cw")
                                 }
-                                className="text-sm w-[50px] border border-gray-300 p-1 z-[-1]"
+                                className="text-sm w-[50px] border border-gray-300 p-1 z-[1]"
                                 // disabled={!row.currMonth.cw}
                               >
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                               </select>
                             </div>
-                            {errors < row.lastRDG ? (
+                            {/* {errors < row.lastRDG ? (
                               <p style={{ color: "red", fontSize: "10px" }}>
                                 Enter reading more than last reading
                               </p>
                             ) : (
                               ""
-                            )}
+                            )} */}
                           </td>
                           
                         </>
@@ -900,20 +887,20 @@ const Reading: React.FC = () => {
                                 onChange={(e) =>
                                   handleInputChange(e, index, "currMonth", "cw")
                                 }
-                                className="text-sm w-[50px] border border-gray-300 p-1  z-[-1]"
-                                disabled={!row.currMonth.cw}
+                                className="text-sm w-[50px] border border-gray-300 p-1  z-[1]"
+                                // disabled={!row.currMonth.cw}
                               >
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                               </select>
                             </div>
-                            {errors < row.lastRDG ? (
+                            {/* {errors < row.lastRDG ? (
                               <p style={{ color: "red", fontSize: "10px" }}>
                                 Enter reading more than last reading
                               </p>
                             ) : (
                               ""
-                            )}
+                            )} */}
                           </td>
                         </>
                       )}
