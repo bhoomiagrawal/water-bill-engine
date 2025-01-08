@@ -199,6 +199,8 @@ const Reading: React.FC = () => {
     subField?: string
   ) => {
     let value: any;
+    console.log("field",subField)
+
 
     if (e.target instanceof HTMLSelectElement) {
       if (field === "category") {
@@ -237,7 +239,7 @@ const Reading: React.FC = () => {
         } else {
           value = { id: "", size: "" };
         }
-      } else if (field === "sewerage" || field ==="stpCharges") {
+      } else if (field === "sewerage" || field ==="stpCharges" || subField ==="cw" ) {
         value = e.target.value === "true";
       } else {
         value = e.target.value;
@@ -688,16 +690,16 @@ const Reading: React.FC = () => {
                               className="text-sm w-[50px] border border-gray-300 p-1"
                             />
                             <select
-                              value={row.prevMonth.cw ? true : false}
+                              value={row.prevMonth.cw ? "true" : "false"}
                               onChange={(e) =>
                                 handleInputChange(e, index, "prevMonth", "cw")
                               }
                               className="text-sm w-[50px] border border-gray-300 p-1"
-                              disabled={!row.prevMonth.cw}
+                              // disabled={!row.prevMonth.cw}
 
                             >
-                              <option value={true}>Yes</option>
-                              <option value={false}>No</option>
+                              <option value="true">Yes</option>
+                              <option value="false">No</option>
                             </select>
                           </div>
                         </td>
@@ -750,16 +752,16 @@ const Reading: React.FC = () => {
                               className="text-sm w-[50px] border border-gray-300 p-1"
                             />
                             <select
-                              value={row.currMonth.cw ? true : false}
+                              value={row.currMonth.cw ? "true" : "false"}
                               onChange={(e) =>
                                 handleInputChange(e, index, "currMonth", "cw")
                               }
                               className="text-sm w-[50px] border border-gray-300 p-1"
-                              disabled={!row.currMonth.cw}
+                              // disabled={!row.currMonth.cw}
 
                             >
-                              <option value={true}>Yes</option>
-                              <option value={false}>No</option>
+                              <option value="true">Yes</option>
+                              <option value="false">No</option>
                             </select>
                           </div>
                         </td>
@@ -814,16 +816,16 @@ const Reading: React.FC = () => {
                               className="text-sm w-[50px] border border-gray-300 p-1"
                             />
                             <select
-                              value={row.currMonth.cw ? true : false}
+                              value={row.currMonth.cw ? "true" : "false"}
                               onChange={(e) =>
                                 handleInputChange(e, index, "currMonth", "cw")
                               }
                               className="text-sm w-[50px] border border-gray-300 p-1"
-                              disabled={!row.currMonth.cw}
+                              // disabled={!row.currMonth.cw}
 
                             >
-                              <option value={true}>Yes</option>
-                              <option value={false}>No</option>
+                              <option value="true">Yes</option>
+                              <option value="false">No</option>
                             </select>
                           </div>
                         </td>
