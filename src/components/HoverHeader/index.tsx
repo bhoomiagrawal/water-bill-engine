@@ -1,44 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation";  // Import usePathname
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 const HoverHeader: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
-  const [submenuHovered, setSubmenuHovered] = useState<string | null>(null); 
+  const [submenuHovered, setSubmenuHovered] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false); 
-  const router = useRouter();
-  const pathname = usePathname();  
+  const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false); // To track client-side rendering
+
+  const router = useRouter(); // useRouter hook for navigation
+  const pathname = usePathname(); // usePathname hook to get the current path
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  // Ensuring that useRouter is only called on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const handleSubmenuClick = async (path: string) => {
-    if (pathname === path) {
+    if (pathname === path) { // Using `pathname` for the current path
       return;
     }
     setIsLoading(true);
-    await router.push(path);
+    router.push(path);
   };
-
-  useEffect(() => {
-    const handleRouteChangeStart = () => {
-      setIsLoading(true); 
-    };
-    
-    const handleRouteChangeComplete = () => {
-      setIsLoading(false); 
-    };
-
-    router?.events?.on("routeChangeStart", handleRouteChangeStart);
-    router?.events?.on("routeChangeComplete", handleRouteChangeComplete);
-    router?.events?.on("routeChangeError", handleRouteChangeComplete); 
-
-    return () => {
-      router?.events?.off("routeChangeStart", handleRouteChangeStart);
-      router?.events?.off("routeChangeComplete", handleRouteChangeComplete);
-      router?.events?.off("routeChangeError", handleRouteChangeComplete);
-    };
-  }, [router]);
 
   const handleMouseEnter = (menu: string) => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
@@ -152,7 +140,7 @@ const HoverHeader: React.FC = () => {
               className="header-item mx-4 cursor-pointer text-xl"
               onMouseEnter={() => handleMouseEnter(item.key)}
               onClick={() => {
-                if (item.key === "home") {
+                if (item.key === "home" && item.path) { // Check if item.path is defined
                   router.push(item.path);
                 } else {
                   handleClickInside(item.key);
@@ -174,9 +162,9 @@ const HoverHeader: React.FC = () => {
                       onMouseLeave={() => setSubmenuHovered(null)}
                       onClick={() => handleSubmenuClick(subItem.path)}
                     >
-                      <div className={`flex p-2 ${
-                        submenuHovered === subItem.label ? "bg-gray-700" : ""
-                      }`}>{subItem.label}</div>
+                      <div className={`flex p-2 ${submenuHovered === subItem.label ? "bg-gray-700" : ""}`}>
+                        {subItem.label}
+                      </div>
                     </Link>
                   ))}
                 </ul>

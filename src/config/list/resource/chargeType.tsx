@@ -1,25 +1,33 @@
-const chargeType =[
+const chargeType = [
     {
-        title:"S.No",
-        column:"index",
-        type:"number"
+      id: "1", // Added unique id
+      title: "S.No",
+      column: "index",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "number",
     },
     {
-        title:"Charge Name",
-        column:"charge_name",
-        type:"text"
+      id: "2",
+      title: "Charge Name",
+      column: "charge_name",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "text",
     },
     {
-        title:"Status",
-        column:"status",
-        Boolean:"displayStatus",
-        type:"text"
+      id: "3",
+      title: "Status",
+      column: "status",
+      columnsecond: "displayStatus", // Added columnsecond with the appropriate value
+      type: "text",
     },
     // {
-    //     title:"Actions",
-    //     column:"actions",
-    //     type:"actions"
+    //   id: "4",
+    //   title: "Actions",
+    //   column: "actions",
+    //   columnsecond: "default_value", // Added columnsecond with a default value
+    //   type: "actions",
     // },
-]
-
-export default chargeType ;
+  ];
+  
+  export default chargeType;
+  

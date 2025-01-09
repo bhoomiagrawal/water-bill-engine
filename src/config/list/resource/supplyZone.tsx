@@ -1,25 +1,18 @@
-
-const supplyZone=[
+const supplyZone = [
     {
-        title:"S.No",
-        column:"index",
-        type:"number"
+        id: "1", // You can add a unique id here
+        title: "S.No",
+        column: "index",
+        columnsecond: "mergi_index", // Include a secondary column if required
+        type: "number"
     },
-    // {
-    //     title:"Category Name",
-    //     column:"category_name",
-    //     type:"text"
-    // },
-    // {
-    //     title:"Sub Category Name",
-    //     column:"subcategory",
-    //     type:"text"
-    // },
     {
-        title:"Actions",
-        column:"actions",
-        type:"actions"
+        id: "2",
+        title: "Actions",
+        column: "actions",
+        columnsecond: "mergi_actions", // Include a secondary column if required
+        type: "actions"
     },
-]
+];
 
 export default supplyZone;

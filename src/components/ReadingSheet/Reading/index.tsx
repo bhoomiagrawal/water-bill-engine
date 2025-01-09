@@ -4,6 +4,7 @@ import WaterBill from "@/components/WaterBill";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { error } from "console";
 
 interface Meter_status_id {
   id: string;
@@ -47,7 +48,7 @@ interface MeterStatus {
 }
 
 interface ConnectionSize {
-  id: string;
+  id: number;
   size: string;
 }
 
@@ -78,8 +79,8 @@ const Reading: React.FC = () => {
 
   const [billData, setBillData] = useState({});
   const [payload, setPayload] = useState({});
-  // const [errors, setErrors] = useState<Partial<any>>({});
-
+  const [errors, setErrors] = useState("");
+  // console.log("errors66",errors)
   const [rows, setRows] = useState<Partial<any>[]>([
     {
       id: 1,
@@ -93,21 +94,23 @@ const Reading: React.FC = () => {
       lastRDG: 20000,
       readingStatus: "",
       prevMonth: {
-        reading: 0,
+        reading: "",
         meter_status_id: { id: "", meter_status: "" },
-        consumption: 0,
+        consumption: "",
         reading_date: "2025-01-07",
         cw: false,
       },
       currMonth: {
-        reading: 0,
+        reading: "",
         meter_status_id: { id: "", meter_status: "" },
         reading_date: "2025-01-07",
-        consumption: 0,
+        consumption: "",
         cw: false,
       },
     },
   ]);
+
+  console.log("rows123", rows);
 
   const [categores, setCategores] = useState<Category[]>([]);
   const [meterStatus, setMeterStatus] = useState<MeterStatus[]>([]);
@@ -168,28 +171,27 @@ const Reading: React.FC = () => {
     });
   }, [rows]);
 
-  const handleChange = (rowIndex: number, field: string, value: any) => {
-    const updatedRows = [...rows];
-    const updatedRow = { ...updatedRows[rowIndex] };
+  // const handleChange = (rowIndex: number, field: string, value: any) => {
+  //   const updatedRows = [...rows];
+  //   const updatedRow = { ...updatedRows[rowIndex] };
 
-    if (field === "firstMonth" || field === "secondMonth") {
-      updatedRow[field] = { ...updatedRow[field], ...value };
-    } else {
-      updatedRow[field] = value;
-    }
+  //   if (field === "currMonth" || field === "prevMonth") {
+  //     updatedRow[field] = { ...updatedRow[field], ...value };
+  //   } else {
+  //     updatedRow[field] = value;
+  //   }
 
-    if (field === "prevMonth" || field === "currMonth") {
-      const firstMonthReading = updatedRow.prevMonth.reading;
-      const secondMonthReading = updatedRow.currMonth.reading;
+  //   if (field === "prevMonth" || field === "currMonth") {
+  //     const firstMonthReading = updatedRow.prevMonth.reading;
+  //     const secondMonthReading = updatedRow.currMonth.reading;
 
-      updatedRow.prevMonth.consumption = firstMonthReading - updatedRow.lastRDG;
-      updatedRow.currMonth.consumption =
-        secondMonthReading - updatedRow.lastRDG;
-    }
+  //     updatedRow.prevMonth.consumption = firstMonthReading - updatedRow.lastRDG;
+  //     updatedRow.currMonth.consumption =secondMonthReading - updatedRow.lastRDG;
+  //   }
 
-    updatedRows[rowIndex] = updatedRow;
-    setRows(updatedRows);
-  };
+  //   updatedRows[rowIndex] = updatedRow;
+  //   setRows(updatedRows);
+  // };
 
   // handleInputChange function
   const handleInputChange = (
@@ -199,13 +201,12 @@ const Reading: React.FC = () => {
     subField?: string
   ) => {
     let value: any;
-    console.log("field",subField)
-
-
+  
+    // First check if the target is an HTMLSelectElement
     if (e.target instanceof HTMLSelectElement) {
       if (field === "category") {
         const selectedCategory = categores?.find(
-          (cat) => cat.id === parseInt(e.target.value)
+          (cat) => cat.id === Number(e.target.value) // Ensure Number conversion for comparison
         );
         if (selectedCategory) {
           value = {
@@ -217,8 +218,9 @@ const Reading: React.FC = () => {
         }
       } else if (field === "connectionSize") {
         const selectedConnectionSize = connectionSize?.find(
-          (cat) => cat.id === parseInt(e.target.value)
+          (cat) => cat.id === Number(e.target.value) // Ensure Number conversion for comparison
         );
+  
         if (selectedConnectionSize) {
           value = {
             id: selectedConnectionSize.id,
@@ -229,7 +231,7 @@ const Reading: React.FC = () => {
         }
       } else if (subField === "meter_status_id") {
         const selectedMeterStatus = meterStatus?.find(
-          (cat) => cat.id === parseInt(e.target.value)
+          (cat) => cat.id === Number(e.target.value) // Ensure Number conversion for comparison
         );
         if (selectedMeterStatus) {
           value = {
@@ -239,42 +241,66 @@ const Reading: React.FC = () => {
         } else {
           value = { id: "", size: "" };
         }
-      } else if (field === "sewerage" || field ==="stpCharges" || subField ==="cw" ) {
+      } else if (field === "sewerage" || field === "stpCharges") {
         value = e.target.value === "true";
       } else {
         value = e.target.value;
       }
-    } else if (e.target instanceof HTMLInputElement) {
+    } 
+    // If target is an HTMLInputElement (like a text input or number input)
+    else if (e.target instanceof HTMLInputElement) {
       if (e.target.type === "number") {
-        value = parseFloat(e.target.value);
+        value = parseFloat(e.target.value); // For number input types
       } else {
         value = e.target.value;
       }
     } else {
-      value = e.target.value;
+      // This is a fallback if the target is neither input nor select
+      // value = e.target.value;
     }
-
+  
+    setErrors(e.target.value);
+  
     const updatedRows = [...rows];
     const updatedRow = { ...updatedRows[rowIndex] };
-
+    console.log("updatedRow", updatedRow.prevMonth.consumption);
+  
     if (subField) {
       updatedRow[field] = { ...updatedRow[field], [subField]: value };
     } else {
       updatedRow[field] = value;
     }
-
+  
     if (field === "prevMonth" || field === "currMonth") {
       const firstMonthReading = updatedRow.prevMonth.reading || 0;
       const secondMonthReading = updatedRow.currMonth.reading || 0;
-
-      updatedRow.prevMonth.consumption = firstMonthReading - updatedRow.lastRDG;
-      updatedRow.currMonth.consumption =
-        secondMonthReading - updatedRow.lastRDG;
+  
+      if (firstMonthReading === 0 && secondMonthReading === 0) {
+        updatedRow.prevMonth.consumption = undefined;
+        updatedRow.currMonth.consumption = undefined;
+      } else {
+        if (firstMonthReading !== 0) {
+          updatedRow.prevMonth.consumption =
+            firstMonthReading - updatedRow.lastRDG;
+        } else {
+          updatedRow.prevMonth.consumption = undefined;
+        }
+  
+        if (secondMonthReading !== 0) {
+          updatedRow.currMonth.consumption =
+            secondMonthReading - updatedRow.lastRDG;
+        } else {
+          updatedRow.currMonth.consumption = undefined;
+        }
+      }
     }
-
+  
     updatedRows[rowIndex] = updatedRow;
     setRows(updatedRows);
   };
+  
+  
+  
 
   const handleGenerateBill = () => {
     if (secondReading === 1) {
@@ -285,7 +311,7 @@ const Reading: React.FC = () => {
           sewerage: boolean;
           stp: boolean;
           rebate: boolean;
-          connection_type_id: string;
+          connection_size_id: string;
           prevMonth: {
             reading: string;
             meter_status_id: Meter_status_id;
@@ -352,7 +378,7 @@ const Reading: React.FC = () => {
       });
 
       const result = payload[Object.keys(payload)[0]];
-    
+
       createBill(result);
       setPayload(rows);
     }
@@ -394,7 +420,7 @@ const Reading: React.FC = () => {
                     colSpan={2}
                     className="border border-gray-300 px-4 py-2 text-left"
                   >
-                    JUL 24
+                    {/* JUL 24 */}
                   </td>
                 </tr>
                 <tr>
@@ -502,7 +528,8 @@ const Reading: React.FC = () => {
                     Size Connection
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
-                    Last RDG, Cons/Stts
+                    Last RDG
+                    {/* , Cons/Stts */}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
                     Acnt No
@@ -546,199 +573,161 @@ const Reading: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row, index) => (
-                  <tr key={row.id}>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {row.accountNumber}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {row.consumerInfo}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <select
-                        value={row?.category?.id || ""} // Bind to category.id to avoid NaN or empty values
-                        onChange={(e) =>
-                          handleInputChange(e, index, "category")
-                        } // Pass 'category' as field name
-                        className="w-full p-2 border border-gray-300 rounded"
-                      >
-                        <option value="">Select Category</option>{" "}
-                        {/* Default empty option */}
-                        {categores?.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.category_name} {/* Display category name */}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
+                {rows.map((row, index) => {
+                  console.log("vvvvvvv", row.currMonth.consumption);
+                  return (
+                    <tr key={row.id}>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {row.accountNumber}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {row.consumerInfo}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <select
+                          value={row?.category?.id || ""} // Bind to category.id to avoid NaN or empty values
+                          onChange={(e) =>
+                            handleInputChange(e, index, "category")
+                          } // Pass 'category' as field name
+                          className="w-full p-2 border border-gray-300 rounded"
+                        >
+                          <option value="">Select Category</option>{" "}
+                          {/* Default empty option */}
+                          {categores?.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.category_name} {/* Display category name */}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
 
-                    <td className="border border-gray-300 px-4 py-2">
-                      <select
-                        value={row.sewerage ? "true" : "false"}
-                        onChange={(e) =>
-                          handleInputChange(e, index, "sewerage")
-                        }
-                        className="w-full p-2 border border-gray-300 rounded"
-                      >
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                      </select>
-                    </td>
-                    
+                      <td className="border border-gray-300 px-4 py-2">
+                        <select
+                          value={row.sewerage ? "true" : "false"}
+                          onChange={(e) =>
+                            handleInputChange(e, index, "sewerage")
+                          }
+                          className="w-full p-2 border border-gray-300 rounded z-[-1]"
+                        >
+                          <option value="true">Yes</option>
+                          <option value="false">No</option>
+                        </select>
+                      </td>
 
-                    <td className="border border-gray-300 px-4 py-2">
-                      <select
-                        value={row.stpCharges ? "true" : "false"}
-                        onChange={(e) =>
-                          handleInputChange(e, index, "stpCharges")
-                        }
-                        className="w-full p-2 border border-gray-300 rounded"
-                        disabled={!row.sewerage}
-                      >
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                      </select>
-                    </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <select
+                          value={row.stpCharges ? "true" : "false"}
+                          onChange={(e) =>
+                            handleInputChange(e, index, "stpCharges")
+                          }
+                          className="w-full p-2 border border-gray-300 rounded z-[-1]"
+                          disabled={!row.sewerage}
+                        >
+                          <option value="true">Yes</option>
+                          <option value="false">No</option>
+                        </select>
+                      </td>
 
-                    <td className="border border-gray-300 px-4 py-2">
-                      <select
-                        value={row.rebate ? true : false}
-                        onChange={(e) => handleInputChange(e, index, "rebate")}
-                        className="w-full p-2 border border-gray-300 rounded"
-                        disabled={!row.rebate}
-                      >
-                        <option value={true}>Yes</option>
-                        <option value={false}>No</option>
-                      </select>
-                    </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <select
+                          value={row.rebate ? "true" : "false"}
+                          onChange={(e) =>
+                            handleInputChange(e, index, "rebate")
+                          }
+                          className="w-full p-2 border border-gray-300 rounded z-[-1]"
+                          disabled={!row.rebate}
+                        >
+                          <option value="true">Yes</option>
+                          <option value="false">No</option>
+                        </select>
+                      </td>
 
-                    <td className="border border-gray-300 px-4 py-2">
-                      <select
-                        value={row?.connectionSize.id || ""}
-                        onChange={
-                          (e) => handleInputChange(e, index, "connectionSize") // Pass 'category_id' instead of 'category_name'
-                        }
-                        className="w-full p-2 border border-gray-300 rounded"
-                      >
-                        <option>Select Connection Size</option>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <select
+                          value={row?.connectionSize.id || ""}
+                          onChange={
+                            (e) => handleInputChange(e, index, "connectionSize") // Pass 'category_id' instead of 'category_name'
+                          }
+                          className="w-full p-2 border border-gray-300 rounded"
+                        >
+                          <option>Select Connection Size</option>
 
-                        {connectionSize?.map((conn) => (
-                          <option key={conn.id} value={conn.id}>
-                            {conn.size}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
+                          {connectionSize?.map((conn) => (
+                            <option key={conn.id} value={conn.id}>
+                              {conn.size}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
 
-                    {/* Set the lastRDG value directly here */}
-                    <td className="border border-gray-300 px-4 py-2">
-                      {row.lastRDG ? row.lastRDG : "Set Value Here"}
-                    </td>
+                      {/* Set the lastRDG value directly here */}
+                      <td className="border border-gray-300 px-4 py-2">
+                        {row.lastRDG ? row.lastRDG : "Set Value Here"}
+                      </td>
 
-                    <td className="border border-gray-300 px-4 py-2">
-                      {row.accountNumber}
-                    </td>
-                    {secondReading === 1 ? (
-                      <>
-                        {" "}
-                        <td className="border border-gray-300 px-4 py-2">
-                          <div className="flex justify-between">
-                            <input
-                              type="text"
-                              value={row.prevMonth.reading}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "prevMonth",
-                                  "reading"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            />
+                      <td className="border border-gray-300 px-4 py-2">
+                        {row.accountNumber}
+                      </td>
+                      {secondReading === 1 ? (
+                        <>
+                          <td className="border border-gray-300 px-4 py-2">
+                            <div className="flex justify-between">
+                              <input
+                                type="text"
+                                value={row.prevMonth.reading}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (/^\d*$/.test(value)) {
+                                    handleInputChange(
+                                      e,
+                                      index,
+                                      "prevMonth",
+                                      "reading"
+                                    );
+                                  }
+                                }}
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              />
 
-                            <select
-                              value={row.prevMonth.meter_status_id?.id || ""}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "prevMonth",
-                                  "meter_status_id"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            >
-                              <option>Select Meter Status</option>
-                              {meterStatus.map((status) => (
-                                <option key={status.id} value={status.id}>
-                                  {status.meter_status}
-                                </option>
-                              ))}
-                            </select>
-                            <input
-                              type="text"
-                              value={row.prevMonth.consumption}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "prevMonth",
-                                  "consumption"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            />
-                            <select
-                              value={row.prevMonth.cw ? "true" : "false"}
-                              onChange={(e) =>
-                                handleInputChange(e, index, "prevMonth", "cw")
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                              // disabled={!row.prevMonth.cw}
+                              <select
+                                value={row.prevMonth.meter_status_id?.id || ""}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    e,
+                                    index,
+                                    "prevMonth",
+                                    "meter_status_id"
+                                  )
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              >
+                                <option>Select Meter Status</option>
+                                {meterStatus.map((status) => (
+                                  <option key={status.id} value={status.id}>
+                                    {status.meter_status}
+                                  </option>
+                                ))}
+                              </select>
 
-                            >
-                              <option value="true">Yes</option>
-                              <option value="false">No</option>
-                            </select>
-                          </div>
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2">
-                          <div className="flex justify-between">
-                            <input
-                              type="text"
-                              value={row.currMonth.reading}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "currMonth",
-                                  "reading"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            />
-                            <select
-                              value={row.currMonth.meter_status_id?.id || ""}
-                              // value={row.currMonth.meter_status_id}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "currMonth",
-                                  "meter_status_id"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            >
-                              <option>Select Meter Status</option>
-                              {meterStatus.map((status) => (
-                                <option key={status.id} value={status.id}>
-                                  {status.meter_status}
-                                </option>
-                              ))}
-                            </select>
-                            <input
+                              <input
+                                type="text"
+                                value={
+                                  row.prevMonth.consumption === undefined
+                                    ? "" // Show an empty string if consumption is 0 or undefined
+                                    : row.prevMonth.consumption
+                                }
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    e,
+                                    index,
+                                    "prevMonth",
+                                    "consumption"
+                                  )
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              />
+
+                              {/* <input
                               type="text"
                               value={row.currMonth.consumption}
                               onChange={(e) =>
@@ -750,89 +739,187 @@ const Reading: React.FC = () => {
                                 )
                               }
                               className="text-sm w-[50px] border border-gray-300 p-1"
-                            />
-                            <select
-                              value={row.currMonth.cw ? "true" : "false"}
-                              onChange={(e) =>
-                                handleInputChange(e, index, "currMonth", "cw")
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                              // disabled={!row.currMonth.cw}
+                            /> */}
+                              <select
+                                value={row.prevMonth.cw ? "true" : "false"}
+                                onChange={(e) =>
+                                  handleInputChange(e, index, "currMonth", "cw")
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1 z-[-1]"
+                                disabled={!row.currMonth.cw}
+                              >
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                              </select>
+                            </div>
+                            {errors < row.lastRDG ? (
+                              <p style={{ color: "red", fontSize: "10px" }}>
+                                Enter reading more than last reading
+                              </p>
+                            ) : (
+                              ""
+                            )}
+                          </td>
 
-                            >
-                              <option value="true">Yes</option>
-                              <option value="false">No</option>
-                            </select>
-                          </div>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="border border-gray-300 px-4 py-2">
-                          <div className="flex justify-between">
-                            <input
-                              type="text"
-                              value={row.currMonth.reading}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "currMonth",
-                                  "reading"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            />
-                            <select
-                              value={row.currMonth.meter_status_id?.id || ""}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "currMonth",
-                                  "meter_status_id"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            >
-                              <option>Select Meter Status</option>
-                              {meterStatus.map((status) => (
-                                <option key={status.id} value={status.id}>
-                                  {status.meter_status}
-                                </option>
-                              ))}
-                            </select>
-                            <input
-                              type="text"
-                              value={row.currMonth.consumption}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  e,
-                                  index,
-                                  "currMonth",
-                                  "consumption"
-                                )
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                            />
-                            <select
-                              value={row.currMonth.cw ? "true" : "false"}
-                              onChange={(e) =>
-                                handleInputChange(e, index, "currMonth", "cw")
-                              }
-                              className="text-sm w-[50px] border border-gray-300 p-1"
-                              // disabled={!row.currMonth.cw}
+                          <td className="border border-gray-300 px-4 py-2">
+                            <div className="flex justify-between">
+                              <input
+                                type="text"
+                                value={row.currMonth.reading}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (/^\d*$/.test(value)) {
+                                    handleInputChange(
+                                      e,
+                                      index,
+                                      "currMonth",
+                                      "reading"
+                                    );
+                                  }
+                                }}
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              />
 
-                            >
-                              <option value="true">Yes</option>
-                              <option value="false">No</option>
-                            </select>
-                          </div>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                ))}
+                              <select
+                                value={row.currMonth.meter_status_id?.id || ""}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    e,
+                                    index,
+                                    "currMonth",
+                                    "meter_status_id"
+                                  )
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              >
+                                <option>Select Meter Status</option>
+                                {meterStatus.map((status) => (
+                                  <option key={status.id} value={status.id}>
+                                    {status.meter_status}
+                                  </option>
+                                ))}
+                              </select>
+
+                              <input
+                                type="text"
+                                value={
+                                  row.currMonth.consumption !== undefined
+                                    ? row.currMonth.consumption
+                                    : ""
+                                }
+                                // value={row.currMonth.consumption}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    e,
+                                    index,
+                                    "currMonth",
+                                    "consumption"
+                                  )
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              />
+                              <select
+                                value={row.currMonth.cw ? "true" : "false"}
+                                onChange={(e) =>
+                                  handleInputChange(e, index, "currMonth", "cw")
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1 z-[-1]"
+                                // disabled={!row.currMonth.cw}
+                              >
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                              </select>
+                            </div>
+                            {errors < row.lastRDG ? (
+                              <p style={{ color: "red", fontSize: "10px" }}>
+                                Enter reading more than last reading
+                              </p>
+                            ) : (
+                              ""
+                            )}
+                          </td>
+                          
+                        </>
+                      ) : (
+                        <>
+                          <td className="border border-gray-300 px-4 py-2">
+                            <div className="flex justify-between">
+                              <input
+                                type="text"
+                                value={row.currMonth.reading}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    e,
+                                    index,
+                                    "currMonth",
+                                    "reading"
+                                  )
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              />
+                              <select
+                                value={row.currMonth.meter_status_id?.id || ""}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    e,
+                                    index,
+                                    "currMonth",
+                                    "meter_status_id"
+                                  )
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              >
+                                <option>Select Meter Status</option>
+                                {meterStatus.map((status) => (
+                                  <option key={status.id} value={status.id}>
+                                    {status.meter_status}
+                                  </option>
+                                ))}
+                              </select>
+
+                              <input
+                                type="text"
+                                value={
+                                  row.currMonth.consumption !== undefined
+                                    ? row.currMonth.consumption
+                                    : ""
+                                }
+                                // value={row.currMonth.consumption}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    e,
+                                    index,
+                                    "currMonth",
+                                    "consumption"
+                                  )
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1"
+                              />
+                              <select
+                                value={row.currMonth.cw ? "true" : "false"}
+                                onChange={(e) =>
+                                  handleInputChange(e, index, "currMonth", "cw")
+                                }
+                                className="text-sm w-[50px] border border-gray-300 p-1  z-[-1]"
+                                disabled={!row.currMonth.cw}
+                              >
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                              </select>
+                            </div>
+                            {errors < row.lastRDG ? (
+                              <p style={{ color: "red", fontSize: "10px" }}>
+                                Enter reading more than last reading
+                              </p>
+                            ) : (
+                              ""
+                            )}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
