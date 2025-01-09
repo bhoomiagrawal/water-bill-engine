@@ -95,14 +95,14 @@ const Reading: React.FC = () => {
       readingStatus: "",
       prevMonth: {
         reading: "",
-        meter_status_id: { id: "", meter_status: "" },
+        meter_status_id: { id: "1", meter_status: "mf" },
         consumption: "",
         reading_date: "2025-01-07",
         cw: false,
       },
       currMonth: {
         reading: "",
-        meter_status_id: { id: "", meter_status: "" },
+        meter_status_id: { id: "1", meter_status: "mf" },
         reading_date: "2025-01-07",
         consumption: "",
         cw: false,
@@ -110,7 +110,6 @@ const Reading: React.FC = () => {
     },
   ]);
 
-  console.log("rows123", rows);
 
   const [categores, setCategores] = useState<Category[]>([]);
   const [meterStatus, setMeterStatus] = useState<MeterStatus[]>([]);
@@ -171,29 +170,6 @@ const Reading: React.FC = () => {
     });
   }, [rows]);
 
-  // const handleChange = (rowIndex: number, field: string, value: any) => {
-  //   const updatedRows = [...rows];
-  //   const updatedRow = { ...updatedRows[rowIndex] };
-
-  //   if (field === "currMonth" || field === "prevMonth") {
-  //     updatedRow[field] = { ...updatedRow[field], ...value };
-  //   } else {
-  //     updatedRow[field] = value;
-  //   }
-
-  //   if (field === "prevMonth" || field === "currMonth") {
-  //     const firstMonthReading = updatedRow.prevMonth.reading;
-  //     const secondMonthReading = updatedRow.currMonth.reading;
-
-  //     updatedRow.prevMonth.consumption = firstMonthReading - updatedRow.lastRDG;
-  //     updatedRow.currMonth.consumption =secondMonthReading - updatedRow.lastRDG;
-  //   }
-
-  //   updatedRows[rowIndex] = updatedRow;
-  //   setRows(updatedRows);
-  // };
-
-  // handleInputChange function
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     rowIndex: number,
@@ -201,8 +177,7 @@ const Reading: React.FC = () => {
     subField?: string
   ) => {
     let value: any;
-  console.log("subField",subField)
-    // First check if the target is an HTMLSelectElement
+    console.log("subField", subField);
     if (e.target instanceof HTMLSelectElement) {
       if (field === "category") {
         const selectedCategory = categores?.find(
@@ -220,7 +195,7 @@ const Reading: React.FC = () => {
         const selectedConnectionSize = connectionSize?.find(
           (cat) => cat.id === Number(e.target.value) // Ensure Number conversion for comparison
         );
-  
+
         if (selectedConnectionSize) {
           value = {
             id: selectedConnectionSize.id,
@@ -241,12 +216,16 @@ const Reading: React.FC = () => {
         } else {
           value = { id: "", size: "" };
         }
-      } else if (field === "sewerage" || field === "stpCharges" || subField ==="cw") {
+      } else if (
+        field === "sewerage" ||
+        field === "stpCharges" ||
+        subField === "cw"
+      ) {
         value = e.target.value === "true";
       } else {
         value = e.target.value;
       }
-    } 
+    }
     // If target is an HTMLInputElement (like a text input or number input)
     else if (e.target instanceof HTMLInputElement) {
       if (e.target.type === "number") {
@@ -258,23 +237,23 @@ const Reading: React.FC = () => {
       // This is a fallback if the target is neither input nor select
       // value = e.target.value;
     }
-  
+
     setErrors(e.target.value);
-  
+
     const updatedRows = [...rows];
     const updatedRow = { ...updatedRows[rowIndex] };
     console.log("updatedRow", updatedRow.prevMonth.consumption);
-  
+
     if (subField) {
       updatedRow[field] = { ...updatedRow[field], [subField]: value };
     } else {
       updatedRow[field] = value;
     }
-  
+
     if (field === "prevMonth" || field === "currMonth") {
       const firstMonthReading = updatedRow.prevMonth.reading || 0;
       const secondMonthReading = updatedRow.currMonth.reading || 0;
-  
+
       if (firstMonthReading === 0 && secondMonthReading === 0) {
         updatedRow.prevMonth.consumption = undefined;
         updatedRow.currMonth.consumption = undefined;
@@ -285,7 +264,7 @@ const Reading: React.FC = () => {
         } else {
           updatedRow.prevMonth.consumption = undefined;
         }
-  
+
         if (secondMonthReading !== 0) {
           updatedRow.currMonth.consumption =
             secondMonthReading - updatedRow.lastRDG;
@@ -294,13 +273,10 @@ const Reading: React.FC = () => {
         }
       }
     }
-  
+
     updatedRows[rowIndex] = updatedRow;
     setRows(updatedRows);
   };
-  
-  
-  
 
   const handleGenerateBill = () => {
     if (secondReading === 1) {
@@ -689,7 +665,13 @@ const Reading: React.FC = () => {
                               />
 
                               <select
-                                value={row.prevMonth.meter_status_id?.id || ""}
+                                value={
+                                  row.prevMonth.meter_status_id?.id ||
+                                  meterStatus.find(
+                                    (status) => status.meter_status === "mf"
+                                  )?.id ||
+                                  ""
+                                }
                                 onChange={(e) =>
                                   handleInputChange(
                                     e,
@@ -700,7 +682,9 @@ const Reading: React.FC = () => {
                                 }
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               >
-                                <option>Select Meter Status</option>
+                                <option value="" disabled>
+                                  Select Meter Status
+                                </option>
                                 {meterStatus.map((status) => (
                                   <option key={status.id} value={status.id}>
                                     {status.meter_status}
@@ -726,7 +710,6 @@ const Reading: React.FC = () => {
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
 
-                              
                               <select
                                 value={row.prevMonth.cw ? "true" : "false"}
                                 onChange={(e) =>
@@ -768,7 +751,13 @@ const Reading: React.FC = () => {
                               />
 
                               <select
-                                value={row.currMonth.meter_status_id?.id || ""}
+                                value={
+                                  row.currMonth.meter_status_id?.id ||
+                                  meterStatus.find(
+                                    (status) => status.meter_status === "mf"
+                                  )?.id ||
+                                  ""
+                                }
                                 onChange={(e) =>
                                   handleInputChange(
                                     e,
@@ -779,7 +768,9 @@ const Reading: React.FC = () => {
                                 }
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               >
-                                <option>Select Meter Status</option>
+                                <option value="" disabled>
+                                  Select Meter Status
+                                </option>
                                 {meterStatus.map((status) => (
                                   <option key={status.id} value={status.id}>
                                     {status.meter_status}
@@ -825,7 +816,6 @@ const Reading: React.FC = () => {
                               ""
                             )} */}
                           </td>
-                          
                         </>
                       ) : (
                         <>

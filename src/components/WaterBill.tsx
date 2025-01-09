@@ -12,7 +12,7 @@ const WaterBill: React.FC<WaterBillProps> = ({
   reponse,
   payload,
 }) => {
-console.log("reponse44",reponse)
+console.log("reponse44",payload)
 ;
   const formattedDateCurrent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const currentMonthData = new Date(reponse?.detailsByMonth[0]?.reading_date).toLocaleDateString('en-US', {
@@ -121,7 +121,7 @@ console.log("reponse44",reponse)
                             मीटर की स्थिति/ मालिक
                           </strong>
                         </td>
-                        <td className="border border-[#6666d7]  ">{payload[0]?.currMonth?.meter_status_id?.name}</td>
+                        <td className="border border-[#6666d7]  ">{payload[0]?.currMonth?.meter_status_id?.name ?payload[0]?.currMonth?.meter_status_id?.name:payload[0]?.currMonth?.meter_status_id?.meter_status}</td>
                         <td className="border border-[#6666d7]  ">
                           <strong className=" text-[#6666d7]">
                             मीटर क्रमांक
