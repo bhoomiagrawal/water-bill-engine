@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import StoreProvider from "./provider";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,6 +23,7 @@ export default function RootLayout({
   }, []);
 
   return (
+    <StoreProvider>
     <html lang="en">
       <body suppressHydrationWarning={true}>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
@@ -43,5 +44,6 @@ export default function RootLayout({
         />
       </body>
     </html>
+    </StoreProvider>
   );
 }

@@ -4,10 +4,9 @@ import WaterBill from "@/components/WaterBill";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { error } from "console";
 
 interface Meter_status_id {
-  id: string;
+  id: number;
   name: string;
 }
 interface prevMonth {
@@ -52,26 +51,26 @@ interface ConnectionSize {
   size: string;
 }
 
-interface Row {
-  id: number;
-  accountNumber: string;
-  consumerInfo: string;
-  category: Category_id;
-  sewerage: boolean;
-  stpCharges: boolean;
-  rebate: boolean;
-  connectionSize: ConnectionSize;
-  lastRDG: number;
-  readingStatus: string;
-  prevMonth: prevMonth;
-  currMonth: currMonth;
-  // readingDateI: string; // Added readingDateI
-  // readingDateII: string; // Added readingDateII
-}
+// interface Row {
+//   id: number;
+//   accountNumber: string;
+//   consumerInfo: string;
+//   category: Category_id;
+//   sewerage: boolean;
+//   stpCharges: boolean;
+//   rebate: boolean;
+//   connectionSize: ConnectionSize;
+//   lastRDG: number;
+//   readingStatus: string;
+//   prevMonth: prevMonth;
+//   currMonth: currMonth;
+//   // readingDateI: string; // Added readingDateI
+//   // readingDateII: string; // Added readingDateII
+// }
 
-const d = new Date();
+const formattedDate = new Date().toISOString().split("T")[0];
 
-const formattedDate = d.toISOString().split("T")[0];
+// Split the date into year, month, and day (YYYY-MM-DD format)
 
 const Reading: React.FC = () => {
   const router = useRouter();
@@ -81,6 +80,78 @@ const Reading: React.FC = () => {
   const [payload, setPayload] = useState({});
   const [errors, setErrors] = useState("");
   // console.log("errors66",errors)
+  const formattedDate = new Date().toISOString().split("T")[0];
+  const [date,setData] =useState(formattedDate)
+
+  // const [rows, setRows] = useState<Partial<any>[]>([
+  //   {
+  //     id: 1,
+  //     accountNumber: "1",
+  //     consumerInfo: "MOTWANI ARJUN F-316 VASHALI NAGAR",
+  //     category: { id: "", name: "" },
+  //     sewerage: false,
+  //     stpCharges: false,
+  //     rebate: false,
+  //     connectionSize: { id: "", size: "" },
+  //     lastRDG: 20000,
+  //     readingStatus: "",
+  //     date: formattedDate, // Correctly formatted date (YYYY-MM-DD)
+  //     prevMonth: {
+  //       reading: "",
+  //       meter_status_id: { id: "1", meter_status: "mf" },
+  //       consumption: "",
+  //       reading_date: "2025-01-07",
+  //       cw: false,
+  //     },
+  //     currMonth: {
+  //       reading: "",
+  //       meter_status_id: { id: "1", meter_status: "mf" },
+  //       reading_date: "2025-01-07",
+  //       consumption: "",
+  //       cw: false,
+  //     },
+  //   },
+  // ]);
+
+  // console.log("rows333", rows[0]?.date);
+
+  // const formattedDate = new Date().toISOString().split("T")[0];
+
+  const [Cyear, Cmonth, Cday] = date.split("-").map(Number);
+  const Cdate = new Date(Cyear, Cmonth - 1, Cday);
+  Cdate.setMonth(Cdate.getMonth() - 1);
+  const CnewDay = String(Cdate.getDate()).padStart(2, "0");
+  const CnewMonth = String(Cdate.getMonth() + 1).padStart(2, "0");
+  const CnewYear = Cdate.getFullYear();
+  const CnextFormattedDate = `${CnewDay}/${CnewMonth}/${CnewYear}`;
+  console.log("here1", CnextFormattedDate);
+
+  const CnewMonthName = Cdate.toLocaleString("en", { month: "long" }); // Get full month name
+
+  const currMonthDate = new Date(Cdate);
+  currMonthDate.setMonth(currMonthDate.getMonth() - 1);
+  const currMonthName = currMonthDate.toLocaleString("en", { month: "short" });
+  const currMonthYear = currMonthDate.getFullYear();
+  const curreMonthFormatted = `${currMonthName}/${currMonthYear}`;
+
+  // console.log("gggggggg: ", curreMonthFormatted); // Output: "Oct/2024"
+
+  const [Pyear, Pmonth, Pday] = date.split("-").map(Number);
+  const Pdate = new Date(Pyear, Pmonth - 1, Pday);
+  Pdate.setMonth(Pdate.getMonth() - 2);
+  const PnewDay = String(Pdate.getDate()).padStart(2, "0");
+  const PnewMonth = String(Pdate.getMonth() + 1).padStart(2, "0");
+  const PnewYear = Pdate.getFullYear();
+  const PnewMonthName = Pdate.toLocaleString("en", { month: "long" });
+  const PnextFormattedDate = `${PnewDay}/${PnewMonth}/${PnewYear}`;
+  const prevMonthDate = new Date(Pdate);
+  prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
+  const prevMonthName = prevMonthDate.toLocaleString("en", { month: "short" });
+  const prevMonthYear = prevMonthDate.getFullYear();
+  const prevMonthFormatted = `${prevMonthName}/${prevMonthYear}`;
+
+  // console.log("here2", PnextFormattedDate);
+
   const [rows, setRows] = useState<Partial<any>[]>([
     {
       id: 1,
@@ -93,23 +164,48 @@ const Reading: React.FC = () => {
       connectionSize: { id: "", size: "" },
       lastRDG: 20000,
       readingStatus: "",
+      // date: formattedDate, // Correctly formatted date (YYYY-MM-DD)
       prevMonth: {
         reading: "",
         meter_status_id: { id: "1", meter_status: "mf" },
         consumption: "",
-        reading_date: "2025-01-07",
+        reading_date: PnextFormattedDate,
         cw: false,
       },
       currMonth: {
         reading: "",
         meter_status_id: { id: "1", meter_status: "mf" },
-        reading_date: "2025-01-07",
+        reading_date: CnextFormattedDate,
         consumption: "",
         cw: false,
       },
     },
   ]);
 
+  const [meterStatusDataPrev, setMeterStatusDataPrev] = useState("");
+  const [meterStatusDataCurr, setMeterStatusDataCurr] = useState("");
+  console.log("rows333", meterStatusDataPrev); // Accessing the correct property
+
+
+
+  // // Extract year, month, and day from rows[0].date
+  // const [Lyear, LPmonth, Lday] = PnextFormattedDate.split("-").map(Number);
+
+  // // Create a new Date object using the extracted values
+  // const Ldate = new Date(Lyear, LPmonth - 1, Lday); // Months are 0-based
+
+  // // Increment the month by 1
+  // Pdate.setMonth(Pdate.getMonth() + 1);
+
+  // // Get the full month name (e.g., "December") and year
+  // const LPnewMonthName = Ldate.toLocaleString("en", { month: "short" }); // Get abbreviated month name (e.g., "Dec")
+  // const LPnewYear = Ldate.getFullYear();
+
+  // const LPnextFormattedDate = `${LPnewMonthName}/${LPnewYear}`;
+
+  // console.log("77777", LPnextFormattedDate); // Output: "Dec/2024"
+
+  // console.log("77777", nextFormattedDate);
 
   const [categores, setCategores] = useState<Category[]>([]);
   const [meterStatus, setMeterStatus] = useState<MeterStatus[]>([]);
@@ -165,10 +261,22 @@ const Reading: React.FC = () => {
   }, [resultConnectionSize]);
 
   useEffect(() => {
-    rows.map((item) => {
-      return setSetSecondReading(item.category.id);
-    });
+    rows.map((item) => setSetSecondReading(item.category.id));
   }, [rows]);
+
+  useEffect(() => {
+    rows.map((item) =>
+      setMeterStatusDataPrev(item?.prevMonth?.meter_status_id?.id)
+    );
+  }, [rows]);
+
+  useEffect(() => {
+    rows.map((item) =>
+      setMeterStatusDataCurr(item?.currMonth?.meter_status_id?.id)
+    );
+  }, [rows]);
+
+  console.log("rows44", rows);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -177,45 +285,29 @@ const Reading: React.FC = () => {
     subField?: string
   ) => {
     let value: any;
-    console.log("subField", subField);
+  
     if (e.target instanceof HTMLSelectElement) {
       if (field === "category") {
         const selectedCategory = categores?.find(
-          (cat) => cat.id === Number(e.target.value) // Ensure Number conversion for comparison
+          (cat) => cat.id === Number(e.target.value)
         );
-        if (selectedCategory) {
-          value = {
-            id: selectedCategory.id,
-            name: selectedCategory.category_name,
-          };
-        } else {
-          value = { id: "", name: "" };
-        }
+        value = selectedCategory
+          ? { id: selectedCategory.id, name: selectedCategory.category_name }
+          : { id: "", name: "" };
       } else if (field === "connectionSize") {
         const selectedConnectionSize = connectionSize?.find(
-          (cat) => cat.id === Number(e.target.value) // Ensure Number conversion for comparison
+          (cat) => cat.id === Number(e.target.value)
         );
-
-        if (selectedConnectionSize) {
-          value = {
-            id: selectedConnectionSize.id,
-            name: selectedConnectionSize.size,
-          };
-        } else {
-          value = { id: "", size: "" };
-        }
+        value = selectedConnectionSize
+          ? { id: selectedConnectionSize.id, name: selectedConnectionSize.size }
+          : { id: "", size: "" };
       } else if (subField === "meter_status_id") {
         const selectedMeterStatus = meterStatus?.find(
-          (cat) => cat.id === Number(e.target.value) // Ensure Number conversion for comparison
+          (cat) => cat.id === Number(e.target.value)
         );
-        if (selectedMeterStatus) {
-          value = {
-            id: selectedMeterStatus.id,
-            name: selectedMeterStatus.meter_status,
-          };
-        } else {
-          value = { id: "", size: "" };
-        }
+        value = selectedMeterStatus
+          ? { id: selectedMeterStatus.id, name: selectedMeterStatus.meter_status }
+          : { id: "", size: "" };
       } else if (
         field === "sewerage" ||
         field === "stpCharges" ||
@@ -224,59 +316,83 @@ const Reading: React.FC = () => {
         value = e.target.value === "true";
       } else {
         value = e.target.value;
+      
       }
+    } else if (e.target instanceof HTMLInputElement) {
+      value = e.target.type === "number" ? parseFloat(e.target.value) : e.target.value;
     }
-    // If target is an HTMLInputElement (like a text input or number input)
-    else if (e.target instanceof HTMLInputElement) {
-      if (e.target.type === "number") {
-        value = parseFloat(e.target.value); // For number input types
+  
+    setRows((prevRows) => {
+      const updatedRows = [...prevRows];
+      const updatedRow = { ...updatedRows[rowIndex] };
+  
+      if (subField) {
+        updatedRow[field] = { ...updatedRow[field], [subField]: value };
       } else {
-        value = e.target.value;
+        updatedRow[field] = value;
       }
-    } else {
-      // This is a fallback if the target is neither input nor select
-      // value = e.target.value;
-    }
-
-    setErrors(e.target.value);
-
-    const updatedRows = [...rows];
-    const updatedRow = { ...updatedRows[rowIndex] };
-    console.log("updatedRow", updatedRow.prevMonth.consumption);
-
-    if (subField) {
-      updatedRow[field] = { ...updatedRow[field], [subField]: value };
-    } else {
-      updatedRow[field] = value;
-    }
-
-    if (field === "prevMonth" || field === "currMonth") {
-      const firstMonthReading = updatedRow.prevMonth.reading || 0;
-      const secondMonthReading = updatedRow.currMonth.reading || 0;
-
-      if (firstMonthReading === 0 && secondMonthReading === 0) {
-        updatedRow.prevMonth.consumption = undefined;
-        updatedRow.currMonth.consumption = undefined;
-      } else {
-        if (firstMonthReading !== 0) {
-          updatedRow.prevMonth.consumption =
-            firstMonthReading - updatedRow.lastRDG;
+  
+      if (field === "prevMonth" || field === "currMonth") {
+        // Always get the latest meter status values
+        if (Number(meterStatusDataPrev) !== 1 && Number(meterStatusDataCurr) !== 1) {
+          // Set reading and consumption to 0 when meter status is not 1
+          updatedRow.prevMonth.reading = 0;
+          updatedRow.currMonth.reading = 0;
+          updatedRow.prevMonth.consumption = 0;
+          updatedRow.currMonth.consumption = 0;
         } else {
-          updatedRow.prevMonth.consumption = undefined;
-        }
-
-        if (secondMonthReading !== 0) {
-          updatedRow.currMonth.consumption =
-            secondMonthReading - updatedRow.lastRDG;
-        } else {
-          updatedRow.currMonth.consumption = undefined;
+          // Perform consumption calculations
+          const firstMonthReading = updatedRow.prevMonth.reading || 0;
+          const secondMonthReading = updatedRow.currMonth.reading || 0;
+  
+          if (firstMonthReading === 0 && secondMonthReading === 0) {
+            updatedRow.prevMonth.consumption = undefined;
+            updatedRow.currMonth.consumption = undefined;
+          } else {
+            updatedRow.prevMonth.consumption =
+              firstMonthReading !== 0
+                ? firstMonthReading - updatedRow.lastRDG
+                : undefined;
+            updatedRow.currMonth.consumption =
+              secondMonthReading !== 0
+                ? secondMonthReading - updatedRow.lastRDG
+                : undefined;
+          }
         }
       }
-    }
-
-    updatedRows[rowIndex] = updatedRow;
-    setRows(updatedRows);
+  
+      updatedRows[rowIndex] = updatedRow;
+      return updatedRows;
+    });
   };
+  
+  useEffect(() => {
+    setRows((prevRows) => {
+      return prevRows.map((row) => {
+        if (
+          Number(meterStatusDataPrev) !== 1 &&
+          Number(meterStatusDataCurr) !== 1
+        ) {
+          return {
+            ...row,
+            prevMonth: {
+              ...row.prevMonth,
+              reading: 0,
+              consumption: 0,
+            },
+            currMonth: {
+              ...row.currMonth,
+              reading: 0,
+              consumption: 0,
+            },
+          };
+        }
+        return row;
+      });
+    });
+  }, [meterStatusDataPrev, meterStatusDataCurr]);
+  
+  
 
   const handleGenerateBill = () => {
     if (secondReading === 1) {
@@ -375,7 +491,7 @@ const Reading: React.FC = () => {
     <>
       {waterBillOpen && (
         <WaterBill
-          setWaterBillOpen={setWaterBillOpen} // Ensure this properly closes the modal
+          setWaterBillOpen={setWaterBillOpen}
           reponse={billData}
           payload={payload}
         />
@@ -396,7 +512,18 @@ const Reading: React.FC = () => {
                     colSpan={2}
                     className="border border-gray-300 px-4 py-2 text-left"
                   >
-                    {/* JUL 24 */}
+                    Bill Issueing Bi Month
+                  </td>
+                  <td
+                    colSpan={2}
+                    className="border border-gray-300 px-4 py-2 text-left"
+                  >
+                    <input
+                      type="date"
+                      value={date || formattedDate}
+                      onChange={(e) => setData(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded"
+                    />
                   </td>
                 </tr>
                 <tr>
@@ -413,9 +540,9 @@ const Reading: React.FC = () => {
                     colSpan={3}
                     className="border border-gray-300 px-4 py-2 text-left"
                   >
-                    {secondReading === 1
-                      ? "Last Rdg Date: Oct/2024"
-                      : "Last Rdg Date: Dec/2024"}
+                    {secondReading !== 1
+                      ? curreMonthFormatted
+                      : prevMonthFormatted}
                   </td>
                   {secondReading === 1 ? (
                     <>
@@ -426,7 +553,10 @@ const Reading: React.FC = () => {
                         <label className="block text-sm font-medium">
                           Reading Date(I):
                         </label>
-                        <input
+                        <p className="  bg-[#ebe7e7] py-2 text-center">
+                          {PnextFormattedDate}
+                        </p>
+                        {/* <input
                           type="date"
                           value={
                             rows[0]?.prevMonth?.reading_date || formattedDate
@@ -435,7 +565,7 @@ const Reading: React.FC = () => {
                             handleInputChange(e, 0, "prevMonth", "reading_date")
                           }
                           className="w-full p-2 border border-gray-300 rounded"
-                        />
+                        /> */}
                       </td>
 
                       <td
@@ -445,7 +575,11 @@ const Reading: React.FC = () => {
                         <label className="block text-sm font-medium">
                           Reading Date(II):
                         </label>
-                        <input
+                        <p className="  bg-[#ebe7e7] py-2 text-center">
+                          {CnextFormattedDate}
+                        </p>
+
+                        {/* <input
                           type="date"
                           value={
                             rows[0]?.currMonth?.reading_date || formattedDate
@@ -454,7 +588,7 @@ const Reading: React.FC = () => {
                             handleInputChange(e, 0, "currMonth", "reading_date")
                           }
                           className="w-full p-2 border border-gray-300 rounded"
-                        />
+                        /> */}
                       </td>
                     </>
                   ) : (
@@ -465,9 +599,13 @@ const Reading: React.FC = () => {
                         className="border border-gray-300 px-4 py-2 text-left"
                       >
                         <label className="block text-sm font-medium">
-                          Reading Date(II):
+                          Reading Date(I):
                         </label>
-                        <input
+                        <p className="  bg-[#ebe7e7] py-2 text-center">
+                          {CnextFormattedDate}
+                        </p>
+
+                        {/* <input
                           type="date"
                           value={
                             rows[0]?.currMonth?.reading_date || formattedDate
@@ -476,7 +614,7 @@ const Reading: React.FC = () => {
                             handleInputChange(e, 0, "currMonth", "reading_date")
                           }
                           className="w-full p-2 border border-gray-300 rounded"
-                        />
+                        /> */}
                       </td>
                     </>
                   )}
@@ -504,7 +642,9 @@ const Reading: React.FC = () => {
                     Size Connection
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
-                    Last RDG
+                    Last RDG ({  secondReading !== 1
+                      ? currMonthName
+                      : prevMonthName})
                     {/* , Cons/Stts */}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
@@ -514,7 +654,7 @@ const Reading: React.FC = () => {
                     <>
                       {" "}
                       <td className="border border-gray-300 px-4 py-2 text-left">
-                        <div className="font-bold">Previous Month </div>
+                        <div className="font-bold">{PnewMonthName} </div>
                         <div className="flex justify-between w-[200px]">
                           <div className="text-sm">Reading</div>
                           <div className="text-sm">Stts</div>
@@ -523,7 +663,7 @@ const Reading: React.FC = () => {
                         </div>
                       </td>
                       <td className="border border-gray-300 px-4 py-2 text-left">
-                        <div className="font-bold">Current Month</div>
+                        <div className="font-bold">{CnewMonthName}</div>
                         <div className="flex justify-between w-[200px]">
                           <div className="text-sm">Reading</div>
                           <div className="text-sm">Stts</div>
@@ -536,7 +676,7 @@ const Reading: React.FC = () => {
                     <>
                       {" "}
                       <td className="border border-gray-300 px-4 py-2 text-left">
-                        <div className="font-bold">Current Month</div>
+                        <div className="font-bold">{CnewMonthName}</div>
                         <div className="flex justify-between w-[200px]">
                           <div className="text-sm">Reading</div>
                           <div className="text-sm">Stts</div>
@@ -649,7 +789,11 @@ const Reading: React.FC = () => {
                             <div className="flex justify-between">
                               <input
                                 type="text"
-                                value={row.prevMonth.reading}
+                                value={
+                                  Number(meterStatusDataPrev) !== 1
+                                    ? 0
+                                    : row.prevMonth.reading
+                                }
                                 onChange={(e) => {
                                   const value = e.target.value;
                                   if (/^\d*$/.test(value)) {
@@ -661,6 +805,7 @@ const Reading: React.FC = () => {
                                     );
                                   }
                                 }}
+                                disabled={Number(meterStatusDataPrev) !== 1}
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
 
@@ -695,9 +840,11 @@ const Reading: React.FC = () => {
                               <input
                                 type="text"
                                 value={
-                                  row.prevMonth.consumption === undefined
-                                    ? "" // Show an empty string if consumption is 0 or undefined
-                                    : row.prevMonth.consumption
+                                  Number(meterStatusDataPrev) !== 1 // If disabled
+                                    ? 0 // Set value to 0 when disabled
+                                    : row.prevMonth.consumption === undefined
+                                      ? "" // Show an empty string if consumption is undefined
+                                      : row.prevMonth.consumption // Show the actual consumption if enabled
                                 }
                                 onChange={(e) =>
                                   handleInputChange(
@@ -707,6 +854,7 @@ const Reading: React.FC = () => {
                                     "consumption"
                                   )
                                 }
+                                disabled={Number(meterStatusDataPrev) !== 1}
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
 
@@ -716,7 +864,6 @@ const Reading: React.FC = () => {
                                   handleInputChange(e, index, "prevMonth", "cw")
                                 }
                                 className="text-sm w-[50px] border border-gray-300 p-1 z-[1]"
-                                // disabled={!row.currMonth.cw}
                               >
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
@@ -735,7 +882,12 @@ const Reading: React.FC = () => {
                             <div className="flex justify-between">
                               <input
                                 type="text"
-                                value={row.currMonth.reading}
+                                value={
+                                  Number(meterStatusDataCurr) !== 1
+                                    ? 0
+                                    : row.currMonth.reading
+                                }
+                                // value={row.currMonth.reading}
                                 onChange={(e) => {
                                   const value = e.target.value;
                                   if (/^\d*$/.test(value)) {
@@ -747,6 +899,7 @@ const Reading: React.FC = () => {
                                     );
                                   }
                                 }}
+                                disabled={Number(meterStatusDataCurr) !== 1}
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
 
@@ -781,10 +934,17 @@ const Reading: React.FC = () => {
                               <input
                                 type="text"
                                 value={
-                                  row.currMonth.consumption !== undefined
-                                    ? row.currMonth.consumption
-                                    : ""
+                                  Number(meterStatusDataCurr) !== 1 // If disabled
+                                    ? 0 // Set value to 0 when disabled
+                                    : row.currMonth.consumption === undefined
+                                      ? "" // Show an empty string if consumption is undefined
+                                      : row.currMonth.consumption // Show the actual consumption if enabled
                                 }
+                                // value={
+                                //   row.currMonth.consumption !== undefined
+                                //     ? row.currMonth.consumption
+                                //     : ""
+                                // }
                                 // value={row.currMonth.consumption}
                                 onChange={(e) =>
                                   handleInputChange(
@@ -794,6 +954,7 @@ const Reading: React.FC = () => {
                                     "consumption"
                                   )
                                 }
+                                disabled={Number(meterStatusDataCurr) !== 1}
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
                               <select
@@ -823,15 +984,24 @@ const Reading: React.FC = () => {
                             <div className="flex justify-between">
                               <input
                                 type="text"
-                                value={row.currMonth.reading}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    e,
-                                    index,
-                                    "currMonth",
-                                    "reading"
-                                  )
+                                value={
+                                  Number(meterStatusDataCurr) !== 1
+                                    ? 0
+                                    : row.currMonth.reading
                                 }
+                                // value={row.currMonth.reading}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (/^\d*$/.test(value)) {
+                                    handleInputChange(
+                                      e,
+                                      index,
+                                      "currMonth",
+                                      "reading"
+                                    );
+                                  }
+                                }}
+                                disabled={Number(meterStatusDataCurr) !== 1}
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
                               <select
@@ -857,10 +1027,17 @@ const Reading: React.FC = () => {
                               <input
                                 type="text"
                                 value={
-                                  row.currMonth.consumption !== undefined
-                                    ? row.currMonth.consumption
-                                    : ""
+                                  Number(meterStatusDataCurr) !== 1 // If disabled
+                                    ? 0 // Set value to 0 when disabled
+                                    : row.currMonth.consumption === undefined
+                                      ? "" // Show an empty string if consumption is undefined
+                                      : row.currMonth.consumption // Show the actual consumption if enabled
                                 }
+                                // value={
+                                //   row.currMonth.consumption !== undefined
+                                //     ? row.currMonth.consumption
+                                //     : ""
+                                // }
                                 // value={row.currMonth.consumption}
                                 onChange={(e) =>
                                   handleInputChange(
@@ -870,6 +1047,7 @@ const Reading: React.FC = () => {
                                     "consumption"
                                   )
                                 }
+                                disabled={Number(meterStatusDataCurr) !== 1}
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
                               <select

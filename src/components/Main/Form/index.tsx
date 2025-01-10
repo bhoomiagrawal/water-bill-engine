@@ -123,17 +123,27 @@ const Form: React.FC<FormProps> = ({
               })}
 
               <div className="flex space-x-4">
-                <button
-                  onClick={(e) => onSubmitData(e)}
-                  type="submit"
-                  className={`w-25 rounded py-3 text-xl font-bold text-white transition ${
-                    dataHasChanged
-                      ? " bg-gray-600 hover:bg-gray-800"
-                      : "opacity-50 cursor-not-allowed bg-gray-600  "
-                  } `}
-                >
-                  {data.id ? "Update" : "Create"}
-                </button>
+              {data.id ? (
+                  <button
+                    onClick={(e) => onSubmitData(e)}
+                    type="submit"
+                    className={`w-25 rounded py-3 text-xl font-bold text-white transition ${
+                      dataHasChanged
+                        ? " bg-gray-600 hover:bg-gray-800"
+                        : "opacity-50 cursor-not-allowed bg-gray-600  "
+                    } `}
+                  >
+                    {data.id ? "Update" : "Create"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={(e) => onSubmitData(e)}
+                    type="submit"
+                    className="w-25 rounded bg-gray-600 py-3 text-xl font-bold text-white transition hover:bg-gray-800"
+                  >
+                    {data.id ? "Update" : "Create"}
+                  </button>
+                )}
 
                 <button
                   type="button"
