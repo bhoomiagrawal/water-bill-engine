@@ -434,7 +434,8 @@ console.log("dataForComputation",dataForComputation)
     subField?: string
   ) => {
     let value: any;
-    console.log("subField", field);
+  
+    // First check if the target is an HTMLSelectElement
     if (e.target instanceof HTMLSelectElement) {
       if (field === "category") {
         const selectedCategory = categores?.find(
@@ -454,27 +455,15 @@ console.log("dataForComputation",dataForComputation)
         const selectedMeterStatus = meterStatus?.find(
           (cat) => cat.id === Number(e.target.value)
         );
-        value = selectedMeterStatus
-          ? {
-              id: selectedMeterStatus.id,
-              name: selectedMeterStatus.meter_status,
-            }
-          : { id: "", size: "" };
-      } else if (field === "connection_type_id") {
-        const selectedConnectionType = connectionType?.find(
-          (conn) => conn.id === Number(e.target.value)
-        );
-        value = selectedConnectionType
-          ? {
-              id: selectedConnectionType.id,
-              name: selectedConnectionType.conn_type,
-            }
-          : { id: "", name: "" };
-      } else if (
-        field === "sewerage" ||
-        field === "stpCharges" ||
-        subField === "cw"
-      ) {
+        if (selectedMeterStatus) {
+          value = {
+            id: selectedMeterStatus.id,
+            name: selectedMeterStatus.meter_status,
+          };
+        } else {
+          value = { id: "", size: "" };
+        }
+      } else if (field === "sewerage" || field === "stpCharges") {
         value = e.target.value === "true";
       } else {
         value = e.target.value;
@@ -1214,6 +1203,19 @@ console.log("dataForComputation",dataForComputation)
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
 
+                              {/* <input
+                              type="text"
+                              value={row.currMonth.consumption}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e,
+                                  index,
+                                  "currMonth",
+                                  "consumption"
+                                )
+                              }
+                              className="text-sm w-[50px] border border-gray-300 p-1"
+                            /> */}
                               <select
                                 value={row.prevMonth.cw ? "true" : "false"}
                                 onChange={(e) =>
