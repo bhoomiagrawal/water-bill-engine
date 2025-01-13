@@ -4,6 +4,11 @@ import WaterBill from "@/components/WaterBill";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import ComputationSheet from "../ComputationSheet";
+// import { useSearchParams } from 'next/navigation';
+import { FaCloudDownloadAlt } from "react-icons/fa";
+import { FaFileDownload } from "react-icons/fa";
+
 
 interface Meter_status_id {
   id: number;
@@ -50,7 +55,10 @@ interface ConnectionSize {
   id: number;
   size: string;
 }
-
+interface ConnectionType {
+  id: number;
+  conn_type: string;
+}
 // interface Row {
 //   id: number;
 //   accountNumber: string;
@@ -78,11 +86,16 @@ const Reading: React.FC = () => {
 
   const [billData, setBillData] = useState({});
   const [payload, setPayload] = useState({});
+  const [ComputationSheetPayload,setComputationSheetPayload]=useState({})
   const [errors, setErrors] = useState("");
   // console.log("errors66",errors)
   const formattedDate = new Date().toISOString().split("T")[0];
-  const [date,setData] =useState(formattedDate)
-
+  const [dataForComputation,setDataForComputation]=useState({})
+console.log("dataForComputation",dataForComputation)
+  // const searchParams = useSearchParams();
+  // const id = searchParams.get('id');
+  // const name = searchParams.get('name');
+  // console.log("8888",id,name)
   // const [rows, setRows] = useState<Partial<any>[]>([
   //   {
   //     id: 1,
@@ -116,7 +129,9 @@ const Reading: React.FC = () => {
   // console.log("rows333", rows[0]?.date);
 
   // const formattedDate = new Date().toISOString().split("T")[0];
+  const [date, setData] = useState(formattedDate);
 
+  console.log("date999", date);
   const [Cyear, Cmonth, Cday] = date.split("-").map(Number);
   const Cdate = new Date(Cyear, Cmonth - 1, Cday);
   Cdate.setMonth(Cdate.getMonth() - 1);
@@ -150,11 +165,76 @@ const Reading: React.FC = () => {
   const prevMonthYear = prevMonthDate.getFullYear();
   const prevMonthFormatted = `${prevMonthName}/${prevMonthYear}`;
 
-  // console.log("here2", PnextFormattedDate);
+  console.log("here1", PnextFormattedDate);
+  console.log("here2", CnextFormattedDate);
+
+  const [newDate, setNewDate] = useState("");
+  // const [newPnextFormattedDate1, setPnextFormattedDate] = useState(PnextFormattedDate);
+  // const [newCnextFormattedDate2, setCnextFormattedDate] = useState(CnextFormattedDate);
+
+  // console.log("newPnextFormattedDate55555555555",newPnextFormattedDate1,newCnextFormattedDate2)
+  useEffect(() => {
+    setNewDate(date); // Update newDate whenever date changes
+  }, [date]);
+
+  useEffect(() => {
+    setPnextFormattedDate(PnextFormattedDate); // Update newDate whenever date changes
+  }, [PnextFormattedDate]);
+  useEffect(() => {
+    setCnextFormattedDate(CnextFormattedDate); // Update newDate whenever date changes
+  }, [CnextFormattedDate]);
+
+  const [newPnextFormattedDate1, setPnextFormattedDate] = useState(
+    PnextFormattedDate || ""
+  ); // Set default fallback value
+  const [newCnextFormattedDate2, setCnextFormattedDate] = useState(
+    CnextFormattedDate || ""
+  ); // Set default fallback value
+
+  console.log(
+    "newPnextFormattedDate55555555555",
+    newPnextFormattedDate1,
+    newCnextFormattedDate2
+  );
+
+  useEffect(() => {
+    setRows((prevRows) =>
+      prevRows.map((row) => ({
+        ...row,
+        prevMonth: {
+          ...row.prevMonth, // Spread the existing prevMonth object
+          reading_date: newPnextFormattedDate1, // Update the reading_date
+        },
+      }))
+    );
+  }, [newPnextFormattedDate1]); // Dependency on `newPnextFormattedDate1`
+
+  useEffect(() => {
+    setRows((prevRows) =>
+      prevRows.map((row) => ({
+        ...row,
+        currMonth: {
+          ...row.currMonth, // Spread the existing currMonth object
+          reading_date: newCnextFormattedDate2, // Update the reading_date
+        },
+      }))
+    );
+  }, [newCnextFormattedDate2]); // Dependency on `newCnextFormattedDate2`
+
+  useEffect(() => {
+    setRows((prevRows) =>
+      prevRows.map((row) => ({
+        ...row,
+        date: newDate, // Update the date field with the new date
+      }))
+    );
+  }, [newDate]); // Dependency on `newDate`
 
   const [rows, setRows] = useState<Partial<any>[]>([
     {
+      CIN: 140120613584,
       id: 1,
+      date: newDate, // This will remain as the initial empty string
       accountNumber: "1",
       consumerInfo: "MOTWANI ARJUN F-316 VASHALI NAGAR",
       category: { id: "", name: "" },
@@ -162,20 +242,20 @@ const Reading: React.FC = () => {
       stpCharges: false,
       rebate: false,
       connectionSize: { id: "", size: "" },
+      connection_type_id: { id: "", name: "" },
       lastRDG: 20000,
       readingStatus: "",
-      // date: formattedDate, // Correctly formatted date (YYYY-MM-DD)
       prevMonth: {
         reading: "",
-        meter_status_id: { id: "1", meter_status: "mf" },
+        meter_status: { id: "1", name: "mf" },
+        reading_date: newPnextFormattedDate1, // Initialize with default value
         consumption: "",
-        reading_date: PnextFormattedDate,
         cw: false,
       },
       currMonth: {
         reading: "",
-        meter_status_id: { id: "1", meter_status: "mf" },
-        reading_date: CnextFormattedDate,
+        meter_status: { id: "1", name: "mf" },
+        reading_date: newCnextFormattedDate2, // Initialize with default value
         consumption: "",
         cw: false,
       },
@@ -185,8 +265,6 @@ const Reading: React.FC = () => {
   const [meterStatusDataPrev, setMeterStatusDataPrev] = useState("");
   const [meterStatusDataCurr, setMeterStatusDataCurr] = useState("");
   console.log("rows333", meterStatusDataPrev); // Accessing the correct property
-
-
 
   // // Extract year, month, and day from rows[0].date
   // const [Lyear, LPmonth, Lday] = PnextFormattedDate.split("-").map(Number);
@@ -210,6 +288,9 @@ const Reading: React.FC = () => {
   const [categores, setCategores] = useState<Category[]>([]);
   const [meterStatus, setMeterStatus] = useState<MeterStatus[]>([]);
   const [connectionSize, setConnectionSize] = useState<ConnectionSize[]>([]);
+  const [connectionType, setConnectionType] = useState<ConnectionType[]>([]);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+
 
   const [secondReading, setSetSecondReading] = useState(1);
 
@@ -233,13 +314,27 @@ const Reading: React.FC = () => {
     ConnectionSizeresourceError,
   ] = useInternalService("connectionSize", "GET", null);
 
+  const [
+    fetchResourceConnectionType,
+    resourceResultConnectionType,
+    connectionTypeInProgress,
+    connectionTypeError,
+  ] = useInternalService("ConnectionType", "GET", null);
+
+  console.log("resourceResultConnectionType", resourceResultConnectionType);
+
   const [createBill, billResult, BillInProgress, BillError] =
     useInternalService("billing/generate-bill", "POST", null);
+
+    const [createBill1, billResult1, BillInProgress1, BillError1] =
+    useInternalService("billing/generate-bill", "POST", null);
+    // console.log("billResult",billResult)
 
   useEffect(() => {
     fetchResourceCategory();
     fetchResourceMeterStatus();
     fetchResourceConnectionSize();
+    fetchResourceConnectionType();
   }, []);
 
   useEffect(() => {
@@ -261,22 +356,76 @@ const Reading: React.FC = () => {
   }, [resultConnectionSize]);
 
   useEffect(() => {
-    rows.map((item) => setSetSecondReading(item.category.id));
+    if (resourceResultConnectionType?.data?.data?.connectionType) {
+      setConnectionType(resourceResultConnectionType.data.data?.connectionType);
+    }
+  }, [resourceResultConnectionType]);
+
+  useEffect(() => {
+    rows.map((item) => setSetSecondReading(item.category?.id));
   }, [rows]);
 
   useEffect(() => {
     rows.map((item) =>
-      setMeterStatusDataPrev(item?.prevMonth?.meter_status_id?.id)
+      setMeterStatusDataPrev(item?.prevMonth?.meter_status?.id)
     );
   }, [rows]);
 
   useEffect(() => {
     rows.map((item) =>
-      setMeterStatusDataCurr(item?.currMonth?.meter_status_id?.id)
+      setMeterStatusDataCurr(item?.currMonth?.meter_status?.id)
     );
   }, [rows]);
 
-  console.log("rows44", rows);
+  useEffect(() => {
+    if (secondReading) {
+      setRows((prevRows) =>
+        prevRows.map((row) => ({
+          ...row,
+          prevMonth: {
+            ...row.prevMonth,
+            reading: "",
+            consumption: "",
+          },
+          currMonth: {
+            ...row.currMonth,
+            reading: "",
+            consumption: "",
+          },
+        }))
+      );
+    }
+  }, [secondReading]);
+
+  console.log(meterStatusDataPrev, meterStatusDataCurr);
+
+  useEffect(() => {
+    if (secondReading) {
+      setRows((prevRows) =>
+        prevRows.map((row) => ({
+          ...row,
+          prevMonth: {
+            ...row.prevMonth,
+            meter_status: {
+              ...row.prevMonth.meter_status,
+              id: "1",
+              name: "mf",
+            },
+          },
+          currMonth: {
+            ...row.currMonth,
+            meter_status: {
+              ...row.currMonth.meter_status,
+              id: "1",
+              name: "mf",
+            },
+          },
+        }))
+      );
+    }
+  }, [secondReading]);
+
+  console.log("secondReading", secondReading);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -285,7 +434,7 @@ const Reading: React.FC = () => {
     subField?: string
   ) => {
     let value: any;
-  
+    console.log("subField", field);
     if (e.target instanceof HTMLSelectElement) {
       if (field === "category") {
         const selectedCategory = categores?.find(
@@ -301,13 +450,26 @@ const Reading: React.FC = () => {
         value = selectedConnectionSize
           ? { id: selectedConnectionSize.id, name: selectedConnectionSize.size }
           : { id: "", size: "" };
-      } else if (subField === "meter_status_id") {
+      } else if (subField === "meter_status") {
         const selectedMeterStatus = meterStatus?.find(
           (cat) => cat.id === Number(e.target.value)
         );
         value = selectedMeterStatus
-          ? { id: selectedMeterStatus.id, name: selectedMeterStatus.meter_status }
+          ? {
+              id: selectedMeterStatus.id,
+              name: selectedMeterStatus.meter_status,
+            }
           : { id: "", size: "" };
+      } else if (field === "connection_type_id") {
+        const selectedConnectionType = connectionType?.find(
+          (conn) => conn.id === Number(e.target.value)
+        );
+        value = selectedConnectionType
+          ? {
+              id: selectedConnectionType.id,
+              name: selectedConnectionType.conn_type,
+            }
+          : { id: "", name: "" };
       } else if (
         field === "sewerage" ||
         field === "stpCharges" ||
@@ -316,43 +478,66 @@ const Reading: React.FC = () => {
         value = e.target.value === "true";
       } else {
         value = e.target.value;
-      
       }
     } else if (e.target instanceof HTMLInputElement) {
-      value = e.target.type === "number" ? parseFloat(e.target.value) : e.target.value;
+      value =
+        e.target.type === "number"
+          ? parseFloat(e.target.value)
+          : e.target.value;
     }
-  
+
     setRows((prevRows) => {
       const updatedRows = [...prevRows];
       const updatedRow = { ...updatedRows[rowIndex] };
-  
+
       if (subField) {
         updatedRow[field] = { ...updatedRow[field], [subField]: value };
       } else {
         updatedRow[field] = value;
       }
-  
+
       if (field === "prevMonth" || field === "currMonth") {
-        // Always get the latest meter status values
-        if (Number(meterStatusDataPrev) !== 1 && Number(meterStatusDataCurr) !== 1) {
-          // Set reading and consumption to 0 when meter status is not 1
-          updatedRow.prevMonth.reading = 0;
+        const firstMonthReading = updatedRow.prevMonth?.reading || 0;
+        const secondMonthReading = updatedRow.currMonth?.reading || 0;
+
+        if (
+          Number(meterStatusDataPrev) !== 1 &&
+          Number(meterStatusDataCurr) !== 1
+        ) {
+          updatedRow.prevMonth = {
+            ...updatedRow.prevMonth,
+            reading: 0,
+            consumption: 0,
+          };
+          updatedRow.currMonth = {
+            ...updatedRow.currMonth,
+            reading: 0,
+            consumption: 0,
+          };
+        } else {
+          updatedRow.prevMonth.consumption =
+            firstMonthReading !== 0
+              ? firstMonthReading - updatedRow.lastRDG
+              : undefined;
+          updatedRow.currMonth.consumption =
+            secondMonthReading !== 0
+              ? secondMonthReading - firstMonthReading
+              : undefined;
+        }
+      }
+
+      
+
+      if (secondReading !== 1) {
+        if (Number(meterStatusDataCurr) !== 1) {
           updatedRow.currMonth.reading = 0;
-          updatedRow.prevMonth.consumption = 0;
           updatedRow.currMonth.consumption = 0;
         } else {
-          // Perform consumption calculations
-          const firstMonthReading = updatedRow.prevMonth.reading || 0;
           const secondMonthReading = updatedRow.currMonth.reading || 0;
-  
-          if (firstMonthReading === 0 && secondMonthReading === 0) {
-            updatedRow.prevMonth.consumption = undefined;
+
+          if (secondMonthReading === 0) {
             updatedRow.currMonth.consumption = undefined;
           } else {
-            updatedRow.prevMonth.consumption =
-              firstMonthReading !== 0
-                ? firstMonthReading - updatedRow.lastRDG
-                : undefined;
             updatedRow.currMonth.consumption =
               secondMonthReading !== 0
                 ? secondMonthReading - updatedRow.lastRDG
@@ -360,12 +545,12 @@ const Reading: React.FC = () => {
           }
         }
       }
-  
+
       updatedRows[rowIndex] = updatedRow;
       return updatedRows;
     });
   };
-  
+
   useEffect(() => {
     setRows((prevRows) => {
       return prevRows.map((row) => {
@@ -391,10 +576,48 @@ const Reading: React.FC = () => {
       });
     });
   }, [meterStatusDataPrev, meterStatusDataCurr]);
-  
-  
+
+  useEffect(() => {
+    setRows((prevRows) => {
+      return prevRows.map((row) => {
+        if (
+          // Number(meterStatusDataPrev) !== 1 &&
+          Number(meterStatusDataCurr) !== 1
+        ) {
+          return {
+            ...row,
+            currMonth: {
+              ...row.currMonth,
+              reading: 0,
+              consumption: 0,
+            },
+          };
+        }
+        return row;
+      });
+    });
+  }, [meterStatusDataCurr]);
+
+  useEffect(() => {
+    setRows((prevRows) => {
+      return prevRows.map((row) => {
+        if (Number(meterStatusDataPrev) !== 1) {
+          return {
+            ...row,
+            prevMonth: {
+              ...row.prevMonth,
+              reading: 0,
+              consumption: 0,
+            },
+          };
+        }
+        return row;
+      });
+    });
+  }, [meterStatusDataPrev]);
 
   const handleGenerateBill = () => {
+    console.log("row10101", rows);
     if (secondReading === 1) {
       const payload: {
         [key: string]: {
@@ -404,23 +627,23 @@ const Reading: React.FC = () => {
           stp: boolean;
           rebate: boolean;
           connection_size_id: string;
+          connection_type_id: string;
           prevMonth: {
             reading: string;
-            meter_status_id: Meter_status_id;
+            meter_status: Meter_status_id;
             consumption: number;
             reading_date: string;
             cw: boolean;
           };
           currMonth: {
             reading: string;
-            meter_status_id: Meter_status_id;
+            meter_status: Meter_status_id;
             reading_date: string;
             consumption: number;
             cw: boolean;
           };
         };
       } = {};
-
       rows.forEach((row) => {
         payload[row.accountNumber] = {
           consumerInfo: row.consumerInfo,
@@ -429,11 +652,12 @@ const Reading: React.FC = () => {
           stp: row.stpCharges,
           rebate: row.rebate,
           connection_size_id: row?.connectionSize?.id,
+          connection_type_id: row?.connection_type_id?.id,
           prevMonth: row.prevMonth,
           currMonth: row.currMonth,
         };
       });
-      console.log("payload5", payload);
+      rows.forEach((row) => console.log("ppppp", row));
       const result = payload[Object.keys(payload)[0]];
       createBill(result);
       setPayload(rows);
@@ -447,9 +671,10 @@ const Reading: React.FC = () => {
           stp: boolean;
           rebate: boolean;
           connection_size_id: string;
+          connection_type_id: string;
           currMonth: {
             reading: string;
-            meter_status_id: Meter_status_id;
+            meter_status: Meter_status_id;
             reading_date: string;
             consumption: number;
             cw: boolean;
@@ -465,6 +690,7 @@ const Reading: React.FC = () => {
           stp: row.stpCharges,
           rebate: row.rebate,
           connection_size_id: row.connectionSize.id,
+          connection_type_id: row?.connection_type_id?.id,
           currMonth: row.currMonth,
         };
       });
@@ -474,9 +700,10 @@ const Reading: React.FC = () => {
       createBill(result);
       setPayload(rows);
     }
+   
   };
   useEffect(() => {
-    if (billResult) {
+    if (billResult ) {
       toast.success(` ${billResult?.data?.data?.message}.`, {
         position: "top-right",
         autoClose: 3000,
@@ -484,15 +711,115 @@ const Reading: React.FC = () => {
       });
       setBillData(billResult?.data?.data?.billDetails);
       setWaterBillOpen(!waterBillOpen);
+      
     }
   }, [billResult]);
 
+  const handleComputationSheet =()=>{
+    setComputationSheetPayload(rows)
+    if (secondReading === 1) {
+      const payload: {
+        [key: string]: {
+          consumerInfo: string;
+          category_id: string;
+          sewerage: boolean;
+          stp: boolean;
+          rebate: boolean;
+          connection_size_id: string;
+          connection_type_id: string;
+          prevMonth: {
+            reading: string;
+            meter_status: Meter_status_id;
+            consumption: number;
+            reading_date: string;
+            cw: boolean;
+          };
+          currMonth: {
+            reading: string;
+            meter_status: Meter_status_id;
+            reading_date: string;
+            consumption: number;
+            cw: boolean;
+          };
+        };
+      } = {};
+      rows.forEach((row) => {
+        payload[row.accountNumber] = {
+          consumerInfo: row.consumerInfo,
+          category_id: row?.category.id,
+          sewerage: row.sewerage,
+          stp: row.stpCharges,
+          rebate: row.rebate,
+          connection_size_id: row?.connectionSize?.id,
+          connection_type_id: row?.connection_type_id?.id,
+          prevMonth: row.prevMonth,
+          currMonth: row.currMonth,
+        };
+      });
+      rows.forEach((row) => console.log("ppppp", row));
+      const result = payload[Object.keys(payload)[0]];
+      createBill1(result);
+      setDataForComputation(billResult1?.data?.data)
+     
+    }
+    if (secondReading !== 1) {
+      const payload: {
+        [key: string]: {
+          consumerInfo: string;
+          category_id: string;
+          sewerage: boolean;
+          stp: boolean;
+          rebate: boolean;
+          connection_size_id: string;
+          connection_type_id: string;
+          currMonth: {
+            reading: string;
+            meter_status: Meter_status_id;
+            reading_date: string;
+            consumption: number;
+            cw: boolean;
+          };
+        };
+      } = {};
+
+      rows.forEach((row) => {
+        payload[row.accountNumber] = {
+          consumerInfo: row.consumerInfo,
+          category_id: row.category.id,
+          sewerage: row.sewerage,
+          stp: row.stpCharges,
+          rebate: row.rebate,
+          connection_size_id: row.connectionSize.id,
+          connection_type_id: row?.connection_type_id?.id,
+          currMonth: row.currMonth,
+        };
+      });
+
+      const result = payload[Object.keys(payload)[0]];
+
+      createBill1(result);
+      // setDataForComputation(billResult?.data?.data)
+
+    }
+
+  
+      
+  }
+
+
+  useEffect(() => {
+    if (billResult1) {
+      setDataForComputation(billResult1?.data?.data);
+      setShowPrintModal(!showPrintModal)
+      
+    }
+  }, [billResult1]);
   return (
     <>
       {waterBillOpen && (
         <WaterBill
           setWaterBillOpen={setWaterBillOpen}
-          reponse={billData}
+          response={billData}
           payload={payload}
         />
       )}
@@ -503,13 +830,13 @@ const Reading: React.FC = () => {
               <thead className="bg-gray-100">
                 <tr>
                   <td
-                    colSpan={2}
+                    colSpan={4}
                     className="border border-gray-300 px-4 py-2 text-left"
                   >
                     PHED Jaipur - Reading Sheet (Bi-monthly)
                   </td>
                   <td
-                    colSpan={2}
+                    colSpan={3}
                     className="border border-gray-300 px-4 py-2 text-left"
                   >
                     Bill Issueing Bi Month
@@ -537,7 +864,7 @@ const Reading: React.FC = () => {
                     <strong>Cycle No:</strong> 12
                   </td>
                   <td
-                    colSpan={3}
+                    colSpan={4}
                     className="border border-gray-300 px-4 py-2 text-left"
                   >
                     {secondReading !== 1
@@ -624,6 +951,9 @@ const Reading: React.FC = () => {
                     Acnt No
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
+                    CIN
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-left">
                     Consumer Name Address
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
@@ -639,17 +969,20 @@ const Reading: React.FC = () => {
                     Rebate
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
-                    Size Connection
+                    Connection Size
                   </td>
+
                   <td className="border border-gray-300 px-4 py-2 text-left">
-                    Last RDG ({  secondReading !== 1
-                      ? currMonthName
-                      : prevMonthName})
+                    Last RDG (
+                    {secondReading !== 1 ? currMonthName : prevMonthName})
                     {/* , Cons/Stts */}
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-left">
-                    Acnt No
+                    Connection Type
                   </td>
+                  {/* <td className="border border-gray-300 px-4 py-2 text-left">
+                    Acnt No
+                  </td> */}
                   {secondReading === 1 ? (
                     <>
                       {" "}
@@ -686,6 +1019,7 @@ const Reading: React.FC = () => {
                       </td>
                     </>
                   )}
+                  <td className="border border-gray-300 px-4 py-2">Computation Sheet</td>
                 </tr>
               </thead>
               <tbody>
@@ -694,6 +1028,9 @@ const Reading: React.FC = () => {
                     <tr key={row.id}>
                       <td className="border border-gray-300 px-4 py-2">
                         {row.accountNumber}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {row.CIN}
                       </td>
                       <td className="border border-gray-300 px-4 py-2">
                         {row.consumerInfo}
@@ -759,7 +1096,7 @@ const Reading: React.FC = () => {
 
                       <td className="border border-gray-300 px-4 py-2">
                         <select
-                          value={row?.connectionSize.id || ""}
+                          value={row?.connectionSize?.id || ""}
                           onChange={
                             (e) => handleInputChange(e, index, "connectionSize") // Pass 'category_id' instead of 'category_name'
                           }
@@ -776,13 +1113,32 @@ const Reading: React.FC = () => {
                       </td>
 
                       {/* Set the lastRDG value directly here */}
-                      <td className="border border-gray-300 px-4 py-2">
+                      <td
+                        className="border border-gray-300 px-4 py-2"
+                        colSpan={1}
+                      >
                         {row.lastRDG ? row.lastRDG : "Set Value Here"}
                       </td>
-
-                      <td className="border border-gray-300 px-4 py-2">
-                        {row.accountNumber}
+                      <td
+                        className="border border-gray-300 px-4 py-2"
+                        colSpan={1}
+                      >
+                        <select
+                          value={row?.connection_type_id?.id || ""} // Bind to category.id to avoid NaN or empty values
+                          onChange={(e) =>
+                            handleInputChange(e, index, "connection_type_id")
+                          } // Pass 'category' as field name
+                          className="w-full p-2 border border-gray-300 rounded"
+                        >
+                          <option value="">Select Category</option>{" "}
+                          {connectionType?.map((conn) => (
+                            <option key={conn.id} value={conn.id}>
+                              {conn.conn_type}
+                            </option>
+                          ))}
+                        </select>
                       </td>
+
                       {secondReading === 1 ? (
                         <>
                           <td className="border border-gray-300 px-4 py-2">
@@ -811,7 +1167,7 @@ const Reading: React.FC = () => {
 
                               <select
                                 value={
-                                  row.prevMonth.meter_status_id?.id ||
+                                  row.prevMonth.meter_status?.id ||
                                   meterStatus.find(
                                     (status) => status.meter_status === "mf"
                                   )?.id ||
@@ -822,7 +1178,7 @@ const Reading: React.FC = () => {
                                     e,
                                     index,
                                     "prevMonth",
-                                    "meter_status_id"
+                                    "meter_status"
                                   )
                                 }
                                 className="text-sm w-[50px] border border-gray-300 p-1"
@@ -905,7 +1261,7 @@ const Reading: React.FC = () => {
 
                               <select
                                 value={
-                                  row.currMonth.meter_status_id?.id ||
+                                  row.currMonth.meter_status?.id ||
                                   meterStatus.find(
                                     (status) => status.meter_status === "mf"
                                   )?.id ||
@@ -916,7 +1272,7 @@ const Reading: React.FC = () => {
                                     e,
                                     index,
                                     "currMonth",
-                                    "meter_status_id"
+                                    "meter_status"
                                   )
                                 }
                                 className="text-sm w-[50px] border border-gray-300 p-1"
@@ -977,6 +1333,7 @@ const Reading: React.FC = () => {
                               ""
                             )} */}
                           </td>
+                       
                         </>
                       ) : (
                         <>
@@ -1004,19 +1361,28 @@ const Reading: React.FC = () => {
                                 disabled={Number(meterStatusDataCurr) !== 1}
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               />
+
                               <select
-                                value={row.currMonth.meter_status_id?.id || ""}
+                                value={
+                                  row.currMonth.meter_status?.id ||
+                                  meterStatus.find(
+                                    (status) => status.meter_status === "mf"
+                                  )?.id ||
+                                  ""
+                                }
                                 onChange={(e) =>
                                   handleInputChange(
                                     e,
                                     index,
                                     "currMonth",
-                                    "meter_status_id"
+                                    "meter_status"
                                   )
                                 }
                                 className="text-sm w-[50px] border border-gray-300 p-1"
                               >
-                                <option>Select Meter Status</option>
+                                <option value="" disabled>
+                                  Select Meter Status
+                                </option>
                                 {meterStatus.map((status) => (
                                   <option key={status.id} value={status.id}>
                                     {status.meter_status}
@@ -1055,8 +1421,8 @@ const Reading: React.FC = () => {
                                 onChange={(e) =>
                                   handleInputChange(e, index, "currMonth", "cw")
                                 }
-                                className="text-sm w-[50px] border border-gray-300 p-1  z-[1]"
-                                // disabled={!row.currMonth.cw}
+                                className="text-sm w-[50px] border border-gray-300 p-1 z-[1]"
+                                disabled={!row.currMonth.cw}
                               >
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
@@ -1070,9 +1436,14 @@ const Reading: React.FC = () => {
                               ""
                             )} */}
                           </td>
+                          
                         </>
                       )}
+                         <td className=" border border-gray-300 px-4 py-2  w-16 h-16 cursor-pointer  text-green-600" >
+                            <FaFileDownload className="w-8 h-8" onClick={handleComputationSheet}/>
+                          </td>
                     </tr>
+                    
                   );
                 })}
               </tbody>
@@ -1088,6 +1459,13 @@ const Reading: React.FC = () => {
           >
             Generate Bill
           </button>
+          {showPrintModal && (
+            <ComputationSheet
+            response={dataForComputation}
+            payload={ComputationSheetPayload}
+              setShowPrintModal={setShowPrintModal}
+            />
+          )}
         </div>
       </div>
     </>

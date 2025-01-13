@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useInternalService } from '@/components/hook/useInternalService';
 
 
 
@@ -25,19 +24,9 @@ const ReadingSheetList: React.FC = () => {
    
 
 
-     const [
-        fetchResourceConnectionType,
-        resourceResultConnectionType,
-        connectionTypeInProgress,
-        resourceError,
-      ] = useInternalService("ConnectionType", "GET", null);
+     
 
-        useEffect(() => {
-            fetchResourceConnectionType();
-        }, []);
-
-        console.log("resourceResultConnectionType",resourceResultConnectionType)
-
+     
     const handleEdit = (id: number) => {
         console.log('Edit category with id:', id);
     };
@@ -55,6 +44,10 @@ const ReadingSheetList: React.FC = () => {
     const handleView = () => {
         router.push('/readingSheet');
     };
+
+    // const handleView = () => {
+    //     router.push('/readingSheet?id=123&name=Sample Data');
+    //   };
 
     return (
         <div className=" mx-auto ">

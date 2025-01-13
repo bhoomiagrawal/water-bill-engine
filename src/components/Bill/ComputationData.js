@@ -80,7 +80,7 @@ export default function ComputationData ({data, slabs}) {
                   <td className="border px-4 py-2">
                     <strong>Fault Code</strong>
                   </td>
-                  <td className="border px-4 py-2">{data?.meter_stts.toUpperCase()}</td>
+                  <td className="border px-4 py-2">{data?.meter_stts?.toUpperCase()}</td>
                   <td className="border px-4 py-2">Total Consumption</td>
                   <td className="border px-4 py-2">{data?.curr_cons}</td>
                 </tr>                
@@ -109,7 +109,7 @@ export default function ComputationData ({data, slabs}) {
                   <td className="border px-4 py-2">
                   </td>
                   <td className="border px-4 py-2">
-                    <strong>{data?.basicCharge.toFixed}</strong>
+                    <strong>{data?.basicCharge?.toFixed}</strong>
                   </td>
                 </tr>
                 <tr>
@@ -182,7 +182,7 @@ export default function ComputationData ({data, slabs}) {
                 <tr>
                   <td className="border px-4 py-2">["K"] IDC Charge</td>
                   <td className="border px-4 py-2"></td>
-                  <td className="border px-4 py-2">{data?.idc.toFixed(2)}</td>
+                  <td className="border px-4 py-2">{data?.idc?.toFixed(2)}</td>
                   {/* <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">N/A</td>
                   <td className="border px-4 py-2">55</td> */}
