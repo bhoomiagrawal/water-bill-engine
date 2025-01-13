@@ -4,14 +4,24 @@ import React, { useEffect, useState } from "react";
 import * as resource from "../../../config/form";
 import { useRouter } from "next/navigation";
 import Form from "@/components/Main/Form";
-import { useInternalService } from "@/components/hook/useInternalService";
-import { toast } from "react-toastify";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
+
+type ResourceType = {
+  [key: string]: Array<{
+    title: string;
+    column: string;
+    type: string;
+    selectKey?: string;
+    source?: string;
+  }>;
+};
+
+const typedResource = resource as ResourceType;
 
 const Page = ({ params }: any) => {
   const { slug } = params;
   const router = useRouter();
-  const column = resource[slug];
+  const column = typedResource[slug];
   const [data, setData] = useState<any>({});
   const [inputeField, setInputeField] = useState<any>([]);
 
@@ -37,7 +47,7 @@ const Page = ({ params }: any) => {
     const payload: any = {};
     inputeField?.forEach((field: any) => {
       if (data[field.column] || field.column === "status") {
-        payload[field.column] = data[field.column] ?? true; 
+        payload[field.column] = data[field.column] ?? true;
       }
     });
 
@@ -63,11 +73,14 @@ const Page = ({ params }: any) => {
       </button>
 
       <Form
-        slug={slug}
+        slug={String(slug)} // Ensure slug is passed as a string
         column={inputeField}
         data={data}
         handleChange={handleChange}
-        handleSubmit={handleSubmit}
+        handleSubmit={handleSubmit} // This is now correctly typed
+        errors={{}}
+        handleError={() => {}}
+        setIsPopupe={() => {}}
       />
     </DefaultLayout>
   );

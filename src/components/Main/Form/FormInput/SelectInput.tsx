@@ -17,8 +17,8 @@ interface SelectInputProps {
 }
 
 const SelectInput: React.FC<SelectInputProps> = ({ label, options, onChange, value, disable }) => {
-  console.log("value1",value)
-  console.log("value2",options)
+  console.log("value1", value);
+  console.log("value2", options);
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -40,7 +40,7 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, options, onChange, val
         <option value="" disabled>Select an option</option>
         {options && options.length > 0 ? (
           options.map((option) => (
-            <option key={option.key} value={option.id}>
+            <option key={option.key} value={String(option.id)}> {/* Ensure 'value' is a string */}
               {option.value}
             </option>
           ))

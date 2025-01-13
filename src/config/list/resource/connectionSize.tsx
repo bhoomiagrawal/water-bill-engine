@@ -1,22 +1,26 @@
-import { title } from "process";
-
-const connectionSize=[
+const connectionSize = [
     {
-        title:"S.No",
-        column:"index",
-        type:"number"
+      id: "1", // Added unique id
+      title: "S.No",
+      column: "index",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "number",
     },
     {
-        title:"Connection Size(MM)",
-        column:"size",
-        type:"text"
+      id: "2", // Added unique id
+      title: "Connection Size(MM)",
+      column: "size",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "text",
     },
+    {
+      id: "3", // Added unique id
+      title: "Actions",
+      column: "actions",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "actions",
+    },
+  ];
   
-    {
-        title:"Actions",
-        column:"actions",
-        type:"actions"
-    },
-]
-
-export default connectionSize;
+  export default connectionSize;
+  

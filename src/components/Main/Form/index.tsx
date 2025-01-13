@@ -5,16 +5,32 @@ import SelectHandler from "./FormInput/SelectHandler";
 import NumberInput from "./FormInput/NumberInput";
 import ToggleInput from "./FormInput/ToggleInput";
 
+interface FormColumn {
+  title: string;
+  column: string;
+  type: string;
+  selectKey?: string;
+  source?: string;
+}
+
 interface FormProps {
   slug: string;
-  column: any;
+  column: FormColumn[];  // Updated type here
   data: any;
   errors: any;
   handleError: (data: any) => void;
   handleChange: (data: any) => void;
-  handleSubmit: () => void;
+  handleSubmit: (e: React.FormEvent) => void;
   setIsPopupe: (value: boolean) => void;
 }
+
+
+type FieldComponentMap = {
+  text: React.FC<any>;
+  select: React.FC<any>;
+  number: React.FC<any>;
+  checkbox: React.FC<any>;
+};
 
 const Form: React.FC<FormProps> = ({
   slug,
@@ -26,7 +42,7 @@ const Form: React.FC<FormProps> = ({
   handleSubmit,
   setIsPopupe,
 }) => {
-  const FormField = {
+  const FormField: FieldComponentMap = {
     text: TextInput,
     select: SelectHandler,
     number: NumberInput,
@@ -38,7 +54,7 @@ const Form: React.FC<FormProps> = ({
 
   const onSubmitData = (e: React.FormEvent) => {
     e.preventDefault();
-    column?.forEach((field: any) => {
+    column?.forEach((field: FormColumn) => {  // Explicitly typing field
       let formValid = true;
       if (field && field.column !== "status" && !data[field.column]) {
         formValid = false;
@@ -46,10 +62,10 @@ const Form: React.FC<FormProps> = ({
       }
     });
     if (dataHasChanged) {
-      handleSubmit();
+      handleSubmit(e);  // Pass the event to handleSubmit
     }
   };
-
+  
   const onChange = (field: string, value: any) => {
     setHasChanged(true);
     handleChange({ [field]: value });
@@ -61,10 +77,7 @@ const Form: React.FC<FormProps> = ({
       <div className="mt-10 bg-gray-100 relative w-[900px] m-auto">
         <div className="mx-auto max-w-6xl">
           <div className="rounded-lg border shadow-lg dark:border-strokedark dark:bg-boxdark">
-            <form
-              // onSubmit={(e)=>{}}
-              className="flex flex-col gap-6 space-x-13 p-10"
-            >
+            <form className="flex flex-col gap-6 space-x-13 p-10">
               <div className="border-b border-stroke px-6 py-4 dark:border-strokedark">
                 <h3 className="text-xl font-bold text-gray-800 dark:text-white">
                   {data.id ||
@@ -76,8 +89,8 @@ const Form: React.FC<FormProps> = ({
                 </h3>
               </div>
 
-              {column?.map((col: any, index: number) => {
-                const FieldComponent = FormField[col.type];
+              {column?.map((col, index) => {
+                const FieldComponent = FormField[col.type as keyof FieldComponentMap];
                 let fieldValue;
                 if (col.type === "checkbox") {
                   fieldValue = data[col.column] ?? true;
@@ -91,9 +104,7 @@ const Form: React.FC<FormProps> = ({
 
                 return (
                   <div key={index} className="flex flex-col gap-2">
-                    <label className="text-gray-700 font-medium">
-                      {col.title}
-                    </label>
+                    <label className="text-gray-700 font-medium">{col.title}</label>
                     {FieldComponent && (
                       <FieldComponent
                         value={fieldValue}
@@ -105,16 +116,14 @@ const Form: React.FC<FormProps> = ({
                       />
                     )}
                     {errors[col.column] && (
-                      <div className="text-red-500 text-sm">
-                        {errors[col.column]}
-                      </div>
+                      <div className="text-red-500 text-sm">{errors[col.column]}</div>
                     )}
                   </div>
                 );
               })}
 
               <div className="flex space-x-4">
-                {data.id ? (
+              {data.id ? (
                   <button
                     onClick={(e) => onSubmitData(e)}
                     type="submit"

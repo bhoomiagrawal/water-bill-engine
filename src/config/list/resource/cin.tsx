@@ -1,21 +1,26 @@
-
-const cin=[
+const cin = [
     {
-        title:"S.No",
-        column:"index",
-        type:"number"
+      id: "1", // Added unique id
+      title: "S.No",
+      column: "index",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "number",
     },
     {
-        title:"CIN Number",
-        column:"category_name",
-        type:"text"
+      id: "2", // Added unique id
+      title: "CIN Number",
+      column: "category_name",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "text",
     },
-   
     {
-        title:"Actions",
-        column:"actions",
-        type:"actions"
+      id: "3", // Added unique id
+      title: "Actions",
+      column: "actions",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "actions",
     },
-]
-
-export default cin;
+  ];
+  
+  export default cin;
+  

@@ -3,34 +3,71 @@ import { RxCross2 } from "react-icons/rx";
 
 interface WaterBillProps {
   setWaterBillOpen: (value: boolean) => void;
-  reponse: any;
+  response: any;
   payload: any;
 }
 
 const WaterBill: React.FC<WaterBillProps> = ({
   setWaterBillOpen,
-  reponse,
+  response,
   payload,
 }) => {
-console.log("reponse44",reponse)
-;
-  const formattedDateCurrent = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const currentMonthData = new Date(reponse?.detailsByMonth[0]?.reading_date).toLocaleDateString('en-US', {
-    month: 'short',  
-    year: 'numeric'  
-  });
+  console.log("response44", response);
+  // const formattedDateCurrent = new Date(payload[0].date).toLocaleDateString('en-US', {
+  //   month: 'short',
+  //   day: 'numeric',
+  // });
 
-  const previousMonthData = new Date(reponse?.detailsByMonth[1]?.reading_date).toLocaleDateString('en-US', {
-    month: 'short',  
-    year: 'numeric'  
-  });
-  
-    // const previousMonthData = new Date(reponse?.detailsByMonth[1]?.reading_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  // Example output: "Jan 10"
+  const PreadingDate = response?.detailsByMonth[0]?.reading_date; // e.g., "10/12/2024"
+  const CreadingDate = response?.detailsByMonth[1]?.reading_date; // e.g., "11/12/2024"
+
+  // Function to format date from "DD/MM/YYYY" to "MMM/YY"
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "Invalid Date"; // If dateString is undefined or empty
+
+    const parts = dateString.split("/");
+    if (parts.length !== 3) return "Invalid Date"; // If date format is not correct
+
+    const [day, month, year] = parts;
+    const date = new Date(`${year}-${month}-${day}`); // Convert to YYYY-MM-DD format
+
+    return !isNaN(date.getTime()) // Check if it's a valid date
+      ? date
+          .toLocaleDateString("en-US", {
+            month: "short", // Short month (e.g., 'Dec')
+            year: "2-digit", // Two-digit year (e.g., '24')
+          })
+          .replace(",", "/") // Replace the comma with a slash for the desired format
+      : "Invalid Date"; // Fallback for invalid date
+  };
+
+  // Format both PreadingDate and CreadingDate
+  const PformattedDate = formatDate(PreadingDate);
+  const CformattedDate = formatDate(CreadingDate);
+
+  console.log("PformattedDate:", PformattedDate); // Output: "Dec/24"
+  console.log("CformattedDate:", CformattedDate); // Output: "Dec/24"
+
+  const formattedDateCurrent = new Date(payload[0]?.date).toLocaleDateString(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+    }
+  );
+
+  // const previousMonthData = new Date(response?.detailsByMonth[0]?.reading_date).toLocaleDateString('en-US', {
+  //   month: 'short',
+  //   year: 'numeric'
+  // });
+
+  // const previousMonthData = new Date(response?.detailsByMonth[1]?.reading_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
     // <div className="flex justify-center items-center min-h-screen p-4 bg-gray-100">
 
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18     overflow-auto">
+    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm bg-black mt-18 z-10 overflow-auto">
       <div className="mt-10 bg-gray-100 relative w-[600px] m-auto flex justify-center items-center min-h-screen ">
         <div className="mx-auto max-w-6xl">
           <div className="w-full max-w-xl p-6 border ">
@@ -73,7 +110,7 @@ console.log("reponse44",reponse)
                     </strong>
                   </p>
                   <p className=" font-bold ml-2">
-                  MOTWANI ARJUN F-316 VASHALI NAGAR
+                    MOTWANI ARJUN F-316 VASHALI NAGAR
                   </p>
                 </div>
 
@@ -91,9 +128,7 @@ console.log("reponse44",reponse)
                             खाता संख्या
                           </strong>
                         </td>
-                        <td className="border border-[#6666d7]  ">
-                          S2-9-95b-12
-                        </td>
+                        <td className="border border-[#6666d7]  ">95b-12-1</td>
                         <td className="border border-[#6666d7]  ">
                           <strong className=" text-[#6666d7]">
                             उपखण्ड संख्या
@@ -121,7 +156,12 @@ console.log("reponse44",reponse)
                             मीटर की स्थिति/ मालिक
                           </strong>
                         </td>
-                        <td className="border border-[#6666d7]  ">{payload[0]?.currMonth?.meter_status_id?.name}</td>
+                        <td className="border border-[#6666d7]  ">
+                          {payload[0]?.currMonth?.meter_status?.name
+                            ? payload[0]?.currMonth?.meter_status?.name
+                            : payload[0]?.currMonth?.meter_status?.meter_status}
+                          /{payload[0]?.connection_type_id?.name}
+                        </td>
                         <td className="border border-[#6666d7]  ">
                           <strong className=" text-[#6666d7]">
                             मीटर क्रमांक
@@ -143,7 +183,9 @@ console.log("reponse44",reponse)
                             बिलिंग माह
                           </strong>
                         </td>
-                        <td className="border border-[#6666d7]  ">{formattedDateCurrent}</td>
+                        <td className="border border-[#6666d7]  ">
+                          {formattedDateCurrent}
+                        </td>
                       </tr>
                       <tr>
                         <td className="border border-[#6666d7]  ">
@@ -159,7 +201,11 @@ console.log("reponse44",reponse)
                             बिल जारी करने की तिथि
                           </strong>
                         </td>
-                        <td className="border border-[#6666d7]  ">{new Date().toLocaleDateString('en-GB')}</td>
+                        <td className="border border-[#6666d7]  ">
+                          {new Date(payload[0]?.date).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -179,10 +225,13 @@ console.log("reponse44",reponse)
                         बिल माह
                       </th>
                       <th className="border border-[#6666d7]   text-left">
-                       {currentMonthData}
+                        {PformattedDate}
                       </th>
                       <th className="border border-[#6666d7]   text-left">
-                   {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? previousMonthData:""}
+                        {payload[0]?.category.name !== "industrial" &&
+                        payload[0]?.category.name !== "non domestic"
+                          ? CformattedDate
+                          : ""}
                       </th>
                     </tr>
                     <tr>
@@ -190,16 +239,19 @@ console.log("reponse44",reponse)
                         वर्तमान पठन तिथि
                       </th>
                       <td className="border border-[#6666d7]  ">
-                      <p>{new Date(reponse.detailsByMonth[0]?.reading_date).toLocaleDateString('en-GB')}</p>
+                        <p>{response?.detailsByMonth[0]?.reading_date}</p>
 
-                        {/* {reponse.detailsByMonth[0]?.reading_date} */}
+                        {/* {response.detailsByMonth[0]?.reading_date} */}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                      {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? new Date(reponse.detailsByMonth[1]?.reading_date).toLocaleDateString('en-GB'):""}
+                        {payload[0]?.category.name !== "industrial" &&
+                        payload[0]?.category.name !== "non domestic"
+                          ? response?.detailsByMonth[1]?.reading_date
+                          : ""}
 
-                      {/* <p>{new Date(reponse.detailsByMonth[1]?.reading_date).toLocaleDateString('en-GB')}</p> */}
+                        {/* <p>{new Date(response.detailsByMonth[1]?.reading_date).toLocaleDateString('en-GB')}</p> */}
 
-                        {/* {reponse.detailsByMonth[1]?.reading_date} */}
+                        {/* {response.detailsByMonth[1]?.reading_date} */}
                       </td>
                     </tr>
                     <tr>
@@ -208,41 +260,50 @@ console.log("reponse44",reponse)
                       </th>
                       <td className="border border-[#6666d7]  ">
                         {" "}
-                        
-                      {payload[0].category.name ==="non domestic" || payload[0].category.name ==="industrial" ? payload[0]?.currMonth?.reading: payload[0]?.prevMonth?.reading}
+                        {payload[0]?.category?.name === "non domestic" ||
+                        payload[0]?.category?.name === "industrial"
+                          ? payload[0]?.currMonth?.reading
+                          : payload[0]?.prevMonth?.reading}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                      {payload[0].category.name ==="domestic"?  payload[0]?.currMonth?.reading:""}
-                      {/* {payload[0]?.currMonth?.reading} */}
+                        {payload[0]?.category?.name === "domestic"
+                          ? payload[0]?.currMonth?.reading
+                          : ""}
+                        {/* {payload[0]?.currMonth?.reading} */}
                       </td>
                     </tr>
                     <tr>
                       <th className="border border-[#6666d7]   text-left text-[#6666d7]">
-                        गत पठन 
+                        गत पठन
                       </th>
                       <td className="border border-[#6666d7]  ">
                         {payload[0]?.lastRDG}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                      {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? payload[0]?.lastRDG:""}
-                      {/* {payload[0]?.lastRDG} */}
+                        {payload[0]?.category.name !== "industrial" &&
+                        payload[0]?.category.name !== "non domestic"
+                          ? payload[0]?.prevMonth?.reading
+                          : ""}
+                        {/* {payload[0]?.lastRDG} */}
                       </td>
                     </tr>
                     <tr>
                       <th className="border border-[#6666d7]   text-left text-[#6666d7]">
                         कुल जल उपभोग (लीटर)
                       </th>
-                      
-                      <td className="border border-[#6666d7]  ">
-                      {payload[0].category.name ==="non domestic" || payload[0].category.name ==="industrial" ? payload[0]?.currMonth?.consumption: payload[0]?.prevMonth?.consumption}
 
-                        
+                      <td className="border border-[#6666d7]  ">
+                        {payload[0]?.category?.name === "non domestic" ||
+                        payload[0]?.category?.name === "industrial"
+                          ? payload[0]?.currMonth?.consumption
+                          : payload[0]?.prevMonth?.consumption}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                      {/* {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? payload[0]?.currMonth?.consumption:""} */}
-                      {/* {payload[0]?.currMonth?.consumption} */}
-                      {payload[0].category.name ==="domestic"?  payload[0]?.currMonth?.consumption:""}
-
+                        {/* {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? payload[0]?.currMonth?.consumption:""} */}
+                        {/* {payload[0]?.currMonth?.consumption} */}
+                        {payload[0]?.category?.name === "domestic"
+                          ? payload[0]?.currMonth?.consumption
+                          : ""}
                       </td>
                     </tr>
                     <tr>
@@ -250,10 +311,10 @@ console.log("reponse44",reponse)
                         कुल जल उपभोग राशि(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[0]?.waterCharge}
+                        {response?.detailsByMonth[0]?.waterCharge}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[1]?.waterCharge}
+                        {response?.detailsByMonth[1]?.waterCharge}
                       </td>
                     </tr>
                     <tr>
@@ -261,13 +322,23 @@ console.log("reponse44",reponse)
                         सीवरेज शुल्क(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[0]?.sewerageCharge + reponse?.detailsByMonth[0]?.stpCharge}
+                        {response?.detailsByMonth[0]?.sewerageCharge +
+                          response?.detailsByMonth[0]?.stpCharge}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {/* {reponse?.detailsByMonth[1]?.sewerageCharge} */}
-                        {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ?reponse?.detailsByMonth[1]?.sewerageCharge + reponse?.detailsByMonth[0]?.stpCharge:  <td className=" px-4 border-[#6666d7]"></td>}
-
-
+                        {/* {response?.detailsByMonth[1]?.sewerageCharge} */}
+                        {payload[0]?.category?.name !== "industrial" &&
+                        payload[0]?.category?.name !== "non domestic" ? (
+                          (
+                            (Number(
+                              response?.detailsByMonth[1]?.sewerageCharge
+                            ) ?? 0) +
+                            (Number(response?.detailsByMonth[1]?.stpCharge) ??
+                              0)
+                          ).toFixed(2)
+                        ) : (
+                          <td className="px-4 border-[#6666d7]"></td>
+                        )}
                       </td>
                     </tr>
                     <tr>
@@ -275,10 +346,10 @@ console.log("reponse44",reponse)
                         मीटर सर्विस शुल्क(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[0]?.meterServiceCharge}
+                        {response?.detailsByMonth[0]?.meterServiceCharge}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[1]?.meterServiceCharge}
+                        {response?.detailsByMonth[1]?.meterServiceCharge}
                       </td>
                     </tr>
                     <tr>
@@ -286,10 +357,10 @@ console.log("reponse44",reponse)
                         स्थायी शुल्क(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[0]?.fixedCharge}
+                        {response?.detailsByMonth[0]?.fixedCharge}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[1]?.fixedCharge}
+                        {response?.detailsByMonth[1]?.fixedCharge}
                       </td>
                     </tr>
                     <tr>
@@ -297,10 +368,10 @@ console.log("reponse44",reponse)
                         आधारभूत विकास सरचार्ज(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[0]?.idcCharge}
+                        {response?.detailsByMonth[0]?.idcCharge}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[1]?.idcCharge}
+                        {response?.detailsByMonth[1]?.idcCharge}
                       </td>
                     </tr>
                     <tr>
@@ -309,7 +380,7 @@ console.log("reponse44",reponse)
                       </th>
                       <td
                         className="border border-[#6666d7]  "
-                        colSpan="2"
+                        colSpan={2}
                       ></td>
                     </tr>
                     <tr>
@@ -317,10 +388,10 @@ console.log("reponse44",reponse)
                         सरकार द्वारा वहन की गई राशि (₹)
                       </th>
                       <td className="border border-[#6666d7] ">
-                        {reponse?.detailsByMonth[0]?.rebate_applied}
+                        {response?.detailsByMonth[0]?.rebate_applied}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[1]?.rebate_applied}
+                        {response?.detailsByMonth[1]?.rebate_applied}
                       </td>
                     </tr>
                     <tr>
@@ -328,11 +399,15 @@ console.log("reponse44",reponse)
                         कुल राशि (₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.detailsByMonth[0]?.bill}
+                        {response?.detailsByMonth[0]?.bill}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                      {payload[0]?.category.name !=="industrial" &&  payload[0]?.category.name !== "non domestic" ? reponse?.detailsByMonth[1]?.bill:  <td className=" px-4 border-[#6666d7]"></td>}
-                      
+                        {payload[0]?.category.name !== "industrial" &&
+                        payload[0]?.category.name !== "non domestic" ? (
+                          response?.detailsByMonth[1]?.bill
+                        ) : (
+                          <td className=" px-4 border-[#6666d7]"></td>
+                        )}
                       </td>
                     </tr>
                     <tr>
@@ -353,14 +428,18 @@ console.log("reponse44",reponse)
                       <th className="border border-[#6666d7]   text-left text-[#6666d7]">
                         नियत तिथि तक कुल देह राशि (₹)
                       </th>
-                      <td className="border border-[#6666d7]  ">{reponse?.totalBill}</td>
+                      <td className="border border-[#6666d7]  ">
+                        {response?.totalBill}
+                      </td>
                       <td className="border border-[#6666d7]  "></td>
                     </tr>
                     <tr>
                       <th className="border border-[#6666d7]   text-left text-[#6666d7]">
                         विलम्ब भुगतान सरचार्ज (₹)
                       </th>
-                      <td className="border border-[#6666d7]  ">{reponse?.lps}</td>
+                      <td className="border border-[#6666d7]  ">
+                        {response?.lps}
+                      </td>
                       <td className="border border-[#6666d7]  "></td>
                     </tr>
                     <tr>
@@ -368,7 +447,7 @@ console.log("reponse44",reponse)
                         नियत तिथि पश्चात कुल देह राशि(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {reponse?.totalBillwithLPS}
+                        {response?.totalBillWithLPS}
                       </td>
                       <td className="border border-[#6666d7]  "></td>
                     </tr>
@@ -377,8 +456,11 @@ console.log("reponse44",reponse)
                         अंतिम भुगतान तिथि (चैक द्वारा)
                       </th>
                       <td className="border border-[#6666d7]">
-                      {new Date(new Date().setDate(new Date().getDate() + 10)).toLocaleDateString('en-GB')}
-                        
+                        {new Date(
+                          new Date(payload[0]?.date).setDate(
+                            new Date(payload[0]?.date).getDate() + 10
+                          )
+                        ).toLocaleDateString("en-GB")}
                       </td>
                       <td className="border border-[#6666d7]  "></td>
                     </tr>
@@ -387,8 +469,11 @@ console.log("reponse44",reponse)
                         अंतिम भुगतान तिथि (नकद द्वारा)
                       </th>
                       <td className="border border-[#6666d7]">
-                      {new Date(new Date().setDate(new Date().getDate() + 10+7)).toLocaleDateString('en-GB')}
-
+                        {new Date(
+                          new Date(payload[0]?.date).setDate(
+                            new Date(payload[0]?.date).getDate() + 10 + 7
+                          )
+                        ).toLocaleDateString("en-GB")}
                       </td>
 
                       <td className="border border-[#6666d7]  "></td>
@@ -458,9 +543,9 @@ console.log("reponse44",reponse)
             <div className="grid grid-cols-5 border border-[#6666d7]">
               <p className="  border-r border-[#6666d7]">1244</p>
               <p className="  border-r border-[#6666d7]">51234</p>
-              <p className="  border-r border-[#6666d7]">S2-9              </p>
-              <p className="  border-r border-[#6666d7]">	S2-9-95b-12</p>
-              <p className="   border-[#6666d7]">{formattedDateCurrent}</p>
+              <p className="  border-r border-[#6666d7]">S2-9 </p>
+              <p className="  border-r border-[#6666d7]">95b-12-1 </p>
+              {/* <p className="   border-[#6666d7]">{formattedDateCurrent}</p> */}
             </div>
             <div className="grid grid-cols-3 border border-[#6666d7]">
               <p className="  border-r border-[#6666d7] text-[#6666d7] bg-[#cacaee]  font-bold">
@@ -476,14 +561,20 @@ console.log("reponse44",reponse)
           <p className="   border-[#6666d7]">नियत तिथि पश्चात देह राशि</p> */}
             </div>
             <div className="grid grid-cols-3 border border-[#6666d7]">
-              <p className="  border-r border-[#6666d7]">   
-              {new Date(new Date().setDate(new Date().getDate() + 10)).toLocaleDateString('en-GB')}
-
-                        </p>
-              <p className="  border-r border-[#6666d7]">   
-              {new Date(new Date().setDate(new Date().getDate() + 10+7)).toLocaleDateString('en-GB')}
-
-                        </p>
+              <p className="  border-r border-[#6666d7]">
+                {new Date(
+                  new Date(payload[0]?.date).setDate(
+                    new Date(payload[0]?.date).getDate() + 10
+                  )
+                ).toLocaleDateString("en-GB")}
+              </p>
+              <p className="  border-r border-[#6666d7]">
+                {new Date(
+                  new Date(payload[0]?.date).setDate(
+                    new Date(payload[0]?.date).getDate() + 10 + 7
+                  )
+                ).toLocaleDateString("en-GB")}
+              </p>
               <p className="  border-r border-[#6666d7]"></p>
               {/* <p className="  border-r border-[#6666d7]">नियत तिथि तक कुल देह राशि</p>
           <p className="   border-[#6666d7]">नियत तिथि पश्चात देह राशि</p> */}
@@ -498,8 +589,12 @@ console.log("reponse44",reponse)
               <p className="    border-[#6666d7]"></p>
             </div>
             <div className="grid grid-cols-3 border border-[#6666d7]">
-              <p className="  border-r border-[#6666d7]">{reponse?.totalBill}</p>
-              <p className="  border-r  border-[#6666d7]">{reponse?.totalBillwithLPS}</p>
+              <p className="  border-r border-[#6666d7]">
+                {response?.totalBill}
+              </p>
+              <p className="  border-r  border-[#6666d7]">
+                {response?.totalBillWithLPS}
+              </p>
               <p className="    border-[#6666d7]"></p>
             </div>
             <div className="grid grid-cols-3 border border-[#6666d7]">

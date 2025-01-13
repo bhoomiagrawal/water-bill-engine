@@ -1,6 +1,7 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+
 
 
 interface Category {
@@ -20,7 +21,12 @@ const ReadingSheetList: React.FC = () => {
     ]);
     const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
     const [newCategoryName, setNewCategoryName] = useState<string>('');
+   
 
+
+     
+
+     
     const handleEdit = (id: number) => {
         console.log('Edit category with id:', id);
     };
@@ -38,6 +44,10 @@ const ReadingSheetList: React.FC = () => {
     const handleView = () => {
         router.push('/readingSheet');
     };
+
+    // const handleView = () => {
+    //     router.push('/readingSheet?id=123&name=Sample Data');
+    //   };
 
     return (
         <div className=" mx-auto ">
@@ -69,7 +79,37 @@ const ReadingSheetList: React.FC = () => {
                                 <td>250</td>
                                 </td>
                                 <td className="border px-4 py-2">
-                                <td>250</td>
+                                <td>100</td>
+                                </td>
+                                <td className="border px-4 py-2">
+                                    <button
+                                        className="px-4 py-2 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+                                        onClick={() => handleView()}
+                                    >
+                                        View
+                                    </button>
+                                </td>
+                                {/* <td className="px-6 py-4 text-sm text-gray-800">{category.category}</td> */}
+                                {/* <td className="px-6 py-4">
+                  <div className="flex space-x-2">
+                    <MdEdit onClick={() => handleEdit(category.id)} className=' w-15  h-6  cursor-pointer'  />
+                    <MdDelete onClick={() => handleDelete(category.id)} className=' w-15  h-6  cursor-pointer'/>
+                  </div>
+                </td> */}
+                            </tr>
+                            <tr  className="border-t hover:bg-gray-100">
+                                <td className="px-6 py-4 text-sm text-gray-800">2</td>
+                                <td className="border px-4 py-2">
+                                <td>Aug 24</td>
+                                </td>
+                                <td className="border px-4 py-2">
+                                <td>350</td>
+                                </td>
+                                <td className="border px-4 py-2">
+                                <td>230</td>
+                                </td>
+                                <td className="border px-4 py-2">
+                                <td>120</td>
                                 </td>
                                 <td className="border px-4 py-2">
                                     <button

@@ -1,26 +1,33 @@
-import { title } from "process";
-
-const chowkri=[
+const chowkri = [
     {
-        title:"S.No",
-        column:"index",
-        type:"number"
+      id: "1", // Added unique id
+      title: "S.No",
+      column: "index",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "number",
     },
     {
-        title:"Chowkri Name",
-        column:"category_name",
-        type:"text"
+      id: "2", // Added unique id
+      title: "Chowkri Name",
+      column: "category_name",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "text",
     },
     {
-        title:"Chowkri Code",
-        column:"category_code",
-        type:"text"
+      id: "3", // Added unique id
+      title: "Chowkri Code",
+      column: "category_code",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "text",
     },
     {
-        title:"Actions",
-        column:"actions",
-        type:"actions"
+      id: "4", // Added unique id
+      title: "Actions",
+      column: "actions",
+      columnsecond: "default_value", // Added columnsecond with a default value
+      type: "actions",
     },
-]
-
-export default chowkri;
+  ];
+  
+  export default chowkri;
+  
