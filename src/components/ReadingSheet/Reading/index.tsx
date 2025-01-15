@@ -9,7 +9,6 @@ import ComputationSheet from "../ComputationSheet";
 import { FaCloudDownloadAlt } from "react-icons/fa";
 import { FaFileDownload } from "react-icons/fa";
 
-
 interface Meter_status_id {
   id: number;
   name: string;
@@ -86,12 +85,12 @@ const Reading: React.FC = () => {
 
   const [billData, setBillData] = useState({});
   const [payload, setPayload] = useState({});
-  const [ComputationSheetPayload,setComputationSheetPayload]=useState({})
+  const [ComputationSheetPayload, setComputationSheetPayload] = useState({});
   const [errors, setErrors] = useState("");
   // console.log("errors66",errors)
   const formattedDate = new Date().toISOString().split("T")[0];
-  const [dataForComputation,setDataForComputation]=useState({})
-console.log("dataForComputation",dataForComputation)
+  const [dataForComputation, setDataForComputation] = useState({});
+  console.log("dataForComputation", dataForComputation);
   // const searchParams = useSearchParams();
   // const id = searchParams.get('id');
   // const name = searchParams.get('name');
@@ -237,7 +236,7 @@ console.log("dataForComputation",dataForComputation)
       date: newDate, // This will remain as the initial empty string
       accountNumber: "1",
       consumerInfo: "MOTWANI ARJUN F-316 VASHALI NAGAR",
-      category: { id: "", name: "" },
+      category: { id: 1, name: "domestic" },
       sewerage: false,
       stpCharges: false,
       rebate: false,
@@ -264,7 +263,7 @@ console.log("dataForComputation",dataForComputation)
 
   const [meterStatusDataPrev, setMeterStatusDataPrev] = useState("");
   const [meterStatusDataCurr, setMeterStatusDataCurr] = useState("");
-  console.log("rows333", meterStatusDataPrev); // Accessing the correct property
+  console.log("rows333", rows); // Accessing the correct property
 
   // // Extract year, month, and day from rows[0].date
   // const [Lyear, LPmonth, Lday] = PnextFormattedDate.split("-").map(Number);
@@ -291,8 +290,8 @@ console.log("dataForComputation",dataForComputation)
   const [connectionType, setConnectionType] = useState<ConnectionType[]>([]);
   const [showPrintModal, setShowPrintModal] = useState(false);
 
-
   const [secondReading, setSetSecondReading] = useState(1);
+  console.log("secondReading000", rows[0]?.category?.id);
 
   const [
     fetchResourceCategory,
@@ -326,9 +325,9 @@ console.log("dataForComputation",dataForComputation)
   const [createBill, billResult, BillInProgress, BillError] =
     useInternalService("billing/generate-bill", "POST", null);
 
-    const [createBill1, billResult1, BillInProgress1, BillError1] =
+  const [createBill1, billResult1, BillInProgress1, BillError1] =
     useInternalService("billing/generate-bill", "POST", null);
-    // console.log("billResult",billResult)
+  // console.log("billResult",billResult)
 
   useEffect(() => {
     fetchResourceCategory();
@@ -342,6 +341,7 @@ console.log("dataForComputation",dataForComputation)
       setCategores(resourceResultCategory.data.data.category);
     }
   }, [resourceResultCategory]);
+  // console.log("resourceResultCategory",resourceResultCategory)
 
   useEffect(() => {
     if (resourceResultMeterStatus?.data?.data?.meteStatusCode) {
@@ -361,10 +361,17 @@ console.log("dataForComputation",dataForComputation)
     }
   }, [resourceResultConnectionType]);
 
+  // useEffect(() => {
+  //   rows.map((item) => setSetSecondReading(item.category?.id));
+  // }, [rows]);
+
   useEffect(() => {
-    rows.map((item) => setSetSecondReading(item.category?.id));
+    if (rows.length > 0) {
+      setSetSecondReading(Number(rows[0].category?.id)); // Ensure it's a number
+    }
   }, [rows]);
 
+  console.log("rows");
   useEffect(() => {
     rows.map((item) =>
       setMeterStatusDataPrev(item?.prevMonth?.meter_status?.id)
@@ -526,8 +533,6 @@ console.log("dataForComputation",dataForComputation)
         }
       }
 
-      
-
       if (secondReading !== 1) {
         if (Number(meterStatusDataCurr) !== 1) {
           updatedRow.currMonth.reading = 0;
@@ -618,11 +623,14 @@ console.log("dataForComputation",dataForComputation)
 
   const handleGenerateBill = () => {
     console.log("row10101", rows);
-    if (secondReading === 1) {
+    console.log("secondReading Value:", secondReading, typeof secondReading);
+  
+    if (Number(secondReading) === 1) {
+      console.log("Inside secondReading === 1 block");
       const payload: {
         [key: string]: {
           consumerInfo: string;
-          category_id: string;
+          category_id: number;
           sewerage: boolean;
           stp: boolean;
           rebate: boolean;
@@ -644,10 +652,11 @@ console.log("dataForComputation",dataForComputation)
           };
         };
       } = {};
+  
       rows.forEach((row) => {
         payload[row.accountNumber] = {
           consumerInfo: row.consumerInfo,
-          category_id: row?.category.id,
+          category_id: row?.category?.id,
           sewerage: row.sewerage,
           stp: row.stpCharges,
           rebate: row.rebate,
@@ -657,16 +666,20 @@ console.log("dataForComputation",dataForComputation)
           currMonth: row.currMonth,
         };
       });
+  
       rows.forEach((row) => console.log("ppppp", row));
+  
       const result = payload[Object.keys(payload)[0]];
+      console.log("Payload for secondReading === 1:", result);
+  
       createBill(result);
       setPayload(rows);
-    }
-    if (secondReading !== 1) {
+    } else {
+      console.log("Inside secondReading !== 1 block");
       const payload: {
         [key: string]: {
           consumerInfo: string;
-          category_id: string;
+          category_id: number;
           sewerage: boolean;
           stp: boolean;
           rebate: boolean;
@@ -681,47 +694,50 @@ console.log("dataForComputation",dataForComputation)
           };
         };
       } = {};
-
+  
       rows.forEach((row) => {
         payload[row.accountNumber] = {
           consumerInfo: row.consumerInfo,
-          category_id: row.category.id,
+          category_id: row?.category?.id,
           sewerage: row.sewerage,
           stp: row.stpCharges,
           rebate: row.rebate,
-          connection_size_id: row.connectionSize.id,
+          connection_size_id: row?.connectionSize?.id,
           connection_type_id: row?.connection_type_id?.id,
           currMonth: row.currMonth,
         };
       });
-
+  
       const result = payload[Object.keys(payload)[0]];
-
+      console.log("Payload for secondReading !== 1:", result);
+  
       createBill(result);
       setPayload(rows);
     }
-   
   };
+  
   useEffect(() => {
-    if (billResult ) {
+    if (billResult) {
+      console.log("Bill result received:", billResult);
       toast.success(` ${billResult?.data?.data?.message}.`, {
         position: "top-right",
         autoClose: 3000,
         theme: "colored",
       });
+  
       setBillData(billResult?.data?.data?.billDetails);
-      setWaterBillOpen(!waterBillOpen);
-      
+      setWaterBillOpen((prev) => !prev);
     }
   }, [billResult]);
-
-  const handleComputationSheet =()=>{
-    setComputationSheetPayload(rows)
+  
+console.log("billResult",billResult)
+  const handleComputationSheet = () => {
+    setComputationSheetPayload(rows);
     if (secondReading === 1) {
       const payload: {
         [key: string]: {
           consumerInfo: string;
-          category_id: string;
+          category_id: number;
           sewerage: boolean;
           stp: boolean;
           rebate: boolean;
@@ -759,14 +775,13 @@ console.log("dataForComputation",dataForComputation)
       rows.forEach((row) => console.log("ppppp", row));
       const result = payload[Object.keys(payload)[0]];
       createBill1(result);
-      setDataForComputation(billResult1?.data?.data)
-     
+      setDataForComputation(billResult1?.data?.data);
     }
     if (secondReading !== 1) {
       const payload: {
         [key: string]: {
           consumerInfo: string;
-          category_id: string;
+          category_id: number;
           sewerage: boolean;
           stp: boolean;
           rebate: boolean;
@@ -799,19 +814,13 @@ console.log("dataForComputation",dataForComputation)
 
       createBill1(result);
       // setDataForComputation(billResult?.data?.data)
-
     }
-
-  
-      
-  }
-
+  };
 
   useEffect(() => {
     if (billResult1) {
       setDataForComputation(billResult1?.data?.data);
-      setShowPrintModal(!showPrintModal)
-      
+      setShowPrintModal(!showPrintModal);
     }
   }, [billResult1]);
   return (
@@ -823,6 +832,7 @@ console.log("dataForComputation",dataForComputation)
           payload={payload}
         />
       )}
+      {console.log("secondReading9090", secondReading)}
       <div className="container mx-auto px-4 py-6">
         <div className="overflow-x-auto">
           <div className=" overflow-y-auto">
@@ -871,8 +881,10 @@ console.log("dataForComputation",dataForComputation)
                       ? curreMonthFormatted
                       : prevMonthFormatted}
                   </td>
-                  {secondReading === 1 ? (
+                  {Number(secondReading) === 1 ? (
                     <>
+                      {console.log("secondReading1", secondReading)}
+                      {/* First Condition */}
                       <td
                         colSpan={1}
                         className="border border-gray-300 px-4 py-2 text-left"
@@ -880,21 +892,10 @@ console.log("dataForComputation",dataForComputation)
                         <label className="block text-sm font-medium">
                           Reading Date(I):
                         </label>
-                        <p className="  bg-[#ebe7e7] py-2 text-center">
+                        <p className="bg-[#ebe7e7] py-2 text-center">
                           {PnextFormattedDate}
                         </p>
-                        {/* <input
-                          type="date"
-                          value={
-                            rows[0]?.prevMonth?.reading_date || formattedDate
-                          }
-                          onChange={(e) =>
-                            handleInputChange(e, 0, "prevMonth", "reading_date")
-                          }
-                          className="w-full p-2 border border-gray-300 rounded"
-                        /> */}
                       </td>
-
                       <td
                         colSpan={1}
                         className="border border-gray-300 px-4 py-2 text-left"
@@ -902,25 +903,15 @@ console.log("dataForComputation",dataForComputation)
                         <label className="block text-sm font-medium">
                           Reading Date(II):
                         </label>
-                        <p className="  bg-[#ebe7e7] py-2 text-center">
+                        <p className="bg-[#ebe7e7] py-2 text-center">
                           {CnextFormattedDate}
                         </p>
-
-                        {/* <input
-                          type="date"
-                          value={
-                            rows[0]?.currMonth?.reading_date || formattedDate
-                          }
-                          onChange={(e) =>
-                            handleInputChange(e, 0, "currMonth", "reading_date")
-                          }
-                          className="w-full p-2 border border-gray-300 rounded"
-                        /> */}
                       </td>
                     </>
                   ) : (
                     <>
-                      {" "}
+                      {console.log("secondReading2", secondReading)}
+                      {/* Second Condition */}
                       <td
                         colSpan={1}
                         className="border border-gray-300 px-4 py-2 text-left"
@@ -928,20 +919,9 @@ console.log("dataForComputation",dataForComputation)
                         <label className="block text-sm font-medium">
                           Reading Date(I):
                         </label>
-                        <p className="  bg-[#ebe7e7] py-2 text-center">
+                        <p className="bg-[#ebe7e7] py-2 text-center">
                           {CnextFormattedDate}
                         </p>
-
-                        {/* <input
-                          type="date"
-                          value={
-                            rows[0]?.currMonth?.reading_date || formattedDate
-                          }
-                          onChange={(e) =>
-                            handleInputChange(e, 0, "currMonth", "reading_date")
-                          }
-                          className="w-full p-2 border border-gray-300 rounded"
-                        /> */}
                       </td>
                     </>
                   )}
@@ -1019,7 +999,9 @@ console.log("dataForComputation",dataForComputation)
                       </td>
                     </>
                   )}
-                  <td className="border border-gray-300 px-4 py-2">Computation Sheet</td>
+                  {/* <td className="border border-gray-300 px-4 py-2">
+                    Computation Sheet
+                  </td> */}
                 </tr>
               </thead>
               <tbody>
@@ -1037,7 +1019,14 @@ console.log("dataForComputation",dataForComputation)
                       </td>
                       <td className="border border-gray-300 px-4 py-2">
                         <select
-                          value={row?.category?.id || ""} // Bind to category.id to avoid NaN or empty values
+                          value={
+                            row?.category?.id ||
+                            categores.find(
+                              (status) => status.category_name === "domestic"
+                            )?.id ||
+                            ""
+                          }
+                          // value={row?.category?.id || ""} // Bind to category.id to avoid NaN or empty values
                           onChange={(e) =>
                             handleInputChange(e, index, "category")
                           } // Pass 'category' as field name
@@ -1333,7 +1322,6 @@ console.log("dataForComputation",dataForComputation)
                               ""
                             )} */}
                           </td>
-                       
                         </>
                       ) : (
                         <>
@@ -1436,14 +1424,15 @@ console.log("dataForComputation",dataForComputation)
                               ""
                             )} */}
                           </td>
-                          
                         </>
                       )}
-                         <td className=" border border-gray-300 px-4 py-2  w-16 h-16 cursor-pointer  text-green-600" >
-                            <FaFileDownload className="w-8 h-8" onClick={handleComputationSheet}/>
-                          </td>
+                      {/* <td className=" border border-gray-300 px-4 py-2  w-16 h-16 cursor-pointer  text-green-600">
+                        <FaFileDownload
+                          className="w-8 h-8"
+                          onClick={handleComputationSheet}
+                        />
+                      </td> */}
                     </tr>
-                    
                   );
                 })}
               </tbody>
@@ -1461,8 +1450,8 @@ console.log("dataForComputation",dataForComputation)
           </button>
           {showPrintModal && (
             <ComputationSheet
-            response={dataForComputation}
-            payload={ComputationSheetPayload}
+              response={dataForComputation}
+              payload={ComputationSheetPayload}
               setShowPrintModal={setShowPrintModal}
             />
           )}
