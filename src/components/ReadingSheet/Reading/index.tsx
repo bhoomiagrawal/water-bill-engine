@@ -832,7 +832,6 @@ console.log("billResult",billResult)
           payload={payload}
         />
       )}
-      {console.log("secondReading9090", secondReading)}
       <div className="container mx-auto px-4 py-6">
         <div className="overflow-x-auto">
           <div className=" overflow-y-auto">
@@ -1087,7 +1086,7 @@ console.log("billResult",billResult)
                         <select
                           value={row?.connectionSize?.id || ""}
                           onChange={
-                            (e) => handleInputChange(e, index, "connectionSize") // Pass 'category_id' instead of 'category_name'
+                            (e) => handleInputChange(e, index, "connectionSize") 
                           }
                           className="w-full p-2 border border-gray-300 rounded"
                         >
@@ -1113,7 +1112,7 @@ console.log("billResult",billResult)
                         colSpan={1}
                       >
                         <select
-                          value={row?.connection_type_id?.id || ""} // Bind to category.id to avoid NaN or empty values
+                          value={row?.connection_type_id?.id || ""} 
                           onChange={(e) =>
                             handleInputChange(e, index, "connection_type_id")
                           } // Pass 'category' as field name

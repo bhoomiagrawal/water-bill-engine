@@ -13,12 +13,16 @@ const WaterBill: React.FC<WaterBillProps> = ({
   payload,
 }) => {
   console.log("response44", response);
+ let data= response?.detailsByMonth[0]?.sewerageCharge +
+                          response?.detailsByMonth[0]?.stpCharge
   // const formattedDateCurrent = new Date(payload[0].date).toLocaleDateString('en-US', {
   //   month: 'short',
   //   day: 'numeric',
   // });
 
   // Example output: "Jan 10"
+
+
   const PreadingDate = response?.detailsByMonth[0]?.reading_date; // e.g., "10/12/2024"
   const CreadingDate = response?.detailsByMonth[1]?.reading_date; // e.g., "11/12/2024"
 
@@ -311,19 +315,18 @@ const WaterBill: React.FC<WaterBillProps> = ({
                         कुल जल उपभोग राशि(₹)
                       </th>
                       <td className="border border-[#6666d7]  ">
-                        {response?.detailsByMonth[0]?.waterCharge}
+                        {response?.detailsByMonth[0]?.waterCharge.toFixed(2)}
                       </td>
                       <td className="border border-[#6666d7]  ">
-                        {response?.detailsByMonth[1]?.waterCharge}
+                        {response?.detailsByMonth[1]?.waterCharge.toFixed(2)}
                       </td>
                     </tr>
                     <tr>
                       <th className="border border-[#6666d7]   text-left text-[#6666d7]">
                         सीवरेज शुल्क(₹)
                       </th>
-                      <td className="border border-[#6666d7]  ">
-                        {response?.detailsByMonth[0]?.sewerageCharge +
-                          response?.detailsByMonth[0]?.stpCharge}
+                      <td className="border border-[#6666d7]">
+                        {data.toFixed(2)}
                       </td>
                       <td className="border border-[#6666d7]  ">
                         {/* {response?.detailsByMonth[1]?.sewerageCharge} */}
